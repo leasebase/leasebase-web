@@ -1,31 +1,43 @@
 # Leasebase Web (Standalone Repo)
 
-This repository is intended to host the **standalone web client** for the Leasebase platform.
+This repository hosts the **web frontend** for the Leasebase platform.
 
-At the moment, the primary implementation work and runtime wiring live in the **monorepo sibling** `../leasebase`, which contains:
-- The backend API (`services/api` – NestJS + Prisma + PostgreSQL)
-- The monorepo-level web app workspace (`apps/web`)
-- Infrastructure and architecture documentation
+It is intentionally **frontend‑only**:
+- No backend API code lives here.
+- No mobile code lives here.
 
-Until this repository gains its own application code, you should treat it primarily as an entry point and documentation hub that points you to the monorepo.
+The web client talks to the backend API running from the separate backend repo:
+- Backend: `leasebase` (a.k.a. `leasebase-backend`), `services/api` (NestJS + Prisma + PostgreSQL)
+
+Until this repository gains its own application code, treat it as the home for all web‑specific assets (UI, components, routing, styling) and as a thin wrapper around the backend API.
 
 ---
 
 ## Working with Leasebase locally
 
-For a complete local development environment (API + web + DB), follow the instructions in:
+For a complete local development environment (API + web + DB), you will work with **two repos** side by side:
 
-- `../leasebase/README.md`
+- Backend: `../leasebase` (backend API + DB)
+- Web: this repo (`leasebase-web`)
 
-In short, from `../leasebase` you will:
+Example workflow (once web code exists):
 
 ```bash path=null start=null
+# 1) In ../leasebase (backend)
 cd ../leasebase
 npm install
-npm run dev         # starts Postgres + API + web (when web is implemented)
+Docker-compose up -d db
+npm run migrate
+npm run seed
+npm run dev:api    # API on http://localhost:4000
+
+# 2) In ../leasebase-web (web frontend)
+cd ../leasebase-web
+npm install
+npm run dev        # web frontend dev server
 ```
 
-The web UI code will live under `../leasebase/apps/web` and will be served by whatever frontend framework is chosen (e.g., Next.js or another React-based stack).
+The web UI code will live entirely in this repo and will be served by whatever frontend framework is chosen (e.g., Next.js or another React-based stack).
 
 ---
 
@@ -63,27 +75,41 @@ The exact commands will depend on the actual web framework and scripts defined i
 
 ---
 
-## Deploying the backend to AWS
+## Deploying the web frontend
 
-**Important:** This repository does **not** contain the backend. The backend API is implemented and deployed from the monorepo in `../leasebase`.
+This repository only contains the web client. Typical deployment targets include:
+- Static hosting + CDN (for SPAs/SSGs)
+- An application runtime such as Vercel/Netlify (for Next.js or similar frameworks)
 
-If you need to:
-- Stand up or modify backend environments, or
-- Understand how the API is deployed to AWS,
+Exact deployment steps will depend on the framework and hosting provider you choose. At a high level you will:
 
-refer to:
+1. Build the web app:
+
+   ```bash path=null start=null
+   npm install
+   npm run build
+   ```
+
+2. Deploy the build artifacts (for example, `.next/`, `dist/`, or a static export directory) to your hosting provider.
+3. Configure the app's API base URL to point at the appropriate backend environment (dev, QA, production), e.g.:
+   - `https://api.dev.yourdomain.com`
+   - `https://api.qa.yourdomain.com`
+   - `https://api.yourdomain.com`
+
+### Backend deployment
+
+The backend API is implemented and deployed from the `../leasebase` repo. To work on or deploy the backend, refer to:
 
 - `../leasebase/README.md` – "Backend deployment to AWS" section
 - `../leasebase/docs/architecture.md` – overall system and AWS architecture
-
-In practice, this web client will consume the backend API via HTTPS, using environment variables or configuration files to point to the appropriate API base URL.
 
 ---
 
 ## Relevant information for contributors
 
-- **Where is the real code right now?**  In the monorepo `../leasebase` under `apps/web` (future) and `services/api`.
-- **Should I add new web features here or in the monorepo?**  Until this repository has been bootstrapped with an actual web app, prefer adding features to the monorepo web workspace.
-- **How do I run the full stack locally?**  Use the monorepo instructions (`../leasebase/README.md`), which describe running Postgres, the NestJS API, and the web app together.
+- **What belongs here?**  All web/frontend concerns: pages, components, styling, web routing, web-only utilities.
+- **What does *not* belong here?**  Backend services, database schema/migrations, mobile code.
+- **Where is the backend?**  In `../leasebase/services/api` (NestJS + Prisma).
+- **Where is the mobile app?**  In the separate `../leasebase-mobile` repo.
 
-As soon as this repo is bootstrapped with a concrete framework and build tooling, this README should be updated with precise commands and deployment details specific to this standalone web client.
+As soon as this repo is bootstrapped with a concrete framework and build tooling, this README should be updated with precise dev, build, and deployment instructions specific to this web client.
