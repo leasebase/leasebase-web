@@ -12,19 +12,13 @@ The goal of this repo is to host all browser-facing UI for Leasebase: routing, p
 
 ## Repository status
 
-As of now, this repository primarily contains documentation and lockfiles. The actual web application code and `package.json` have **not yet** been added.
+This repo is now bootstrapped as a **Next.js (TypeScript) + Tailwind CSS** application.
 
-That means:
+- Uses the **App Router** in `app/`.
+- Integrates with the `../leasebase` backend API via `NEXT_PUBLIC_API_BASE_URL`.
+- Is intended to integrate with AWS Cognito for authentication using `NEXT_PUBLIC_COGNITO_*` env vars.
 
-- There are currently **no npm scripts** (no `npm run dev`, `npm run build`, etc.).
-- There is **no configured frontend framework** yet (e.g., Next.js, Vite, CRA, etc.).
-- This repo should be treated as the future home for the Leasebase web UI and static build artifacts.
-
-Once the frontend stack is chosen and bootstrapped, this README should be updated with:
-
-- The exact development server command (e.g. `npm run dev`).
-- The exact build command (e.g. `npm run build`).
-- The exact output directory used for static assets (e.g. `out/`, `build/`, `.next`, etc.).
+Concrete dev/build commands and output directory are documented below.
 
 ---
 
@@ -45,29 +39,39 @@ Keep a **strict separation of concerns**:
 
 ---
 
-## Local development (high level)
+## Local development
 
 A full local environment (API + web + DB) uses two repos side by side:
 
 - Backend/API: `../leasebase`
 - Web frontend: `./` (this repo)
 
-Until the web app is bootstrapped, only the backend is runnable. For the authoritative backend setup (DB, migrations, seeding, API port), refer to the docs in `../leasebase`, especially its `README.md` and any `docs/` it provides.
+### 1. Run the backend API locally (from `../leasebase`)
 
-Once this repo has real frontend code and a `package.json`, the local dev flow will roughly look like:
+Refer to the backend repo docs for the authoritative commands. A typical flow is:
 
-1. **Run the backend API locally** (from `../leasebase`)
-   - Install dependencies.
-   - Start or provision the database.
-   - Run migrations and seeds.
-   - Start the API server (commonly on `http://localhost:4000`, but check the backend docs to be sure).
+1. Install dependencies.
+2. Start or provision the database.
+3. Run migrations and seeds.
+4. Start the API server (commonly on `http://localhost:4000`, but always check the backend docs).
 
-2. **Run the web frontend** (from this repo)
-   - Install dependencies with `npm install` (or your chosen package manager).
-   - Configure the API base URL via an env file (e.g. `.env.local`).
-   - Start the dev server (e.g. `npm run dev`).
+### 2. Run the web frontend (this repo)
 
-The exact commands and ports must be taken from the chosen web stack and `package.json` once they exist.
+From this directory:
+
+```bash
+npm install
+cp .env.example .env.local   # then edit values as needed
+npm run dev
+```
+
+This will start the Next.js dev server (default on `http://localhost:3000`).
+
+Key env vars (see `.env.example`):
+
+- `NEXT_PUBLIC_API_BASE_URL` – base URL of the Leasebase API (e.g. `http://localhost:4000`).
+- `NEXT_PUBLIC_COGNITO_USER_POOL_ID`, `NEXT_PUBLIC_COGNITO_CLIENT_ID`, `NEXT_PUBLIC_COGNITO_DOMAIN` – AWS Cognito configuration for auth.
+- `DEV_ONLY_MOCK_AUTH` – optional dev-only flag for mock auth flows (must remain `false` in production).
 
 ---
 

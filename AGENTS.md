@@ -20,11 +20,12 @@ For system-level and AWS architecture, consult the backend monorepo:
 
 ## Current state of this repo
 
-- As of now, this repository primarily contains documentation and lockfiles; the actual web application code and `package.json` have not yet been added.
-- Treat this repo as the future home for the web UI and static build artifacts that will be deployed to AWS (S3 + CloudFront) provisioned from the backend repo.
-- Any framework-specific decisions (e.g., Next.js vs. another React stack) and the exact build output directory (`out/`, `build/`, `.next`, etc.) must be confirmed once the frontend stack is chosen.
+- This repository is bootstrapped as a **Next.js (TypeScript) + Tailwind CSS** app using the App Router (`app/`).
+- A concrete `package.json` exists with scripts for dev, build, tests, and OpenAPI client generation.
+- The web UI will be deployed as static/SSR assets (Next.js) behind AWS infrastructure provisioned from the backend repo.
+- The Next.js build output directory is the default `.next/`.
 
-When you add concrete application code or change the stack, **update this file and the README** with precise commands and paths.
+If you materially change the frontend stack or core commands, **update this file and the README** with precise commands and paths.
 
 ## Local development workflow
 
@@ -64,14 +65,9 @@ Notes:
 
 ## Build, test, and lint commands
 
-Because there is **no `package.json` yet in this repo**, there are currently **no concrete build, test, or lint scripts** defined here. Future agents should:
+Authoritative scripts live in `package.json`. Current expectations:
 
-1. Inspect this repo's `package.json` (once it exists) for authoritative scripts.
-2. Update this section with the exact commands for the chosen stack.
-
-Until then, use the following expectations from the existing documentation:
-
-### Build (expected pattern, to be confirmed)
+### Build
 
 ```bash path=null start=null
 cd ../leasebase-web
@@ -79,22 +75,41 @@ npm install
 npm run build
 ```
 
-- The static output directory is not yet fixed; it may be `out/`, `build/`, or framework-specific (e.g., `.next`).
-- Once the stack is chosen, document the exact output directory here.
+- Next.js uses the default `.next/` build output directory.
+
+### Dev server
+
+```bash path=null start=null
+cd ../leasebase-web
+npm install
+npm run dev
+```
 
 ### Tests
 
-- No test runner or test scripts are currently configured in this repo.
-- When tests are added, ensure that:
-  - There is a script in `package.json` (e.g., `"test"`) to run the full test suite.
-  - You document in this file how to run a **single test file or a focused test** using that runner's CLI (for example, passing a test file path or pattern).
+- Unit/component tests use Jest + Testing Library:
 
-Until that exists, **do not assume** a specific test framework or single-test command.
+```bash path=null start=null
+cd ../leasebase-web
+npm test           # run Jest test suite
+npm run test:watch # optional watch mode
+```
+
+- Minimal Playwright E2E smoke tests:
+
+```bash path=null start=null
+cd ../leasebase-web
+npm run test:e2e
+```
 
 ### Linting / formatting
 
-- No lint or format scripts are currently defined in this repo.
-- When linting is introduced (e.g., ESLint, Prettier), add the exact commands here (for example, `npm run lint` for the full codebase and any supported filters for linting a single file or directory).
+- ESLint is configured via `eslint-config-next`:
+
+```bash path=null start=null
+cd ../leasebase-web
+npm run lint
+```
 
 ## How future agents should reason about changes
 
