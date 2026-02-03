@@ -15,7 +15,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 - Backend services, database schema/migrations, and infrastructure code live in `../leasebase` and should not be added to this repo.
 
 For system-level and AWS architecture, consult the backend monorepo:
-- `../leasebase/README.md` – backend & web deployment to AWS (Terraform, per account).
+- `../leasebase/README.md` – backend & web deployment to AWS (per account).
 - `../leasebase/docs/architecture.md` – overall system and AWS architecture.
 
 ## Current state of this repo
@@ -95,50 +95,6 @@ Until that exists, **do not assume** a specific test framework or single-test co
 
 - No lint or format scripts are currently defined in this repo.
 - When linting is introduced (e.g., ESLint, Prettier), add the exact commands here (for example, `npm run lint` for the full codebase and any supported filters for linting a single file or directory).
-
-## Deployment and infrastructure
-
-The infrastructure for hosting this web client lives in the backend repo and is provisioned via Terraform:
-
-- Terraform envs in `../leasebase/infra/terraform/envs/{dev,qa,prod}` create:
-  - S3 bucket(s) for static web assets.
-  - CloudFront distribution(s) serving the web frontend.
-  - The API stack exposed via an ALB/custom domain.
-
-### High-level deployment flow (once this repo has a build)
-
-1. **Provision or update infra (backend repo)**
-
-   ```bash path=null start=null
-   cd ../leasebase/infra/terraform/envs/<env>   # dev | qa | prod
-   export AWS_PROFILE=leasebase-<env>
-   # Set required TF_VAR_* (db_password, api_database_url, api_container_image, web_bucket_suffix, ...)
-   terraform init
-   terraform apply
-   ```
-
-2. **Build the web app (this repo)**
-
-   ```bash path=null start=null
-   cd ../leasebase-web
-   npm install
-   npm run build
-   ```
-
-3. **Upload static assets to S3**
-
-   ```bash path=null start=null
-   aws s3 sync ./out s3://<web_bucket_name-from-terraform>/ --delete
-   ```
-
-   - Replace `./out` with the actual build output directory for the chosen framework.
-
-4. **Configure API base URL per environment**
-
-   - Use env files (e.g., `.env`, `.env.local`, or equivalent) to set the base URL for the backend API:
-     - `https://<dev-api-alb-dns-name>`
-     - `https://<qa-api-alb-dns-name>`
-     - `https://<prod-api-alb-dns-name>`
 
 ## How future agents should reason about changes
 

@@ -34,7 +34,7 @@ The full Leasebase system spans multiple repos:
 
 - **Backend/API**: `../leasebase`
   - Core API in `services/api` (NestJS + Prisma + PostgreSQL).
-  - Terraform infrastructure for API and web hosting.
+  - Infrastructure for API and web hosting (managed outside this repo).
 - **Web frontend**: this repo (`leasebase-web`).
 - **Mobile app**: `../leasebase-mobile`.
 
@@ -70,28 +70,6 @@ Once this repo has real frontend code and a `package.json`, the local dev flow w
 The exact commands and ports must be taken from the chosen web stack and `package.json` once they exist.
 
 ---
-
-## Deployment (high level)
-
-This repo contains only the web client source code and its static build artifacts. The **infrastructure** for hosting the web frontend in AWS is defined and provisioned from the backend repo (`../leasebase`) using Terraform.
-
-In the backend repo you will find Terraform environments under something like:
-
-- `infra/terraform/envs/dev`
-- `infra/terraform/envs/qa`
-- `infra/terraform/envs/prod`
-
-At a high level, a deployment workflow looks like this (per environment):
-
-1. **Provision or update infrastructure** (from `../leasebase` using Terraform).
-2. **Build the web app** (from this repo) using the appropriate build command.
-3. **Upload static assets to S3** using the bucket and CloudFront distribution created by Terraform.
-4. **Configure the API base URL** for each environment using the ALB DNS name or custom domain output by Terraform.
-
-For authoritative details on infrastructure, environment variables, and deployment pipelines, always consult:
-
-- `../leasebase/README.md`
-- `../leasebase/docs/architecture.md` (or equivalent architecture docs)
 
 ---
 
