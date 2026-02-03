@@ -75,6 +75,33 @@ Key env vars (see `.env.example`):
 
 ---
 
+## Docker / cloud deployment
+
+A production-ready container image can be built from the root `Dockerfile`:
+
+```bash
+# Build image
+docker build -t leasebase-web:latest .
+
+# Run container locally (example)
+docker run --rm -p 3000:3000 \
+  -e NEXT_PUBLIC_API_BASE_URL=http://host.docker.internal:4000 \
+  -e NEXT_PUBLIC_COGNITO_USER_POOL_ID=... \
+  -e NEXT_PUBLIC_COGNITO_CLIENT_ID=... \
+  -e NEXT_PUBLIC_COGNITO_DOMAIN=... \
+  leasebase-web:latest
+```
+
+The container:
+
+- Serves the app on port `3000` using `npm run start`.
+- Exposes a basic health endpoint at `GET /api/health` that returns `{ "status": "ok" }`.
+- Is stateless; env vars configure API base URL and Cognito.
+
+For ECS or other orchestrators, see `docs/RUNTIME_CONTRACT.md` and `docs/ENVIRONMENT_CONFIG.md` for the full runtime contract and environment requirements.
+
+---
+
 ---
 
 ## Contributing
@@ -87,9 +114,11 @@ When adding or changing code in this repo:
   - Coordinate API contracts (types, DTOs, error responses) between this repo and `../leasebase`.
   - Reflect any API shape changes in both places.
 
-Once the concrete frontend framework and tooling are in place, expand this README with:
+This repo is already configured with Next.js + TypeScript + Tailwind, along with Jest and Playwright.
 
-- Exact dev/build/test/lint commands.
-- Project structure and conventions.
-- Any framework-specific notes (routing, data fetching, SSR/SSG, etc.).
+Future changes should keep this README in sync by updating:
+
+- Dev/build/test/lint commands when scripts change.
+- Project structure and conventions as new modules and routes are added.
+- Any framework-specific notes (routing, data fetching, SSR/SSG, etc.) that impact how contributors work on the app.
 

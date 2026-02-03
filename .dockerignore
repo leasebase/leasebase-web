@@ -1,0 +1,33 @@
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store
+
+# Git / VCS
+.git
+.gitignore
+
+# Logs
+logs
+*.log
+
+# Env files (except example)
+.env
+.env.*
+!.env.example
+
+# Next.js output
+.next
+out
+build
+dist
+
+# Test and coverage artifacts
+coverage
+.playwright
+
+# OS / editor
+.DS_Store
+.idea
+.vscode
