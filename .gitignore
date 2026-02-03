@@ -15,15 +15,16 @@ logs
 *.log
 
 # Build outputs
-.dist
-.build
-dist
-out
 .next
+out
+build
+dist
 coverage
 
-# Framework-specific (adjust as needed once framework is chosen)
+# Framework / tooling caches
 .cache
+.next-cache
+.playwright
 
 # OS / editor
 .DS_Store
