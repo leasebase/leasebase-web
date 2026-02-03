@@ -77,30 +77,58 @@ The exact commands will depend on the actual web framework and scripts defined i
 
 ## Deploying the web frontend
 
-This repository only contains the web client. Typical deployment targets include:
-- Static hosting + CDN (for SPAs/SSGs)
-- An application runtime such as Vercel/Netlify (for Next.js or similar frameworks)
+This repository only contains the web client. The **infrastructure** for hosting it in AWS (S3 + CloudFront) is provisioned via Terraform in the backend repo:
 
-Exact deployment steps will depend on the framework and hosting provider you choose. At a high level you will:
+- `../leasebase/infra/terraform/envs/dev`
+- `../leasebase/infra/terraform/envs/qa`
+- `../leasebase/infra/terraform/envs/prod`
 
-1. Build the web app:
+At a high level, deployment looks like this for each environment:
+
+1. **Provision or update infra (run from backend repo)**
 
    ```bash path=null start=null
+   # Example: dev environment
+   cd ../leasebase/infra/terraform/envs/dev
+   export AWS_PROFILE=leasebase-dev
+   # Set required TF_VAR_* (db_password, api_database_url, api_container_image, web_bucket_suffix, ...)
+   terraform init
+   terraform apply
+   ```
+
+   Terraform will output the S3 bucket name and CloudFront domain for the web frontend.
+
+2. **Build the web app (this repo)**
+
+   ```bash path=null start=null
+   cd ../leasebase-web
    npm install
    npm run build
    ```
 
-2. Deploy the build artifacts (for example, `.next/`, `dist/`, or a static export directory) to your hosting provider.
-3. Configure the app's API base URL to point at the appropriate backend environment (dev, QA, production), e.g.:
-   - `https://api.dev.yourdomain.com`
-   - `https://api.qa.yourdomain.com`
-   - `https://api.yourdomain.com`
+   Depending on your framework, the static output directory might be `out/`, `build/`, or `.next/export`.
+
+3. **Upload static assets to S3**
+
+   ```bash path=null start=null
+   aws s3 sync ./out s3://<web_bucket_name-from-terraform>/ --delete
+   ```
+
+   Replace `./out` with the actual build output directory for your framework.
+
+4. **Configure API base URL**
+
+   In your web app configuration (`.env`, `.env.local`, or similar), set the API base URL per environment using the ALB DNS name or custom domain created by Terraform, e.g.:
+
+   - `https://<dev-api-alb-dns-name>`
+   - `https://<qa-api-alb-dns-name>`
+   - `https://<prod-api-alb-dns-name>`
 
 ### Backend deployment
 
-The backend API is implemented and deployed from the `../leasebase` repo. To work on or deploy the backend, refer to:
+The backend API is implemented and deployed from the `../leasebase` repo, which now includes Terraform stacks for dev/QA/prod. To work on or deploy the backend (including the infra used by this web repo), refer to:
 
-- `../leasebase/README.md` – "Backend deployment to AWS" section
+- `../leasebase/README.md` – "Backend & web deployment to AWS (Terraform, per account)" section
 - `../leasebase/docs/architecture.md` – overall system and AWS architecture
 
 ---
