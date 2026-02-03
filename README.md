@@ -75,6 +75,35 @@ Key env vars (see `.env.example`):
 
 ---
 
+## Tests
+
+Run unit/component tests with Jest:
+
+```bash
+npm test
+```
+
+Run Playwright e2e smoke tests (requires the dev server running with mock auth enabled):
+
+```bash
+# in one terminal
+DEV_ONLY_MOCK_AUTH=true NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH=true npm run dev
+
+# in another terminal
+npm run test:e2e
+```
+
+## OpenAPI client generation
+
+When the backend OpenAPI spec is available, place it at `openapi/openapi.json` (or update
+the path in `package.json`) and run:
+
+```bash
+npm run api:generate
+```
+
+This will generate a typed client into `src/lib/api/generated`.
+
 ## Docker / cloud deployment
 
 A production-ready container image can be built from the root `Dockerfile`:
