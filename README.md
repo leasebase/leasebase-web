@@ -1,143 +1,113 @@
-# Leasebase Web (Standalone Repo)
+# Leasebase Web
 
-This repository hosts the **web frontend** for the Leasebase platform.
+This repository is the **standalone web frontend** for the Leasebase platform.
 
-It is intentionally **frontend‑only**:
-- No backend API code lives here.
-- No mobile code lives here.
+- **Frontend-only**: no backend API or database code lives here.
+- **Web client only**: mobile apps live in a separate repo.
+- The web client talks to the backend API running from the `../leasebase` backend monorepo (NestJS + Prisma + PostgreSQL).
 
-The web client talks to the backend API running from the separate backend repo:
-- Backend: `leasebase` (a.k.a. `leasebase-backend`), `services/api` (NestJS + Prisma + PostgreSQL)
-
-Until this repository gains its own application code, treat it as the home for all web‑specific assets (UI, components, routing, styling) and as a thin wrapper around the backend API.
+The goal of this repo is to host all browser-facing UI for Leasebase: routing, pages, components, styling, and web-specific utilities.
 
 ---
 
-## Working with Leasebase locally
+## Repository status
 
-For a complete local development environment (API + web + DB), you will work with **two repos** side by side:
+As of now, this repository primarily contains documentation and lockfiles. The actual web application code and `package.json` have **not yet** been added.
 
-- Backend: `../leasebase` (backend API + DB)
-- Web: this repo (`leasebase-web`)
+That means:
 
-Example workflow (once web code exists):
+- There are currently **no npm scripts** (no `npm run dev`, `npm run build`, etc.).
+- There is **no configured frontend framework** yet (e.g., Next.js, Vite, CRA, etc.).
+- This repo should be treated as the future home for the Leasebase web UI and static build artifacts.
 
-```bash path=null start=null
-# 1) In ../leasebase (backend)
-cd ../leasebase
-npm install
-Docker-compose up -d db
-npm run migrate
-npm run seed
-npm run dev:api    # API on http://localhost:4000
+Once the frontend stack is chosen and bootstrapped, this README should be updated with:
 
-# 2) In ../leasebase-web (web frontend)
-cd ../leasebase-web
-npm install
-npm run dev        # web frontend dev server
-```
-
-The web UI code will live entirely in this repo and will be served by whatever frontend framework is chosen (e.g., Next.js or another React-based stack).
+- The exact development server command (e.g. `npm run dev`).
+- The exact build command (e.g. `npm run build`).
+- The exact output directory used for static assets (e.g. `out/`, `build/`, `.next`, etc.).
 
 ---
 
-## Local environment for this repo (future)
+## Related repositories
 
-Once this repository is populated with the standalone web app code, the expected local setup will look roughly like this:
+The full Leasebase system spans multiple repos:
 
-1. Install prerequisites
-   - Node.js (LTS, e.g. 18 or 20)
-   - npm
-   - Docker (optional, if you want to run the backend locally via Docker)
+- **Backend/API**: `../leasebase`
+  - Core API in `services/api` (NestJS + Prisma + PostgreSQL).
+  - Terraform infrastructure for API and web hosting.
+- **Web frontend**: this repo (`leasebase-web`).
+- **Mobile app**: `../leasebase-mobile`.
 
-2. Clone and install
+Keep a **strict separation of concerns**:
 
-   ```bash path=null start=null
-   git clone <your-git-url>/leasebase-web.git
-   cd leasebase-web
-   npm install
-   ```
-
-3. Configure environment
-   - Point the web client at a Leasebase API endpoint (local, dev, or prod), e.g.:
-     - `http://localhost:4000` (local API from the monorepo)
-     - `https://api.dev.yourdomain.com` (AWS dev environment)
-
-   This will typically be done via an `.env.local` file or similar, depending on the chosen framework.
-
-4. Run the dev server (placeholder example)
-
-   ```bash path=null start=null
-   npm run dev
-   ```
-
-The exact commands will depend on the actual web framework and scripts defined in `package.json` once the project is bootstrapped.
+- Web-only UI, client-side routing, and presentation live here.
+- Backend business logic, data validation, persistence, and heavy computations live in `../leasebase`.
 
 ---
 
-## Deploying the web frontend
+## Local development (high level)
 
-This repository only contains the web client. The **infrastructure** for hosting it in AWS (S3 + CloudFront) is provisioned via Terraform in the backend repo:
+A full local environment (API + web + DB) uses two repos side by side:
 
-- `../leasebase/infra/terraform/envs/dev`
-- `../leasebase/infra/terraform/envs/qa`
-- `../leasebase/infra/terraform/envs/prod`
+- Backend/API: `../leasebase`
+- Web frontend: `./` (this repo)
 
-At a high level, deployment looks like this for each environment:
+Until the web app is bootstrapped, only the backend is runnable. For the authoritative backend setup (DB, migrations, seeding, API port), refer to the docs in `../leasebase`, especially its `README.md` and any `docs/` it provides.
 
-1. **Provision or update infra (run from backend repo)**
+Once this repo has real frontend code and a `package.json`, the local dev flow will roughly look like:
 
-   ```bash path=null start=null
-   # Example: dev environment
-   cd ../leasebase/infra/terraform/envs/dev
-   export AWS_PROFILE=leasebase-dev
-   # Set required TF_VAR_* (db_password, api_database_url, api_container_image, web_bucket_suffix, ...)
-   terraform init
-   terraform apply
-   ```
+1. **Run the backend API locally** (from `../leasebase`)
+   - Install dependencies.
+   - Start or provision the database.
+   - Run migrations and seeds.
+   - Start the API server (commonly on `http://localhost:4000`, but check the backend docs to be sure).
 
-   Terraform will output the S3 bucket name and CloudFront domain for the web frontend.
+2. **Run the web frontend** (from this repo)
+   - Install dependencies with `npm install` (or your chosen package manager).
+   - Configure the API base URL via an env file (e.g. `.env.local`).
+   - Start the dev server (e.g. `npm run dev`).
 
-2. **Build the web app (this repo)**
-
-   ```bash path=null start=null
-   cd ../leasebase-web
-   npm install
-   npm run build
-   ```
-
-   Depending on your framework, the static output directory might be `out/`, `build/`, or `.next/export`.
-
-3. **Upload static assets to S3**
-
-   ```bash path=null start=null
-   aws s3 sync ./out s3://<web_bucket_name-from-terraform>/ --delete
-   ```
-
-   Replace `./out` with the actual build output directory for your framework.
-
-4. **Configure API base URL**
-
-   In your web app configuration (`.env`, `.env.local`, or similar), set the API base URL per environment using the ALB DNS name or custom domain created by Terraform, e.g.:
-
-   - `https://<dev-api-alb-dns-name>`
-   - `https://<qa-api-alb-dns-name>`
-   - `https://<prod-api-alb-dns-name>`
-
-### Backend deployment
-
-The backend API is implemented and deployed from the `../leasebase` repo, which now includes Terraform stacks for dev/QA/prod. To work on or deploy the backend (including the infra used by this web repo), refer to:
-
-- `../leasebase/README.md` – "Backend & web deployment to AWS (Terraform, per account)" section
-- `../leasebase/docs/architecture.md` – overall system and AWS architecture
+The exact commands and ports must be taken from the chosen web stack and `package.json` once they exist.
 
 ---
 
-## Relevant information for contributors
+## Deployment (high level)
 
-- **What belongs here?**  All web/frontend concerns: pages, components, styling, web routing, web-only utilities.
-- **What does *not* belong here?**  Backend services, database schema/migrations, mobile code.
-- **Where is the backend?**  In `../leasebase/services/api` (NestJS + Prisma).
-- **Where is the mobile app?**  In the separate `../leasebase-mobile` repo.
+This repo contains only the web client source code and its static build artifacts. The **infrastructure** for hosting the web frontend in AWS is defined and provisioned from the backend repo (`../leasebase`) using Terraform.
 
-As soon as this repo is bootstrapped with a concrete framework and build tooling, this README should be updated with precise dev, build, and deployment instructions specific to this web client.
+In the backend repo you will find Terraform environments under something like:
+
+- `infra/terraform/envs/dev`
+- `infra/terraform/envs/qa`
+- `infra/terraform/envs/prod`
+
+At a high level, a deployment workflow looks like this (per environment):
+
+1. **Provision or update infrastructure** (from `../leasebase` using Terraform).
+2. **Build the web app** (from this repo) using the appropriate build command.
+3. **Upload static assets to S3** using the bucket and CloudFront distribution created by Terraform.
+4. **Configure the API base URL** for each environment using the ALB DNS name or custom domain output by Terraform.
+
+For authoritative details on infrastructure, environment variables, and deployment pipelines, always consult:
+
+- `../leasebase/README.md`
+- `../leasebase/docs/architecture.md` (or equivalent architecture docs)
+
+---
+
+## Contributing
+
+When adding or changing code in this repo:
+
+- Keep backend responsibilities (authorization, persistence, complex business rules) in the backend service (`../leasebase/services/api`).
+- Keep this repo focused on web UI concerns: components, layout, navigation, client-side state, and integration with the backend API.
+- When a change spans both frontend and backend:
+  - Coordinate API contracts (types, DTOs, error responses) between this repo and `../leasebase`.
+  - Reflect any API shape changes in both places.
+
+Once the concrete frontend framework and tooling are in place, expand this README with:
+
+- Exact dev/build/test/lint commands.
+- Project structure and conventions.
+- Any framework-specific notes (routing, data fetching, SSR/SSG, etc.).
+
