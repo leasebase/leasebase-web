@@ -21,6 +21,9 @@
       "node"
     ],
     "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*", "./*"]
+    },
     "incremental": true,
     "plugins": [
       {

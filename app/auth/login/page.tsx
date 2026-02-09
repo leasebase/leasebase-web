@@ -122,7 +122,7 @@ function LoginContent() {
 
       <div className="border-t border-slate-800 pt-4">
         <p className="text-sm text-slate-400">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/auth/register" className="text-emerald-400 hover:underline">
             Sign up
           </Link>
