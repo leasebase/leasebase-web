@@ -31,3 +31,11 @@ coverage
 .DS_Store
 .idea
 .vscode
+
+# Disabled directories for minimal deployment
+_pm_disabled
+_tenant_disabled
+_auth_disabled
+_api_disabled
+_infra_disabled
+_src_disabled

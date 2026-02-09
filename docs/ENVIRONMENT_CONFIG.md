@@ -10,6 +10,9 @@ This document describes the environment variables required by the `leasebase-web
   - Staging: `https://api.staging.leasebase.com`
   - Prod: `https://api.leasebase.com`
 
+- `NEXT_PUBLIC_COGNITO_REGION`  
+  AWS region of the Cognito User Pool (e.g. `us-west-2`).
+
 - `NEXT_PUBLIC_COGNITO_USER_POOL_ID`  
   AWS Cognito User Pool ID used for authentication.
 
@@ -17,7 +20,13 @@ This document describes the environment variables required by the `leasebase-web
   Cognito app client ID for the web app.
 
 - `NEXT_PUBLIC_COGNITO_DOMAIN`  
-  Cognito Hosted UI domain used for login/logout redirects.
+  Cognito Hosted UI domain used for login/logout redirects (e.g. `your-domain.auth.us-west-2.amazoncognito.com`).
+
+- `NEXT_PUBLIC_COGNITO_OAUTH_REDIRECT_SIGNIN`  
+  OAuth redirect URL for sign-in (e.g. `http://localhost:3000/auth/callback`).
+
+- `NEXT_PUBLIC_COGNITO_OAUTH_REDIRECT_SIGNOUT`  
+  OAuth redirect URL for sign-out (e.g. `http://localhost:3000/login`).
 
 - `DEV_ONLY_MOCK_AUTH`  
   Optional flag (e.g. `true` / `false`) to enable development-only auth bypass flows.  

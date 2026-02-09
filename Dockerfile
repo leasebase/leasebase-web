@@ -5,8 +5,6 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-ENV NODE_ENV=production
-
 # Install OS deps (if needed for future tooling)
 RUN apk add --no-cache libc6-compat
 
@@ -46,7 +44,7 @@ RUN addgroup -g 1001 -S nodejs \
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public 2>/dev/null || true
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder /app/next.config.mjs ./next.config.mjs
 COPY --from=builder /app/node_modules ./node_modules
 
