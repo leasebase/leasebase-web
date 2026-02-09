@@ -21,6 +21,17 @@ Flow:
    establish a secure session (implemented in the backend repo). This frontend assumes the
    backend sets HttpOnly cookies as part of that flow.
 
+## User types and registration
+
+During registration, users select one of three user types:
+
+- `PROPERTY_MANAGER` – Manages properties for multiple owners/landlords. Creates an organization.
+- `OWNER` – Landlord who owns and rents out properties.
+- `TENANT` – Rents a property and manages their lease.
+
+The `userType` is sent to the backend during registration and determines the user's initial role and
+permissions.
+
 ## Role-based access
 
 Roles are represented as:
