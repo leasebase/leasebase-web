@@ -1,39 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+// Generic dashboard view. For now we don&apos;t enforce auth here; the
+// login flow sends users here after a successful sign-in, and later
+// we can tighten this up with role-based layouts.
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    // Minimal client-side check: if we have an id/access token in localStorage,
-    // treat the user as signed in. Otherwise, send them to login.
-    const hasToken = (() => {
-      if (typeof window === "undefined") return false;
-      return (
-        !!window.localStorage.getItem("lb_id_token") ||
-        !!window.localStorage.getItem("lb_access_token")
-      );
-    })();
-
-    if (!hasToken) {
-      router.replace("/auth/login?next=%2Fdashboard");
-      return;
-    }
-
-    setReady(true);
-  }, [router]);
-
-  if (!ready) {
-    return (
-      <div className="max-w-3xl mx-auto py-16">
-        <p className="text-slate-300">Loading your dashboard…</p>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-5xl mx-auto py-10 space-y-6">
       <div>
