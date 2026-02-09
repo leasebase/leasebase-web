@@ -68,6 +68,18 @@ function LoginContent() {
       )}
       {error && <p className="text-sm text-red-400">{error}</p>}
 
+      <p className="text-xs text-slate-400">
+        Just created an account but don&apos;t see a verification screen?{" "}
+        <button
+          type="button"
+          onClick={() => router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`)}
+          className="text-emerald-400 hover:underline"
+        >
+          Verify your email or resend the code
+        </button>
+        .
+      </p>
+
       <form className="space-y-3" onSubmit={handleSubmit}>
         <div className="space-y-1 text-sm">
           <label className="block text-slate-200">Email</label>
