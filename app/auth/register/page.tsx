@@ -3,10 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-function getApiBaseUrl() {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || "";
-}
+import { getApiBaseUrl } from "@/lib/apiBase";
 
 function RegisterContent() {
   const router = useRouter();
@@ -43,12 +40,28 @@ function RegisterContent() {
         body: JSON.stringify({ email, password, firstName, lastName })
       });
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.message || "Registration failed");
+        const text = await res.text();
+        let message = "Registration failed";
+        try {
+          const body = JSON.parse(text);
+          message = body.message || message;
+        } catch {
+          // Non-JSON response (likely HTML error page)
+        }
+        throw new Error(message);
       }
-      const data = await res.json();
-      // Redirect to login with success message
-      const message = encodeURIComponent(data.message || "Registration successful. Please check your email to verify your account.");
+
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        // If the backend returns 2xx with no JSON body, still treat as success.
+      }
+
+      const message = encodeURIComponent(
+        data.message ||
+          "Registration successful. Please check your email to verify your account."
+      );
       router.push(`/auth/login?registered=true&message=${message}`);
     } catch (err: any) {
       setError(err.message || "Registration failed");

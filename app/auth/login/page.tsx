@@ -3,10 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-
-function getApiBaseUrl() {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || "";
-}
+import { getApiBaseUrl } from "@/lib/apiBase";
 
 function LoginContent() {
   const router = useRouter();
