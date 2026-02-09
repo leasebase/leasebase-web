@@ -1,0 +1,56 @@
+# Multi-stage Dockerfile for Leasebase Web (Next.js + Node.js)
+
+# 1) Builder image: install deps and build the app
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install OS deps (if needed for future tooling)
+RUN apk add --no-cache libc6-compat
+
+# Copy package manifests and lockfile first for better caching
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+# Copy the rest of the source
+COPY . .
+
+# Build the Next.js app
+RUN npm run build
+
+# 2) Runner image: minimal production runtime
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Ensure runtime env vars are clearly defined here; actual values are
+# injected at deploy time (ECS task definition, etc.).
+#
+# - NEXT_PUBLIC_API_BASE_URL
+# - NEXT_PUBLIC_COGNITO_USER_POOL_ID
+# - NEXT_PUBLIC_COGNITO_CLIENT_ID
+# - NEXT_PUBLIC_COGNITO_DOMAIN
+# - DEV_ONLY_MOCK_AUTH
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs \
+  && adduser -S nextjs -u 1001
+
+# Copy only what we need from the builder
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/package-lock.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder /app/next.config.mjs ./next.config.mjs
+COPY --from=builder /app/node_modules ./node_modules
+
+USER nextjs
+
+EXPOSE 3000
+
+# Start the Next.js production server
+CMD ["npm", "run", "start"]

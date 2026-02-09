@@ -1,89 +1,153 @@
-# Leasebase Web (Standalone Repo)
+# Leasebase Web
 
-This repository is intended to host the **standalone web client** for the Leasebase platform.
+This repository is the **standalone web frontend** for the Leasebase platform.
 
-At the moment, the primary implementation work and runtime wiring live in the **monorepo sibling** `../leasebase`, which contains:
-- The backend API (`services/api` – NestJS + Prisma + PostgreSQL)
-- The monorepo-level web app workspace (`apps/web`)
-- Infrastructure and architecture documentation
+- **Frontend-only**: no backend API or database code lives here.
+- **Web client only**: mobile apps live in a separate repo.
+- The web client talks to the backend API running from the `../leasebase` backend monorepo (NestJS + Prisma + PostgreSQL).
 
-Until this repository gains its own application code, you should treat it primarily as an entry point and documentation hub that points you to the monorepo.
+The goal of this repo is to host all browser-facing UI for Leasebase: routing, pages, components, styling, and web-specific utilities.
 
 ---
 
-## Working with Leasebase locally
+## Repository status
 
-For a complete local development environment (API + web + DB), follow the instructions in:
+This repo is now bootstrapped as a **Next.js (TypeScript) + Tailwind CSS** application.
 
-- `../leasebase/README.md`
+- Uses the **App Router** in `app/`.
+- Integrates with the `../leasebase` backend API via `NEXT_PUBLIC_API_BASE_URL`.
+- Is intended to integrate with AWS Cognito for authentication using `NEXT_PUBLIC_COGNITO_*` env vars.
 
-In short, from `../leasebase` you will:
+Concrete dev/build commands and output directory are documented below.
 
-```bash path=null start=null
-cd ../leasebase
+---
+
+## Related repositories
+
+The full Leasebase system spans multiple repos:
+
+- **Backend/API**: `../leasebase`
+  - Core API in `services/api` (NestJS + Prisma + PostgreSQL).
+  - Infrastructure for API and web hosting (managed outside this repo).
+- **Web frontend**: this repo (`leasebase-web`).
+- **Mobile app**: `../leasebase-mobile`.
+
+Keep a **strict separation of concerns**:
+
+- Web-only UI, client-side routing, and presentation live here.
+- Backend business logic, data validation, persistence, and heavy computations live in `../leasebase`.
+
+---
+
+## Local development
+
+A full local environment (API + web + DB) uses two repos side by side:
+
+- Backend/API: `../leasebase`
+- Web frontend: `./` (this repo)
+
+### 1. Run the backend API locally (from `../leasebase`)
+
+Refer to the backend repo docs for the authoritative commands. A typical flow is:
+
+1. Install dependencies.
+2. Start or provision the database.
+3. Run migrations and seeds.
+4. Start the API server (commonly on `http://localhost:4000`, but always check the backend docs).
+
+### 2. Run the web frontend (this repo)
+
+From this directory:
+
+```bash
 npm install
-npm run dev         # starts Postgres + API + web (when web is implemented)
+cp .env.example .env.local   # then edit values as needed
+npm run dev
 ```
 
-The web UI code will live under `../leasebase/apps/web` and will be served by whatever frontend framework is chosen (e.g., Next.js or another React-based stack).
+This will start the Next.js dev server (default on `http://localhost:3000`).
+
+Key env vars (see `.env.example`):
+
+- `NEXT_PUBLIC_API_BASE_URL` – base URL of the Leasebase API (e.g. `http://localhost:4000`).
+- `NEXT_PUBLIC_COGNITO_USER_POOL_ID`, `NEXT_PUBLIC_COGNITO_CLIENT_ID`, `NEXT_PUBLIC_COGNITO_DOMAIN` – AWS Cognito configuration for auth.
+- `DEV_ONLY_MOCK_AUTH` – optional dev-only flag for mock auth flows (must remain `false` in production).
 
 ---
 
-## Local environment for this repo (future)
+## Tests
 
-Once this repository is populated with the standalone web app code, the expected local setup will look roughly like this:
+Run unit/component tests with Jest:
 
-1. Install prerequisites
-   - Node.js (LTS, e.g. 18 or 20)
-   - npm
-   - Docker (optional, if you want to run the backend locally via Docker)
+```bash
+npm test
+```
 
-2. Clone and install
+Run Playwright e2e smoke tests (requires the dev server running with mock auth enabled):
 
-   ```bash path=null start=null
-   git clone <your-git-url>/leasebase-web.git
-   cd leasebase-web
-   npm install
-   ```
+```bash
+# in one terminal
+DEV_ONLY_MOCK_AUTH=true NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH=true npm run dev
 
-3. Configure environment
-   - Point the web client at a Leasebase API endpoint (local, dev, or prod), e.g.:
-     - `http://localhost:4000` (local API from the monorepo)
-     - `https://api.dev.yourdomain.com` (AWS dev environment)
+# in another terminal
+npm run test:e2e
+```
 
-   This will typically be done via an `.env.local` file or similar, depending on the chosen framework.
+## OpenAPI client generation
 
-4. Run the dev server (placeholder example)
+When the backend OpenAPI spec is available, place it at `openapi/openapi.json` (or update
+the path in `package.json`) and run:
 
-   ```bash path=null start=null
-   npm run dev
-   ```
+```bash
+npm run api:generate
+```
 
-The exact commands will depend on the actual web framework and scripts defined in `package.json` once the project is bootstrapped.
+This will generate a typed client into `src/lib/api/generated`.
+
+## Docker / cloud deployment
+
+A production-ready container image can be built from the root `Dockerfile`:
+
+```bash
+# Build image
+docker build -t leasebase-web:latest .
+
+# Run container locally (example)
+docker run --rm -p 3000:3000 \
+  -e NEXT_PUBLIC_API_BASE_URL=http://host.docker.internal:4000 \
+  -e NEXT_PUBLIC_COGNITO_USER_POOL_ID=... \
+  -e NEXT_PUBLIC_COGNITO_CLIENT_ID=... \
+  -e NEXT_PUBLIC_COGNITO_DOMAIN=... \
+  leasebase-web:latest
+```
+
+The container:
+
+- Serves the app on port `3000` using `npm run start`.
+- Exposes a basic health endpoint at `GET /api/health` that returns `{ "status": "ok" }`.
+- Is stateless; env vars configure API base URL and Cognito.
+
+For ECS or other orchestrators, see `docs/RUNTIME_CONTRACT.md` and `docs/ENVIRONMENT_CONFIG.md` for the full runtime contract and environment requirements.
 
 ---
 
-## Deploying the backend to AWS
-
-**Important:** This repository does **not** contain the backend. The backend API is implemented and deployed from the monorepo in `../leasebase`.
-
-If you need to:
-- Stand up or modify backend environments, or
-- Understand how the API is deployed to AWS,
-
-refer to:
-
-- `../leasebase/README.md` – "Backend deployment to AWS" section
-- `../leasebase/docs/architecture.md` – overall system and AWS architecture
-
-In practice, this web client will consume the backend API via HTTPS, using environment variables or configuration files to point to the appropriate API base URL.
-
 ---
 
-## Relevant information for contributors
+## Contributing
 
-- **Where is the real code right now?**  In the monorepo `../leasebase` under `apps/web` (future) and `services/api`.
-- **Should I add new web features here or in the monorepo?**  Until this repository has been bootstrapped with an actual web app, prefer adding features to the monorepo web workspace.
-- **How do I run the full stack locally?**  Use the monorepo instructions (`../leasebase/README.md`), which describe running Postgres, the NestJS API, and the web app together.
+When adding or changing code in this repo:
 
-As soon as this repo is bootstrapped with a concrete framework and build tooling, this README should be updated with precise commands and deployment details specific to this standalone web client.
+- Keep backend responsibilities (authorization, persistence, complex business rules) in the backend service (`../leasebase/services/api`).
+- Keep this repo focused on web UI concerns: components, layout, navigation, client-side state, and integration with the backend API.
+- When a change spans both frontend and backend:
+  - Coordinate API contracts (types, DTOs, error responses) between this repo and `../leasebase`.
+  - Reflect any API shape changes in both places.
+
+This repo is already configured with Next.js + TypeScript + Tailwind, along with Jest and Playwright.
+
+Future changes should keep this README in sync by updating:
+
+- Dev/build/test/lint commands when scripts change.
+- Project structure and conventions as new modules and routes are added.
+- Any framework-specific notes (routing, data fetching, SSR/SSG, etc.) that impact how contributors work on the app.
+

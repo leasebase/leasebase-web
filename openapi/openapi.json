@@ -1,0 +1,20 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Leasebase API (MVP placeholder)",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/pm/dashboard": {"get": {"summary": "PM dashboard"}},
+    "/pm/properties": {"get": {"summary": "List properties"}},
+    "/pm/leases": {"get": {"summary": "List leases"}},
+    "/pm/work-orders": {"get": {"summary": "List work orders"}},
+    "/pm/documents": {"get": {"summary": "List documents"}},
+    "/pm/settings/org": {"get": {"summary": "Org settings"}},
+    "/pm/billing/summary": {"get": {"summary": "Billing summary"}},
+    "/tenant/dashboard": {"get": {"summary": "Tenant dashboard"}},
+    "/tenant/payments": {"get": {"summary": "Tenant payments"}},
+    "/tenant/maintenance": {"get": {"summary": "Tenant maintenance"}},
+    "/tenant/documents": {"get": {"summary": "Tenant documents"}}
+  }
+}
