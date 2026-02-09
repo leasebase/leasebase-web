@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 function getApiBaseUrl() {
   return process.env.NEXT_PUBLIC_API_BASE_URL || "";
 }
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -16,6 +17,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const next = searchParams.get("next") || "/";
+  const registered = searchParams.get("registered");
+  const registrationMessage = searchParams.get("message");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +66,9 @@ export default function LoginPage() {
         </p>
       </div>
 
+      {registered && registrationMessage && (
+        <p className="text-sm text-emerald-400">{decodeURIComponent(registrationMessage)}</p>
+      )}
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       <form className="space-y-3" onSubmit={handleSubmit}>
@@ -116,6 +122,23 @@ export default function LoginPage() {
           </button>
         </div>
       </div>
+
+      <div className="border-t border-slate-800 pt-4">
+        <p className="text-sm text-slate-400">
+          Don't have an account?{" "}
+          <Link href="/auth/register" className="text-emerald-400 hover:underline">
+            Sign up
+          </Link>
+        </p>
+      </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="max-w-md mx-auto"><p>Loading...</p></div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
