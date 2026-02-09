@@ -16,6 +16,10 @@ RUN npm ci
 # Copy the rest of the source
 COPY . .
 
+# API URL for server-side rewrites - must be set at build time
+ARG API_BASE_URL=http://localhost:4000
+ENV API_BASE_URL=${API_BASE_URL}
+
 # Build the Next.js app
 RUN npm run build
 
@@ -27,11 +31,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# API URL for server-side rewrites (proxies /api/* to backend)
-ARG API_BASE_URL=http://localhost:4000
-ENV API_BASE_URL=${API_BASE_URL}
-
-# Ensure runtime env vars are clearly defined here; actual values are
+# Ensure runtime env vars
 # injected at deploy time (ECS task definition, etc.).
 #
 # - API_BASE_URL (for server-side rewrites)
