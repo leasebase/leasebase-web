@@ -27,10 +27,15 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
+# API URL for server-side rewrites (proxies /api/* to backend)
+ARG API_BASE_URL=http://localhost:4000
+ENV API_BASE_URL=${API_BASE_URL}
+
 # Ensure runtime env vars are clearly defined here; actual values are
 # injected at deploy time (ECS task definition, etc.).
 #
-# - NEXT_PUBLIC_API_BASE_URL
+# - API_BASE_URL (for server-side rewrites)
+# - NEXT_PUBLIC_API_BASE_URL (for client-side calls, if different)
 # - NEXT_PUBLIC_COGNITO_USER_POOL_ID
 # - NEXT_PUBLIC_COGNITO_CLIENT_ID
 # - NEXT_PUBLIC_COGNITO_DOMAIN
