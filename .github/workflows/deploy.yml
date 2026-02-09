@@ -80,30 +80,31 @@ jobs:
           
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Update ECS service
+      - name: Download current task definition
         env:
           ENV: ${{ steps.env.outputs.environment }}
         run: |
-          CLUSTER="${ECS_CLUSTER_PREFIX}-${ENV}-cluster"
-          SERVICE="${ECS_CLUSTER_PREFIX}-${ENV}-${ECS_SERVICE_SUFFIX}"
+          TASK_DEF="${ECS_CLUSTER_PREFIX}-${ENV}-web-task"
+          aws ecs describe-task-definition \
+            --task-definition $TASK_DEF \
+            --query 'taskDefinition' \
+            --output json > task-def.json
           
-          aws ecs update-service \
-            --cluster $CLUSTER \
-            --service $SERVICE \
-            --force-new-deployment \
-            --region $AWS_REGION
+          # Remove fields that can't be used when registering a new revision
+          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' task-def.json > new-task-def.json
 
-      - name: Wait for service stability
-        env:
-          ENV: ${{ steps.env.outputs.environment }}
-        run: |
-          CLUSTER="${ECS_CLUSTER_PREFIX}-${ENV}-cluster"
-          SERVICE="${ECS_CLUSTER_PREFIX}-${ENV}-${ECS_SERVICE_SUFFIX}"
-          
-          echo "Waiting for ECS service to stabilize..."
-          aws ecs wait services-stable \
-            --cluster $CLUSTER \
-            --services $SERVICE \
-            --region $AWS_REGION
-          
-          echo "✅ Deployment complete!"
+      - name: Update task definition with new image
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: new-task-def.json
+          container-name: web
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_CLUSTER_PREFIX }}-${{ steps.env.outputs.environment }}-${{ env.ECS_SERVICE_SUFFIX }}
+          cluster: ${{ env.ECS_CLUSTER_PREFIX }}-${{ steps.env.outputs.environment }}-cluster
+          wait-for-service-stability: ${{ steps.env.outputs.environment == 'prod' }}
