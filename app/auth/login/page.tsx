@@ -13,7 +13,7 @@ function LoginContent() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const next = searchParams.get("next") || "/";
+  const next = searchParams.get("next") || "/dashboard";
   const registered = searchParams.get("registered");
   const registrationMessage = searchParams.get("message");
 
@@ -28,10 +28,24 @@ function LoginContent() {
         credentials: "include",
         body: JSON.stringify({ email, password })
       });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.message || "Login failed");
+
+      // Try to parse JSON; if this fails, treat as a login failure so we don&apos;t
+      // silently redirect back to /auth/login via the dashboard.
+      const body: any = await res.json().catch(() => null);
+
+      if (!res.ok || !body || !body.accessToken || !body.idToken) {
+        throw new Error(body?.message || "Login failed");
       }
+
+      // Persist tokens so the dashboard can detect a signed-in user.
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("lb_access_token", body.accessToken as string);
+        window.localStorage.setItem("lb_id_token", body.idToken as string);
+        if (body.refreshToken) {
+          window.localStorage.setItem("lb_refresh_token", body.refreshToken as string);
+        }
+      }
+
       router.replace(next);
     } catch (err: any) {
       setError(err.message || "Login failed");
