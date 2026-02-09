@@ -1,14 +1,20 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
 export default function HomePage() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Leasebase Dev Environment
-        </h1>
-        <p className="text-lg text-gray-600">
-          Infrastructure deployed successfully ✓
-        </p>
-      </div>
-    </div>
-  );
+  const cookieStore = cookies();
+  const role = cookieStore.get("lb_role")?.value;
+
+  // No session: land on login page
+  if (!role) {
+    redirect("/auth/login");
+  }
+
+  // Tenant session → tenant dashboard
+  if (role === "TENANT") {
+    redirect("/tenant");
+  }
+
+  // PM / landlord roles → management dashboard
+  redirect("/pm");
 }
