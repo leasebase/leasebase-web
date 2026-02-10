@@ -41,15 +41,14 @@ export async function apiRequest<T = any>({ path, anonymous, ...init }: ApiReque
 
   const text = await response.text();
   if (!text) {
-    // @ts-expect-error allow void
+    // No content; caller should be prepared to handle undefined.
     return undefined as T;
   }
 
   try {
     return JSON.parse(text) as T;
   } catch {
-    // Non-JSON response
-    // @ts-expect-error caller must handle
-    return text as T;
+    // Non-JSON response; surface raw text to the caller.
+    return text as unknown as T;
   }
 }

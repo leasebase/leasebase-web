@@ -1,10 +1,51 @@
 "use client";
 
-// Generic dashboard view. For now we don&apos;t enforce auth here; the
-// login flow sends users here after a successful sign-in, and later
-// we can tighten this up with role-based layouts.
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+// Generic dashboard view with a simple auth guard based only on the
+// Cognito token expiry returned by the backend.
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const accessToken = window.localStorage.getItem("lb_access_token");
+    const idToken = window.localStorage.getItem("lb_id_token");
+    const expiresRaw = window.localStorage.getItem("lb_token_expires_at");
+    const expiresAt = expiresRaw ? parseInt(expiresRaw, 10) : NaN;
+    const now = Date.now();
+
+    const hasValidTokens =
+      !!accessToken &&
+      !!idToken &&
+      Number.isFinite(expiresAt) &&
+      expiresAt > now;
+
+    if (!hasValidTokens) {
+      // Clear any stale tokens and send the user back to login.
+      window.localStorage.removeItem("lb_access_token");
+      window.localStorage.removeItem("lb_id_token");
+      window.localStorage.removeItem("lb_refresh_token");
+      window.localStorage.removeItem("lb_token_expires_at");
+      router.replace("/auth/login?next=%2Fdashboard");
+      return;
+    }
+
+    setReady(true);
+  }, [router]);
+
+  if (!ready) {
+    return (
+      <div className="max-w-3xl mx-auto py-16">
+        <p className="text-slate-300">Loading your dashboard…</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto py-10 space-y-6">
       <div>
