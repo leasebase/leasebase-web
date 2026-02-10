@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { getApiBaseUrl } from "@/lib/apiBase";
+import { authStore } from "@/lib/auth/store";
 
 function LoginContent() {
   const router = useRouter();
@@ -12,6 +12,9 @@ function LoginContent() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [devEmail, setDevEmail] = useState("");
+  const [devRole, setDevRole] = useState("ORG_ADMIN");
+  const [devOrgId, setDevOrgId] = useState("dev-org-1");
 
   const next = searchParams.get("next") || "/dashboard";
   const registered = searchParams.get("registered");
@@ -22,30 +25,7 @@ function LoginContent() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${getApiBaseUrl()}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password })
-      });
-
-      // Try to parse JSON; if this fails, treat as a login failure so we don&apos;t
-      // silently redirect back to /auth/login via the dashboard.
-      const body: any = await res.json().catch(() => null);
-
-      if (!res.ok || !body || !body.accessToken || !body.idToken) {
-        throw new Error(body?.message || "Login failed");
-      }
-
-      // Persist tokens so the dashboard can detect a signed-in user.
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("lb_access_token", body.accessToken as string);
-        window.localStorage.setItem("lb_id_token", body.idToken as string);
-        if (body.refreshToken) {
-          window.localStorage.setItem("lb_refresh_token", body.refreshToken as string);
-        }
-      }
-
+      await authStore.getState().loginWithPassword(email, password);
       router.replace(next);
     } catch (err: any) {
       setError(err.message || "Login failed");
@@ -54,17 +34,9 @@ function LoginContent() {
     }
   };
 
-  const startOidcLogin = (provider: string) => {
-    const base = getApiBaseUrl();
-    if (!base) {
-      setError("NEXT_PUBLIC_API_BASE_URL is not configured.");
-      return;
-    }
-    const redirectUri = `${window.location.origin}/auth/callback`;
-    const url = new URL(`${base}/auth/${provider}`);
-    url.searchParams.set("redirect_uri", redirectUri);
-    url.searchParams.set("state", encodeURIComponent(next));
-    window.location.href = url.toString();
+  const startOidcLogin = () => {
+    // Placeholder: Hosted UI / social login flows can be wired here later.
+    setError("Social login is not configured for this environment.");
   };
 
   return (
@@ -131,17 +103,10 @@ function LoginContent() {
         <div className="flex flex-col gap-2">
           <button
             type="button"
-            onClick={() => startOidcLogin("google")}
+            onClick={startOidcLogin}
             className="w-full rounded-md border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-slate-800"
           >
-            Continue with Google
-          </button>
-          <button
-            type="button"
-            onClick={() => startOidcLogin("microsoft")}
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-slate-800"
-          >
-            Continue with Microsoft
+            Social login (coming soon)
           </button>
         </div>
       </div>
