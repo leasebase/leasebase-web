@@ -1,7 +1,7 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
-import { apiRequest } from "@/lib/api/client";
 import { mapUserRoleToPersona, Persona } from "@/lib/auth/roles";
+import { getApiBaseUrl } from "@/lib/apiBase";
 
 export type AuthMode = "cognito" | "devBypass";
 
@@ -72,12 +72,23 @@ export const authStore = create<AuthState>()(
       },
 
       loginWithPassword: async (email, password) => {
-        const res = await apiRequest<{ accessToken: string; idToken: string; refreshToken?: string; expiresIn: number }>({
-          path: "auth/login",
+        const base = getApiBaseUrl();
+        const res = await fetch(`${base}/auth/login`, {
           method: "POST",
-          anonymous: true,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
+        }).then(async (r) => {
+          const text = await r.text();
+          let body: any = {};
+          try {
+            body = text ? JSON.parse(text) : {};
+          } catch {
+            body = {};
+          }
+          if (!r.ok) {
+            throw new Error(body?.message || "Login failed");
+          }
+          return body as { accessToken: string; idToken: string; refreshToken?: string; expiresIn: number };
         });
 
         const now = Date.now();
@@ -113,8 +124,33 @@ export const authStore = create<AuthState>()(
 
       loadMe: async () => {
         try {
-          const me = await apiRequest<{ id: string; orgId: string; email: string; name: string; role: string }>({
-            path: "auth/me",
+          const base = getApiBaseUrl();
+          const me = await fetch(`${base}/auth/me`, {
+            headers: (() => {
+              const headers = new Headers();
+              const { mode, accessToken, devBypass } = get();
+              if (mode === "cognito" && accessToken) {
+                headers.set("Authorization", `Bearer ${accessToken}`);
+              }
+              if (mode === "devBypass" && devBypass) {
+                headers.set("x-dev-user-email", devBypass.email);
+                headers.set("x-dev-user-role", devBypass.role);
+                headers.set("x-dev-org-id", devBypass.orgId);
+              }
+              return headers;
+            })(),
+          }).then(async (r) => {
+            const text = await r.text();
+            let body: any = {};
+            try {
+              body = text ? JSON.parse(text) : {};
+            } catch {
+              body = {};
+            }
+            if (!r.ok) {
+              throw new Error(body?.message || "Unable to load session");
+            }
+            return body as { id: string; orgId: string; email: string; name: string; role: string };
           });
           const persona = mapUserRoleToPersona(me.role as any);
           const user: CurrentUser = { ...me, persona };

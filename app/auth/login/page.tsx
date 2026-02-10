@@ -16,6 +16,10 @@ function LoginContent() {
   const [devRole, setDevRole] = useState("ORG_ADMIN");
   const [devOrgId, setDevOrgId] = useState("dev-org-1");
 
+  const devBypassEnabled =
+    process.env.NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH === "true" ||
+    process.env.NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH === "1";
+
   const next = searchParams.get("next") || "/dashboard";
   const registered = searchParams.get("registered");
   const registrationMessage = searchParams.get("message");
@@ -37,6 +41,24 @@ function LoginContent() {
   const startOidcLogin = () => {
     // Placeholder: Hosted UI / social login flows can be wired here later.
     setError("Social login is not configured for this environment.");
+  };
+
+  const handleDevBypass = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const emailToUse = devEmail || email || "pm@example.com";
+      await authStore.getState().loginDevBypass({
+        email: emailToUse,
+        role: devRole,
+        orgId: devOrgId || "dev-org-1",
+      });
+      router.replace(next || "/app");
+    } catch (err: any) {
+      setError(err.message || "Dev bypass login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -110,6 +132,71 @@ function LoginContent() {
           </button>
         </div>
       </div>
+
+      {devBypassEnabled && (
+        <div className="mt-6 border-t border-dashed border-slate-800 pt-4 space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-400">
+            Developer bypass (local/dev only)
+          </p>
+          <p className="text-xs text-slate-400">
+            When the backend is running with DEV_AUTH_BYPASS enabled, you can
+            sign in without Cognito by choosing a role. Do not enable this in
+            production.
+          </p>
+          <div className="space-y-2 text-xs">
+            <div className="space-y-1">
+              <label className="block text-slate-200" htmlFor="dev-email">
+                Dev email
+              </label>
+              <input
+                id="dev-email"
+                type="email"
+                value={devEmail}
+                onChange={(e) => setDevEmail(e.target.value)}
+                className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs"
+                placeholder="pm@example.com"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-slate-200" htmlFor="dev-org">
+                Dev org ID
+              </label>
+              <input
+                id="dev-org"
+                type="text"
+                value={devOrgId}
+                onChange={(e) => setDevOrgId(e.target.value)}
+                className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs"
+                placeholder="dev-org-1"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-slate-200" htmlFor="dev-role">
+                Role
+              </label>
+              <select
+                id="dev-role"
+                value={devRole}
+                onChange={(e) => setDevRole(e.target.value)}
+                className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs"
+              >
+                <option value="ORG_ADMIN">Property Manager (ORG_ADMIN)</option>
+                <option value="PM_STAFF">Property Manager Staff (PM_STAFF)</option>
+                <option value="OWNER">Owner</option>
+                <option value="TENANT">Tenant</option>
+              </select>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleDevBypass}
+            disabled={loading}
+            className="w-full rounded-md border border-emerald-600 bg-slate-900 px-4 py-2 text-xs font-medium text-emerald-300 hover:bg-slate-800 disabled:opacity-60"
+          >
+            {loading ? "Signing in (dev bypass)…" : "Sign in with dev bypass"}
+          </button>
+        </div>
+      )}
 
       <div className="border-t border-slate-800 pt-4">
         <p className="text-sm text-slate-400">
