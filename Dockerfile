@@ -45,13 +45,11 @@ RUN addgroup -g 1001 -S nodejs \
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/custom-server.js ./custom-server.js
 
 USER nextjs
 
 EXPOSE 3000
 
-# Start the buffering proxy in front of the standalone server.
-# This works around AWS API Gateway HTTP API dropping the initial streaming
-# flush from Next.js (which contains <!DOCTYPE>, <html>, <head>, CSS links).
-CMD ["node", "custom-server.js"]
+# Start the Next.js standalone server directly.
+# CloudFront → public web ALB → ECS; no API Gateway in the web path.
+CMD ["node", "server.js"]
