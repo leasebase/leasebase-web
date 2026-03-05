@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { mapUserRoleToPersona, Persona } from "@/lib/auth/roles";
 import { getApiBaseUrl } from "@/lib/apiBase";
 
@@ -186,6 +186,20 @@ export const authStore = create<AuthState>()(
     }),
     {
       name: "lb_auth_v1",
+      // Wrap localStorage access so it returns undefined during SSR (no
+      // window).  Without this the persist middleware throws on the server.
+      storage: createJSONStorage(() =>
+        typeof window !== "undefined" ? localStorage : (undefined as any)
+      ),
+      // IMPORTANT — prevent zustand from auto-rehydrating from localStorage
+      // when the store module is first imported.  Without this flag the
+      // client's initial render can differ from the server render because
+      // persisted state (user, tokens) is merged before React hydrates,
+      // causing React error #418 / #423 and DOM appendChild failures.
+      //
+      // Each consumer must call `authStore.persist.rehydrate()` inside a
+      // useEffect so rehydration happens *after* the hydration pass.
+      skipHydration: true,
       partialize: (state): PersistedAuthState => ({
         mode: state.mode,
         accessToken: state.accessToken,

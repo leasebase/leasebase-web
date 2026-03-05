@@ -22,6 +22,11 @@ export function useRequireAuth(): UseRequireAuthResult {
 
   useEffect(() => {
     if (state.status === "idle") {
+      // Rehydrate persisted state from localStorage first.  The store uses
+      // skipHydration: true so this is the earliest safe moment (after React
+      // hydration).  rehydrate() is synchronous for localStorage so the
+      // subsequent initializeFromStorage() call sees the restored tokens.
+      authStore.persist.rehydrate();
       authStore.getState().initializeFromStorage();
       return;
     }

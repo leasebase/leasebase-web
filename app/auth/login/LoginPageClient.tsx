@@ -25,20 +25,32 @@ export default function LoginPageClient({
   const [devEmail, setDevEmail] = useState("");
   const [devRole, setDevRole] = useState("ORG_ADMIN");
   const [devOrgId, setDevOrgId] = useState("dev-org-1");
+  const [hydrated, setHydrated] = useState(false);
 
   const devBypassEnabled =
     process.env.NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH === "true" ||
     process.env.NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH === "1";
 
+  // Rehydrate the persisted auth store *after* React hydration completes.
+  // The store uses skipHydration: true so the first client render matches
+  // the server render (both see default/idle state).  Calling rehydrate()
+  // here merges localStorage data back into the store without causing a
+  // hydration mismatch (React #418 / #423).
+  useEffect(() => {
+    authStore.persist.rehydrate();
+    setHydrated(true);
+  }, []);
+
   // If already authenticated, skip login and go to the dashboard.
   useEffect(() => {
+    if (!hydrated) return;
     if (status === "idle") {
       authStore.getState().initializeFromStorage();
     }
     if (status === "authenticated" && user) {
       router.replace(next);
     }
-  }, [status, user, next, router]);
+  }, [hydrated, status, user, next, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
