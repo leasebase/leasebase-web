@@ -13,7 +13,9 @@
     "test:e2e:headed": "playwright test --headed",
     "api:generate": "openapi-typescript-codegen --input ./openapi/openapi.json --output ./src/lib/api/generated --client fetch",
     "generate:api": "openapi-typescript-codegen --input ./openapi/openapi.json --output ./src/lib/api/generated --client fetch",
-    "cognito:bootstrap": "node ./infra/cognito-bootstrap.ts"
+    "cognito:bootstrap": "node ./infra/cognito-bootstrap.ts",
+    "docs": "npx tsx docs-engine/analyzeRepo.ts",
+    "docs:preview": "DOCS_PREVIEW_ONLY=true npx tsx docs-engine/analyzeRepo.ts"
   },
   "dependencies": {
     "aws-amplify": "^6.16.2",

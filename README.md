@@ -133,6 +133,61 @@ For ECS or other orchestrators, see `docs/RUNTIME_CONTRACT.md` and `docs/ENVIRON
 
 ---
 
+## Automatic Documentation
+
+This repo includes a documentation engine (`docs-engine/`) that automatically scans the codebase and synchronizes documentation to Confluence.
+
+### What it does
+
+The engine extracts:
+
+- **Routes** — all Next.js App Router pages with their metadata
+- **Navigation structure** — from `src/lib/appNav.ts`
+- **Permissions** — persona-to-route mappings from the nav config and roles
+- **User flows** — login, dashboard, property management, maintenance, payments (with Mermaid diagrams)
+- **Use cases** — structured use cases with actors, steps, errors, and API dependencies
+
+It then generates Confluence storage-format HTML and creates/updates pages via the Confluence REST API.
+
+### Run locally
+
+```bash
+# Preview mode (no Confluence updates, outputs markdown summary)
+npm run docs:preview
+
+# Full mode (updates Confluence — requires env vars)
+npm run docs
+```
+
+Required environment variables for Confluence updates:
+
+- `CONFLUENCE_BASE_URL` — e.g. `https://yourorg.atlassian.net`
+- `CONFLUENCE_EMAIL` — Atlassian account email
+- `CONFLUENCE_API_TOKEN` — Atlassian API token
+- `CONFLUENCE_SPACE_KEY` — Confluence space key
+
+### CI/CD integration
+
+The GitHub Action `.github/workflows/update-docs.yml` runs automatically:
+
+- **On push to `main`**: updates all Confluence pages
+- **On pull requests**: posts a preview comment with detected routes, flows, use cases, and permissions
+
+Confluence secrets must be configured in the repository's GitHub Actions secrets.
+
+### Confluence page structure
+
+- **LeaseBase Web Documentation** (root)
+  - Overview (architecture, personas, auth)
+  - User Flows (Mermaid diagrams)
+  - Use Cases (grouped by category)
+  - Page Reference (per-route documentation)
+  - Permissions Matrix
+  - Error Handling
+  - Testing Scenarios
+
+---
+
 ## Contributing
 
 When adding or changing code in this repo:
