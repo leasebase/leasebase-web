@@ -11,6 +11,7 @@
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
+    "tokens:generate": "node scripts/generate-tokens.mjs",
     "api:generate": "openapi-typescript-codegen --input ./openapi/openapi.json --output ./src/lib/api/generated --client fetch",
     "generate:api": "openapi-typescript-codegen --input ./openapi/openapi.json --output ./src/lib/api/generated --client fetch",
     "cognito:bootstrap": "node ./infra/cognito-bootstrap.ts"

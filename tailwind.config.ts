@@ -1,5 +1,13 @@
 import type { Config } from "tailwindcss";
 
+/**
+ * Tailwind theme wired to CSS custom properties generated from tokens/*.json.
+ * Run `node scripts/generate-tokens.mjs` after editing token files.
+ *
+ * Shorthand helper:  var(--lb-<category>-<key>)
+ */
+const v = (name: string) => `var(--lb-${name})`;
+
 const config: Config = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
@@ -9,45 +17,91 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50: "#ecfdf5",
-          100: "#d1fae5",
-          200: "#a7f3d0",
-          300: "#6ee7b7",
-          400: "#34d399",
-          500: "#10b981",
-          600: "#059669",
-          700: "#047857",
-          800: "#065f46",
-          900: "#064e3b",
-          950: "#022c22",
+          50:  v("color-brand-primary-50"),
+          100: v("color-brand-primary-100"),
+          200: v("color-brand-primary-200"),
+          300: v("color-brand-primary-300"),
+          400: v("color-brand-primary-400"),
+          500: v("color-brand-primary-500"),
+          600: v("color-brand-primary-600"),
+          700: v("color-brand-primary-700"),
+          800: v("color-brand-primary-800"),
+          900: v("color-brand-primary-900"),
+          950: v("color-brand-primary-950"),
+        },
+        secondary: {
+          50:  v("color-brand-secondary-50"),
+          100: v("color-brand-secondary-100"),
+          200: v("color-brand-secondary-200"),
+          300: v("color-brand-secondary-300"),
+          400: v("color-brand-secondary-400"),
+          500: v("color-brand-secondary-500"),
+          600: v("color-brand-secondary-600"),
+          700: v("color-brand-secondary-700"),
+          800: v("color-brand-secondary-800"),
+          900: v("color-brand-secondary-900"),
+          950: v("color-brand-secondary-950"),
         },
         surface: {
-          DEFAULT: "#0f172a",
-          raised: "#1e293b",
-          overlay: "#334155",
+          DEFAULT: v("color-surface-default"),
+          base:    v("color-surface-base"),
+          raised:  v("color-surface-raised"),
+          overlay: v("color-surface-overlay"),
         },
-        success: { DEFAULT: "#10b981", light: "#d1fae5" },
-        warning: { DEFAULT: "#f59e0b", light: "#fef3c7" },
-        danger: { DEFAULT: "#ef4444", light: "#fee2e2" },
-        info: { DEFAULT: "#3b82f6", light: "#dbeafe" },
+        success: {
+          DEFAULT: v("color-semantic-success-500"),
+          light:   v("color-semantic-success-100"),
+          50:  v("color-semantic-success-50"),
+          600: v("color-semantic-success-600"),
+          700: v("color-semantic-success-700"),
+        },
+        warning: {
+          DEFAULT: v("color-semantic-warning-500"),
+          light:   v("color-semantic-warning-100"),
+          50:  v("color-semantic-warning-50"),
+          600: v("color-semantic-warning-600"),
+          700: v("color-semantic-warning-700"),
+        },
+        danger: {
+          DEFAULT: v("color-semantic-danger-500"),
+          light:   v("color-semantic-danger-100"),
+          50:  v("color-semantic-danger-50"),
+          600: v("color-semantic-danger-600"),
+          700: v("color-semantic-danger-700"),
+        },
+        info: {
+          DEFAULT: v("color-semantic-info-500"),
+          light:   v("color-semantic-info-100"),
+          50:  v("color-semantic-info-50"),
+          600: v("color-semantic-info-600"),
+          700: v("color-semantic-info-700"),
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: [v("typography-font-family-sans")],
+        mono: [v("typography-font-family-mono")],
       },
       borderRadius: {
-        DEFAULT: "0.375rem",
-        lg: "0.5rem",
-        xl: "0.75rem",
+        DEFAULT: v("radius-md"),
+        sm:  v("radius-sm"),
+        lg:  v("radius-lg"),
+        xl:  v("radius-xl"),
+        "2xl": v("radius-2xl"),
+        "3xl": v("radius-3xl"),
+        full: v("radius-full"),
       },
       boxShadow: {
-        card: "0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3)",
-        modal: "0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5)",
+        sm:    v("shadow-sm"),
+        card:  v("shadow-md"),
+        lg:    v("shadow-lg"),
+        xl:    v("shadow-xl"),
+        modal: v("shadow-2xl"),
       },
       ringWidth: {
         focus: "2px",
       },
       ringColor: {
-        focus: "#10b981",
+        focus: v("color-brand-primary-500"),
       },
     },
   },
