@@ -67,8 +67,9 @@ jobs:
         env:
           API_BASE_URL: ${{ vars.API_BASE_URL }}
 
-      # ── Deploy to ECS ──────────────────────────────────────────────────
+      # ── Deploy to ECS + invalidate CloudFront cache ──────────────────────────
       - name: Deploy to ECS Dev
         run: bash scripts/deploy_ecs.sh
         env:
           IMAGE: ${{ steps.build.outputs.image }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}

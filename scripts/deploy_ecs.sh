@@ -72,4 +72,21 @@ aws ecs wait services-stable \
   --cluster "$ECS_CLUSTER" \
   --services "$ECS_SERVICE"
 
-echo "✓ Deployment complete — ${ECS_SERVICE} is stable"
+echo "✓ ECS deployment complete — ${ECS_SERVICE} is stable"
+
+# ── CloudFront cache invalidation (optional) ─────────────────────────────────
+CF_DIST_ID=$(jq -r '.cloudfront_distribution_id // empty' "$CONFIG")
+# Also accept env-var override (e.g. from GitHub Actions repo variable)
+CF_DIST_ID="${CLOUDFRONT_DISTRIBUTION_ID:-${CF_DIST_ID}}"
+
+if [[ -n "${CF_DIST_ID}" ]]; then
+  echo "▸ Invalidating CloudFront cache (${CF_DIST_ID})..."
+  aws cloudfront create-invalidation \
+    --distribution-id "$CF_DIST_ID" \
+    --paths "/*" \
+    --query 'Invalidation.Id' \
+    --output text
+  echo "✓ CloudFront invalidation created"
+else
+  echo "▹ Skipping CloudFront invalidation (no distribution ID configured)"
+fi

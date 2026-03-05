@@ -7,5 +7,6 @@
   "task_family": "leasebase-dev-v2-web",
   "container_name": "web",
   "execution_role": "leasebase-dev-v2-ecs-execution",
-  "task_role": "leasebase-dev-v2-web-task"
+  "task_role": "leasebase-dev-v2-web-task",
+  "cloudfront_distribution_id": ""
 }
