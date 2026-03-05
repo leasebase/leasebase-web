@@ -32,13 +32,21 @@ CURRENT_TASK_DEF=$(aws ecs describe-task-definition \
   --region "$AWS_REGION" \
   --query 'taskDefinition')
 
-# ── Build new task definition with updated image ─────────────────────────────
+# ── Build new task definition with updated image + health check ───────────────
 NEW_TASK_DEF=$(echo "$CURRENT_TASK_DEF" | jq \
   --arg IMAGE "$IMAGE" \
   --arg CONTAINER "$CONTAINER_NAME" \
   '
   .containerDefinitions |= map(
-    if .name == $CONTAINER then .image = $IMAGE else . end
+    if .name == $CONTAINER then
+      .image = $IMAGE
+      | if .healthCheck then
+          .healthCheck.command = ["CMD-SHELL",
+            "wget -q -O /dev/null http://localhost:" +
+            (.portMappings[0].containerPort | tostring) +
+            "/api/health || exit 1"]
+        else . end
+    else . end
   )
   | del(.taskDefinitionArn, .revision, .status, .requiresAttributes,
         .compatibilities, .registeredAt, .registeredBy)
