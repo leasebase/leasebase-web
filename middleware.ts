@@ -11,7 +11,9 @@ import type { NextRequest } from "next/server";
  */
 export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === "/") {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+    const res = NextResponse.redirect(new URL("/auth/login", request.url));
+    res.headers.set("cache-control", "no-store, max-age=0");
+    return res;
   }
   return NextResponse.next();
 }
