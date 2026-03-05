@@ -1,5 +1,7 @@
-import LoginPage from "./auth/login/page";
+import LoginPageClient from "./auth/login/LoginPageClient";
+
+export const dynamic = "force-dynamic";
 
 export default function HomePage() {
-  return <LoginPage />;
+  return <LoginPageClient next="/app" />;
 }

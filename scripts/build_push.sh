@@ -36,6 +36,7 @@ if [[ -n "${API_BASE_URL:-}" ]]; then
 fi
 
 docker buildx build \
+  --no-cache \
   "${BUILD_ARGS[@]}" \
   --tag "${IMAGE_SHA}" \
   --tag "${IMAGE_LATEST}" \
