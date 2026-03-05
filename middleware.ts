@@ -11,7 +11,11 @@ import type { NextRequest } from "next/server";
  */
 export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === "/") {
-    const res = NextResponse.redirect(new URL("/auth/login", request.url));
+    // Use nextUrl (which respects x-forwarded-host / x-forwarded-proto)
+    // instead of request.url (which reflects the internal proxy address).
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/login";
+    const res = NextResponse.redirect(url);
     res.headers.set("cache-control", "no-store, max-age=0");
     return res;
   }

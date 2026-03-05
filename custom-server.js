@@ -32,12 +32,22 @@ require("./server");
 
 function createProxy() {
   return http.createServer((clientReq, clientRes) => {
+    // Build forwarding headers so Next.js middleware can reconstruct
+    // the public-facing URL (x-forwarded-host, x-forwarded-proto).
+    const fwdHeaders = Object.assign({}, clientReq.headers);
+    if (!fwdHeaders["x-forwarded-host"]) {
+      fwdHeaders["x-forwarded-host"] = clientReq.headers.host || "";
+    }
+    if (!fwdHeaders["x-forwarded-proto"]) {
+      fwdHeaders["x-forwarded-proto"] = "https";
+    }
+
     const proxyOpts = {
       hostname: "127.0.0.1",
       port: NEXT_INTERNAL_PORT,
       path: clientReq.url,
       method: clientReq.method,
-      headers: clientReq.headers,
+      headers: fwdHeaders,
     };
 
     const proxyReq = http.request(proxyOpts, (upstreamRes) => {
