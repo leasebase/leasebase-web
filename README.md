@@ -75,6 +75,59 @@ Key env vars (see `.env.example`):
 
 ---
 
+## Design System & Tokens
+
+The UI is built on a **canonical design token system** that lives in `tokens/` as JSON files. These tokens are the single source of truth for colors, typography, spacing, radius, and shadows.
+
+### Token files
+
+- `tokens/colors.json` — Brand, secondary, neutral, semantic palettes (WCAG AA)
+- `tokens/typography.json` — Font families, sizes, weights, line-heights
+- `tokens/spacing.json` — Spacing scale (0–64)
+- `tokens/radius.json` — Border-radius scale
+- `tokens/shadows.json` — Box-shadow scale
+- `tokens/README.md` — Full conventions and usage guide
+
+### Generating CSS custom properties
+
+After editing any token JSON file, regenerate the CSS variables:
+
+```bash
+npm run tokens:generate
+```
+
+This produces `src/design-system/tokens.css` with `--lb-*` CSS custom properties.
+`tailwind.config.ts` references these vars, so all Tailwind classes automatically update.
+
+### Figma sync
+
+If you have a Figma file with design tokens/icons, set `FIGMA_FILE_KEY` in `.env.local` and run:
+
+```bash
+npm run design:sync
+```
+
+This pulls variables + SVG icons from Figma and regenerates CSS tokens.
+
+### Component library
+
+All UI primitives live in `src/components/ui/` and are exported from `src/components/ui/index.ts`:
+
+Button, Input, Textarea, Select, RadioGroup, Badge, Card, Modal, Toast,
+DataTable, Checkbox, Switch, Tabs, Tooltip, Breadcrumb, Pagination,
+EmptyState, Skeleton, Avatar, DropdownMenu, Icon, PageHeader.
+
+Visit `/dev/components` in the dev server to see all components rendered.
+
+### Adding a new component
+
+1. Create `src/components/ui/MyComponent.tsx` following existing patterns.
+2. Export from `src/components/ui/index.ts`.
+3. Add a section in `app/dev/components/page.tsx`.
+4. Add unit tests in `tests/unit/`.
+
+---
+
 ## Tests
 
 Run unit/component tests with Jest:
