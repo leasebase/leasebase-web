@@ -7,6 +7,13 @@ jest.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
+// Mock next/headers — headers() is called in the page component to force
+// dynamic rendering, but it throws outside a real Next.js request context.
+jest.mock("next/headers", () => ({
+  headers: jest.fn(() => new Map()),
+  cookies: jest.fn(() => ({ get: jest.fn() })),
+}));
+
 describe("LoginPage", () => {
   test("renders sign-in heading", () => {
     render(<LoginPage />);
