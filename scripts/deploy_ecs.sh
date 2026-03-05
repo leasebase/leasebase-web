@@ -44,7 +44,7 @@ NEW_TASK_DEF=$(echo "$CURRENT_TASK_DEF" | jq \
           .healthCheck.command = ["CMD-SHELL",
             "wget -q -O /dev/null http://localhost:" +
             (.portMappings[0].containerPort | tostring) +
-            "/api/health || exit 1"]
+            "/healthz || exit 1"]
         else . end
     else . end
   )
