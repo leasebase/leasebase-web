@@ -1,4 +1,4 @@
-# Leasebase Web
+# Leasebase Web -- 
 
 This repository is the **standalone web frontend** for the Leasebase platform.
 
