@@ -1,22 +1,28 @@
-import { canAccessArea, getAreaForPath, PM_ROLES, TENANT_ROLES } from "@/lib/auth/roles";
+import { mapUserRoleToPersona } from "@/lib/auth/roles";
 
-describe("role guards", () => {
-  test("maps paths to areas", () => {
-    expect(getAreaForPath("/pm")).toBe("pm");
-    expect(getAreaForPath("/pm/leases")).toBe("pm");
-    expect(getAreaForPath("/tenant")).toBe("tenant");
-    expect(getAreaForPath("/foo")).toBeNull();
+describe("mapUserRoleToPersona", () => {
+  test("ORG_ADMIN maps to propertyManager", () => {
+    expect(mapUserRoleToPersona("ORG_ADMIN")).toBe("propertyManager");
   });
 
-  test("pm roles can access pm area", () => {
-    for (const r of PM_ROLES) {
-      expect(canAccessArea(r, "pm")).toBe(true);
-    }
+  test("PM_STAFF maps to propertyManager", () => {
+    expect(mapUserRoleToPersona("PM_STAFF")).toBe("propertyManager");
   });
 
-  test("tenant role cannot access pm area", () => {
-    for (const r of TENANT_ROLES) {
-      expect(canAccessArea(r, "pm")).toBe(false);
-    }
+  test("OWNER maps to owner", () => {
+    expect(mapUserRoleToPersona("OWNER")).toBe("owner");
+  });
+
+  test("TENANT maps to tenant", () => {
+    expect(mapUserRoleToPersona("TENANT")).toBe("tenant");
+  });
+
+  test("unknown role defaults to tenant", () => {
+    expect(mapUserRoleToPersona("UNKNOWN_ROLE")).toBe("tenant");
+  });
+
+  test("null/undefined defaults to tenant", () => {
+    expect(mapUserRoleToPersona(null)).toBe("tenant");
+    expect(mapUserRoleToPersona(undefined)).toBe("tenant");
   });
 });

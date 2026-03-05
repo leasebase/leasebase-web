@@ -1,17 +1,23 @@
 import { render, screen } from "@testing-library/react";
 import LoginPage from "@/app/auth/login/page";
 
-jest.mock("@/lib/config", () => ({
-  getAppConfig: () => ({
-    apiBaseUrl: "http://localhost:4000",
-    cognito: { userPoolId: undefined, clientId: undefined, domain: undefined },
-    devMockAuth: true
-  })
+// Mock next/navigation for useRouter / useSearchParams
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: jest.fn(), push: jest.fn() }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 describe("LoginPage", () => {
-  test("shows dev-only mock login section when enabled", () => {
+  test("renders sign-in heading", () => {
     render(<LoginPage />);
-    expect(screen.getByText(/Dev-only mock login/)).toBeInTheDocument();
+    expect(screen.getByText(/Sign in to Leasebase/)).toBeInTheDocument();
+  });
+
+  test("renders email and password fields", () => {
+    render(<LoginPage />);
+    // Login form uses <label> + <input> in the same container (no explicit htmlFor)
+    expect(screen.getByRole("textbox", { name: "" })).toBeTruthy(); // email input
+    expect(screen.getByText(/Email/)).toBeInTheDocument();
+    expect(screen.getByText(/Password/)).toBeInTheDocument();
   });
 });

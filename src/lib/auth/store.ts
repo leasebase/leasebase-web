@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { mapUserRoleToPersona, Persona } from "@/lib/auth/roles";
 import { getApiBaseUrl } from "@/lib/apiBase";
