@@ -40,9 +40,13 @@ NEW_TASK_DEF=$(echo "$CURRENT_TASK_DEF" | jq \
   .containerDefinitions |= map(
     if .name == $CONTAINER then
       .image = $IMAGE
+      | .environment = (
+          ((.environment // []) | map(select(.name != "HOSTNAME")))
+          + [{ "name": "HOSTNAME", "value": "0.0.0.0" }]
+        )
       | if .healthCheck then
           .healthCheck.command = ["CMD-SHELL",
-            "wget -q -O /dev/null http://localhost:" +
+            "wget -q -O /dev/null http://127.0.0.1:" +
             (.portMappings[0].containerPort | tostring) +
             "/healthz || exit 1"]
         else . end
