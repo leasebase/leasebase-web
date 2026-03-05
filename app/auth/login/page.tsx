@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { authStore } from "@/lib/auth/store";
@@ -8,6 +8,7 @@ import { authStore } from "@/lib/auth/store";
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user, status } = authStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +21,17 @@ function LoginContent() {
     process.env.NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH === "true" ||
     process.env.NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH === "1";
 
-  const next = searchParams.get("next") || "/dashboard";
+  const next = searchParams.get("next") || "/app";
+
+  // If already authenticated, skip login and go to the dashboard.
+  useEffect(() => {
+    if (status === "idle") {
+      authStore.getState().initializeFromStorage();
+    }
+    if (status === "authenticated" && user) {
+      router.replace(next);
+    }
+  }, [status, user, next, router]);
   const registered = searchParams.get("registered");
   const registrationMessage = searchParams.get("message");
 
@@ -62,8 +73,10 @@ function LoginContent() {
   };
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <div>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+     <div className="w-full max-w-md space-y-6">
+      <div className="flex flex-col items-center gap-2 mb-2">
+        <span className="h-10 w-10 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-lg">LB</span>
         <h1 className="text-2xl font-semibold">Sign in to Leasebase</h1>
         <p className="mt-1 text-sm text-slate-300">
           Use your email and password, or continue with a connected identity
@@ -206,6 +219,7 @@ function LoginContent() {
           </Link>
         </p>
       </div>
+     </div>
     </div>
   );
 }
