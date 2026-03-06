@@ -1,13 +1,16 @@
 import { render, screen } from "@testing-library/react";
-import PmDashboardPage from "@/app/(pm)/pm/page";
+import { PMDashboard } from "@/components/dashboards/PMDashboard";
 
-jest.mock("@/lib/api/hooks", () => ({
-  usePmDashboard: () => ({ data: null, loading: true, error: null })
-}));
+describe("PMDashboard", () => {
+  test("renders portfolio overview heading", () => {
+    render(<PMDashboard />);
+    expect(screen.getByText(/Portfolio overview/)).toBeInTheDocument();
+  });
 
-describe("PmDashboardPage", () => {
-  test("shows loading state", () => {
-    render(<PmDashboardPage />);
-    expect(screen.getByText(/Loading dashboard/i)).toBeInTheDocument();
+  test("renders KPI stat cards", () => {
+    render(<PMDashboard />);
+    expect(screen.getByText("Properties")).toBeInTheDocument();
+    expect(screen.getByText("Units")).toBeInTheDocument();
+    expect(screen.getByText("Occupancy")).toBeInTheDocument();
   });
 });

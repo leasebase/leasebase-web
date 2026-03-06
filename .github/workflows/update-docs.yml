@@ -1,0 +1,65 @@
+name: Update Documentation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  docs:
+    name: Generate & Sync Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install docs-engine dependencies
+        working-directory: docs-engine
+        run: npm ci --ignore-scripts
+
+      # ── Push to main → update Confluence ──────────────────────
+      - name: Update Confluence pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        working-directory: docs-engine
+        env:
+          CONFLUENCE_BASE_URL: ${{ secrets.CONFLUENCE_BASE_URL }}
+          CONFLUENCE_EMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
+          CONFLUENCE_API_TOKEN: ${{ secrets.CONFLUENCE_API_TOKEN }}
+          CONFLUENCE_SPACE_KEY: ${{ secrets.CONFLUENCE_SPACE_KEY }}
+        run: npx tsx analyzeRepo.ts
+
+      # ── Pull request → preview comment ────────────────────────
+      - name: Generate documentation preview
+        if: github.event_name == 'pull_request'
+        id: preview
+        working-directory: docs-engine
+        env:
+          DOCS_PREVIEW_ONLY: "true"
+        run: |
+          npx tsx analyzeRepo.ts > /tmp/docs-output.txt 2>&1 || true
+          # Extract the preview section between markers
+          sed -n '/---PREVIEW_START---/,/---PREVIEW_END---/{/---PREVIEW_START---/d;/---PREVIEW_END---/d;p}' /tmp/docs-output.txt > /tmp/preview.md
+          echo "preview_file=/tmp/preview.md" >> "$GITHUB_OUTPUT"
+
+      - name: Post PR comment with preview
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -s /tmp/preview.md ]; then
+            gh pr comment "${{ github.event.pull_request.number }}" \
+              --repo "${{ github.repository }}" \
+              --body-file /tmp/preview.md
+          else
+            echo "No preview content generated — skipping comment."
+          fi

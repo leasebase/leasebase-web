@@ -1,20 +1,12 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+/**
+ * Root page — immediately redirects to the login page.
+ *
+ * In practice the middleware already handles "/" → "/auth/login", but this
+ * server-side redirect acts as a safety net for any path that bypasses
+ * middleware (e.g. direct RSC fetches during client navigation).
+ */
 export default function HomePage() {
-  const cookieStore = cookies();
-  const role = cookieStore.get("lb_role")?.value;
-
-  // No session: land on login page
-  if (!role) {
-    redirect("/auth/login");
-  }
-
-  // Tenant session → tenant dashboard
-  if (role === "TENANT") {
-    redirect("/tenant");
-  }
-
-  // PM / landlord roles → management dashboard
-  redirect("/pm");
+  redirect("/auth/login");
 }

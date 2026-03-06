@@ -16,10 +16,16 @@ RUN npm ci
 # Copy the rest of the source
 COPY . .
 
+# NEXT_PUBLIC_API_BASE_URL is baked into the client JS bundle at build time.
+# Set via --build-arg in CI (e.g. https://api.dev.leasebase.co for dev).
+# Locally it defaults to empty; .env.local supplies http://localhost:4000.
+ARG NEXT_PUBLIC_API_BASE_URL=
+ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+
 # Build the Next.js app
 RUN npm run build
 
-# 2) Runner image: minimal production runtime
+# 2) Runner image: minimal production runtime (standalone)
 FROM node:20-alpine AS runner
 
 WORKDIR /app
@@ -27,30 +33,25 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Ensure runtime env vars are clearly defined here; actual values are
-# injected at deploy time (ECS task definition, etc.).
-#
-# - NEXT_PUBLIC_API_BASE_URL
-# - NEXT_PUBLIC_COGNITO_USER_POOL_ID
-# - NEXT_PUBLIC_COGNITO_CLIENT_ID
-# - NEXT_PUBLIC_COGNITO_DOMAIN
-# - DEV_ONLY_MOCK_AUTH
+# Runtime env vars injected at deploy time (ECS task definition):
+#   NEXT_PUBLIC_COGNITO_USER_POOL_ID, NEXT_PUBLIC_COGNITO_CLIENT_ID,
+#   NEXT_PUBLIC_COGNITO_DOMAIN, DEV_ONLY_MOCK_AUTH
+# Note: NEXT_PUBLIC_API_BASE_URL is baked at build time, not runtime.
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs \
   && adduser -S nextjs -u 1001
 
-# Copy only what we need from the builder
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/package-lock.json ./
-COPY --from=builder /app/.next ./.next
+# With output: 'standalone', Next.js bundles everything into .next/standalone.
+# We only need the standalone server, static assets, and public dir.
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder /app/next.config.mjs ./next.config.mjs
-COPY --from=builder /app/node_modules ./node_modules
 
 USER nextjs
 
 EXPOSE 3000
 
-# Start the Next.js production server
-CMD ["npm", "run", "start"]
+# Start the Next.js standalone server directly.
+# CloudFront → public web ALB → ECS; no API Gateway in the web path.
+CMD ["node", "server.js"]

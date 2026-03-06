@@ -1,4 +1,4 @@
-# Leasebase Web
+# Leasebase Web -- 
 
 This repository is the **standalone web frontend** for the Leasebase platform.
 
@@ -75,6 +75,59 @@ Key env vars (see `.env.example`):
 
 ---
 
+## Design System & Tokens
+
+The UI is built on a **canonical design token system** that lives in `tokens/` as JSON files. These tokens are the single source of truth for colors, typography, spacing, radius, and shadows.
+
+### Token files
+
+- `tokens/colors.json` — Brand, secondary, neutral, semantic palettes (WCAG AA)
+- `tokens/typography.json` — Font families, sizes, weights, line-heights
+- `tokens/spacing.json` — Spacing scale (0–64)
+- `tokens/radius.json` — Border-radius scale
+- `tokens/shadows.json` — Box-shadow scale
+- `tokens/README.md` — Full conventions and usage guide
+
+### Generating CSS custom properties
+
+After editing any token JSON file, regenerate the CSS variables:
+
+```bash
+npm run tokens:generate
+```
+
+This produces `src/design-system/tokens.css` with `--lb-*` CSS custom properties.
+`tailwind.config.ts` references these vars, so all Tailwind classes automatically update.
+
+### Figma sync
+
+If you have a Figma file with design tokens/icons, set `FIGMA_FILE_KEY` in `.env.local` and run:
+
+```bash
+npm run design:sync
+```
+
+This pulls variables + SVG icons from Figma and regenerates CSS tokens.
+
+### Component library
+
+All UI primitives live in `src/components/ui/` and are exported from `src/components/ui/index.ts`:
+
+Button, Input, Textarea, Select, RadioGroup, Badge, Card, Modal, Toast,
+DataTable, Checkbox, Switch, Tabs, Tooltip, Breadcrumb, Pagination,
+EmptyState, Skeleton, Avatar, DropdownMenu, Icon, PageHeader.
+
+Visit `/dev/components` in the dev server to see all components rendered.
+
+### Adding a new component
+
+1. Create `src/components/ui/MyComponent.tsx` following existing patterns.
+2. Export from `src/components/ui/index.ts`.
+3. Add a section in `app/dev/components/page.tsx`.
+4. Add unit tests in `tests/unit/`.
+
+---
+
 ## Tests
 
 Run unit/component tests with Jest:
@@ -133,6 +186,61 @@ For ECS or other orchestrators, see `docs/RUNTIME_CONTRACT.md` and `docs/ENVIRON
 
 ---
 
+## Automatic Documentation
+
+This repo includes a documentation engine (`docs-engine/`) that automatically scans the codebase and synchronizes documentation to Confluence.
+
+### What it does
+
+The engine extracts:
+
+- **Routes** — all Next.js App Router pages with their metadata
+- **Navigation structure** — from `src/lib/appNav.ts`
+- **Permissions** — persona-to-route mappings from the nav config and roles
+- **User flows** — login, dashboard, property management, maintenance, payments (with Mermaid diagrams)
+- **Use cases** — structured use cases with actors, steps, errors, and API dependencies
+
+It then generates Confluence storage-format HTML and creates/updates pages via the Confluence REST API.
+
+### Run locally
+
+```bash
+# Preview mode (no Confluence updates, outputs markdown summary)
+npm run docs:preview
+
+# Full mode (updates Confluence — requires env vars)
+npm run docs
+```
+
+Required environment variables for Confluence updates:
+
+- `CONFLUENCE_BASE_URL` — e.g. `https://yourorg.atlassian.net`
+- `CONFLUENCE_EMAIL` — Atlassian account email
+- `CONFLUENCE_API_TOKEN` — Atlassian API token
+- `CONFLUENCE_SPACE_KEY` — Confluence space key
+
+### CI/CD integration
+
+The GitHub Action `.github/workflows/update-docs.yml` runs automatically:
+
+- **On push to `main`**: updates all Confluence pages
+- **On pull requests**: posts a preview comment with detected routes, flows, use cases, and permissions
+
+Confluence secrets must be configured in the repository's GitHub Actions secrets.
+
+### Confluence page structure
+
+- **LeaseBase Web Documentation** (root)
+  - Overview (architecture, personas, auth)
+  - User Flows (Mermaid diagrams)
+  - Use Cases (grouped by category)
+  - Page Reference (per-route documentation)
+  - Permissions Matrix
+  - Error Handling
+  - Testing Scenarios
+
+---
+
 ## Contributing
 
 When adding or changing code in this repo:
@@ -151,3 +259,17 @@ Future changes should keep this README in sync by updating:
 - Project structure and conventions as new modules and routes are added.
 - Any framework-specific notes (routing, data fetching, SSR/SSG, etc.) that impact how contributors work on the app.
 
+
+
+---
+
+## Docker Tagging Strategy
+
+Every CI build on `develop` pushes **two Docker image tags** to Amazon ECR:
+
+- **`dev-latest`** — moving tag that always points to the most recent develop build. ECS services are configured to deploy this tag.
+- **`<git-sha>`** — immutable tag using the full 40-character commit SHA, retained for traceability and rollback.
+
+**ECS deployments** reference `dev-latest`. After pushing, the pipeline registers a new ECS task definition with `dev-latest` and forces a new deployment.
+
+**Rollbacks**: to roll back to a previous build, update the ECS task definition to reference the specific `<git-sha>` tag of the desired commit.
