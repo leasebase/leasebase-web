@@ -1,9 +1,11 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getApiBaseUrl } from "@/lib/apiBase";
+import { validatePassword, isPasswordComplexityError } from "@/lib/validation/password";
+import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 
 export type UserType = "PROPERTY_MANAGER" | "OWNER" | "TENANT";
 
@@ -47,6 +49,14 @@ const userTypeOptions: UserTypeOption[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Field-level error state                                            */
+/* ------------------------------------------------------------------ */
+interface FieldErrors {
+  password?: string;
+  confirmPassword?: string;
+}
+
 function RegisterContent() {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2>(1);
@@ -57,7 +67,26 @@ function RegisterContent() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [loading, setLoading] = useState(false);
+  const [passwordDirty, setPasswordDirty] = useState(false);
+  const [confirmDirty, setConfirmDirty] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  // Live password validation — recomputed on every keystroke.
+  const pwResult = useMemo(() => validatePassword(password), [password]);
+
+  // Derived: confirm mismatch (only surface after user has touched the field).
+  const confirmMismatch = confirmDirty && confirmPassword.length > 0 && password !== confirmPassword;
+
+  // Derived: form is submittable.
+  const formValid =
+    !!userType &&
+    email.length > 0 &&
+    firstName.length > 0 &&
+    lastName.length > 0 &&
+    pwResult.valid &&
+    password === confirmPassword;
 
   const handleUserTypeSelect = (type: UserType) => {
     setUserType(type);
@@ -67,46 +96,55 @@ function RegisterContent() {
   const handleBack = () => {
     setStep(1);
     setError(null);
+    setFieldErrors({});
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitted(true);
     setError(null);
+    setFieldErrors({});
 
     if (!userType) {
       setError("Please select a user type");
-      setLoading(false);
+      return;
+    }
+
+    // Client-side password validation — block submit, don't call API.
+    if (!pwResult.valid) {
+      setFieldErrors({ password: "Password does not meet the requirements." });
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      setLoading(false);
+      setFieldErrors({ confirmPassword: "Passwords do not match." });
       return;
     }
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters");
-      setLoading(false);
-      return;
-    }
+    setLoading(true);
 
     try {
       const res = await fetch(`${getApiBaseUrl()}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, firstName, lastName, userType })
+        body: JSON.stringify({ email, password, firstName, lastName, userType }),
       });
       if (!res.ok) {
         const text = await res.text();
         let message = "Registration failed";
         try {
           const body = JSON.parse(text);
-          message = body.message || message;
+          message = body.message || body.error?.message || message;
         } catch {
           // Non-JSON response (likely HTML error page)
         }
+
+        // Map password-specific backend errors to the password field.
+        if (isPasswordComplexityError(message)) {
+          setFieldErrors({ password: "Password does not meet the requirements." });
+          return;
+        }
+
         throw new Error(message);
       }
 
@@ -119,7 +157,7 @@ function RegisterContent() {
 
       const message = encodeURIComponent(
         data.message ||
-          "Registration successful. Please check your email for a Leasebase verification code."
+          "Registration successful. Please check your email for a Leasebase verification code.",
       );
 
       if (data.userConfirmed) {
@@ -176,7 +214,7 @@ function RegisterContent() {
   }
 
   // Step 2: Registration form
-  const selectedOption = userTypeOptions.find(o => o.value === userType);
+  const selectedOption = userTypeOptions.find((o) => o.value === userType);
 
   return (
     <div className="max-w-md mx-auto space-y-6">
@@ -196,66 +234,104 @@ function RegisterContent() {
         </p>
       </div>
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {/* Global error — only for non-field-specific issues (e.g. "email already exists") */}
+      {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
 
-      <form className="space-y-3" onSubmit={handleSubmit}>
+      <form className="space-y-3" onSubmit={handleSubmit} noValidate>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1 text-sm">
-            <label className="block text-slate-200">First Name</label>
+            <label htmlFor="register-first-name" className="block text-slate-200">First Name</label>
             <input
+              id="register-first-name"
               type="text"
               value={firstName}
-              onChange={e => setFirstName(e.target.value)}
+              onChange={(e) => setFirstName(e.target.value)}
               className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-sm"
               required
             />
           </div>
           <div className="space-y-1 text-sm">
-            <label className="block text-slate-200">Last Name</label>
+            <label htmlFor="register-last-name" className="block text-slate-200">Last Name</label>
             <input
+              id="register-last-name"
               type="text"
               value={lastName}
-              onChange={e => setLastName(e.target.value)}
+              onChange={(e) => setLastName(e.target.value)}
               className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-sm"
               required
             />
           </div>
         </div>
         <div className="space-y-1 text-sm">
-          <label className="block text-slate-200">Email</label>
+          <label htmlFor="register-email" className="block text-slate-200">Email</label>
           <input
+            id="register-email"
             type="email"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-sm"
             required
           />
         </div>
+
+        {/* ── Password with live requirements ────────────────────────── */}
         <div className="space-y-1 text-sm">
-          <label className="block text-slate-200">Password</label>
+          <label htmlFor="register-password" className="block text-slate-200">Password</label>
           <input
+            id="register-password"
             type="password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-sm"
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (!passwordDirty) setPasswordDirty(true);
+              setFieldErrors((prev) => ({ ...prev, password: undefined }));
+            }}
+            aria-invalid={!!fieldErrors.password || (submitted && !pwResult.valid)}
+            aria-describedby="pw-requirements pw-error"
+            className={`w-full rounded-md border bg-slate-900 px-2 py-1 text-sm ${
+              fieldErrors.password ? "border-red-500" : "border-slate-700"
+            }`}
             placeholder="At least 8 characters"
             required
           />
+          <PasswordRequirements result={pwResult} dirty={passwordDirty} id="pw-requirements" />
+          {fieldErrors.password && (
+            <p id="pw-error" className="text-xs text-red-400" role="alert">
+              {fieldErrors.password}
+            </p>
+          )}
         </div>
+
+        {/* ── Confirm password ───────────────────────────────────────── */}
         <div className="space-y-1 text-sm">
-          <label className="block text-slate-200">Confirm Password</label>
+          <label htmlFor="register-confirm" className="block text-slate-200">Confirm Password</label>
           <input
+            id="register-confirm"
             type="password"
             value={confirmPassword}
-            onChange={e => setConfirmPassword(e.target.value)}
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-sm"
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              if (!confirmDirty) setConfirmDirty(true);
+              setFieldErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+            }}
+            aria-invalid={confirmMismatch || !!fieldErrors.confirmPassword}
+            aria-describedby="confirm-error"
+            className={`w-full rounded-md border bg-slate-900 px-2 py-1 text-sm ${
+              confirmMismatch || fieldErrors.confirmPassword ? "border-red-500" : "border-slate-700"
+            }`}
             required
           />
+          {(confirmMismatch || fieldErrors.confirmPassword) && (
+            <p id="confirm-error" className="text-xs text-red-400" role="alert">
+              {fieldErrors.confirmPassword || "Passwords do not match."}
+            </p>
+          )}
         </div>
+
         <button
           type="submit"
-          disabled={loading}
-          className="mt-2 w-full rounded-md bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 disabled:opacity-60"
+          disabled={loading || !formValid}
+          className="mt-2 w-full rounded-md bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? "Creating account…" : "Create account"}
         </button>

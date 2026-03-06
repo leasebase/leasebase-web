@@ -12,9 +12,12 @@ export interface UseRequireAuthResult {
 }
 
 /**
- * Auth guard hook. Reads authStore, initialises the session from persisted
- * storage when idle, calls loadMe when needed, and redirects to login when
- * the session is determined to be unauthenticated.
+ * Auth guard hook for protected routes.
+ *
+ * - On first mount (`idle`), calls `bootstrapSession()` which handles
+ *   rehydration, token validation, and /me in one shot.
+ * - Redirects to `/auth/login` when status settles to `unauthenticated`.
+ * - Never surfaces bootstrap errors — a stale token is silently cleared.
  */
 export function useRequireAuth(): UseRequireAuthResult {
   const router = useRouter();
@@ -25,25 +28,9 @@ export function useRequireAuth(): UseRequireAuthResult {
     devLog("auth", "useRequireAuth status =", state.status);
 
     if (state.status === "idle") {
-      // Rehydrate persisted state from localStorage first.  The store uses
-      // skipHydration: true so this is the earliest safe moment (after React
-      // hydration).  rehydrate() is synchronous for localStorage so the
-      // subsequent initializeFromStorage() call sees the restored tokens.
-      devLog("auth", "rehydrating + initializeFromStorage");
-      authStore.persist.rehydrate();
-      authStore.getState().initializeFromStorage();
-      return;
-    }
-
-    if (state.status === "initializing" && !state.user) {
-      devLog("auth", "loading /api/auth/me");
-      authStore
-        .getState()
-        .loadMe()
-        .catch(() => {
-          devLog("auth", "loadMe failed, redirecting to login");
-          router.replace(`/auth/login?next=${encodeURIComponent(pathname || "/app")}`);
-        });
+      // bootstrapSession handles rehydrate + initializeFromStorage + loadMe
+      // in one atomic flow.  It never throws.
+      authStore.getState().bootstrapSession();
       return;
     }
 

@@ -19,65 +19,56 @@ export default function LoginPageClient({
 }: LoginPageClientProps) {
   const router = useRouter();
   const { user, status } = authStore();
+  // `loginError` is ONLY set by the login-submit handler — never by bootstrap.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [devEmail, setDevEmail] = useState("");
   const [devRole, setDevRole] = useState("ORG_ADMIN");
   const [devOrgId, setDevOrgId] = useState("dev-org-1");
-  const [hydrated, setHydrated] = useState(false);
 
   const devBypassEnabled =
     process.env.NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH === "true" ||
     process.env.NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH === "1";
 
-  // Rehydrate the persisted auth store *after* React hydration completes.
-  // The store uses skipHydration: true so the first client render matches
-  // the server render (both see default/idle state).  Calling rehydrate()
-  // here merges localStorage data back into the store without causing a
-  // hydration mismatch (React #418 / #423).
+  // Bootstrap: check if user already has a valid session.
+  // Uses bootstrapSession() which never throws and silently clears stale tokens.
   useEffect(() => {
-    devLog("login", "rehydrating auth store");
-    authStore.persist.rehydrate();
-    setHydrated(true);
+    devLog("login", "bootstrapping session");
+    authStore.getState().bootstrapSession();
   }, []);
 
-  // If already authenticated, skip login and go to the dashboard.
+  // If already authenticated (or becomes authenticated after bootstrap), redirect.
   useEffect(() => {
-    if (!hydrated) return;
     devLog("login", "auth status =", status, "user =", user?.email ?? "(none)");
-    if (status === "idle") {
-      authStore.getState().initializeFromStorage();
-    }
     if (status === "authenticated" && user) {
       devLog("login", "already authenticated, redirecting to", next);
       router.replace(next);
     }
-  }, [hydrated, status, user, next, router]);
+  }, [status, user, next, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
+    setLoginError(null);
     try {
       await authStore.getState().loginWithPassword(email, password);
       router.replace(next);
     } catch (err: any) {
-      setError(err.message || "Login failed");
+      setLoginError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
   const startOidcLogin = () => {
-    // Placeholder: Hosted UI / social login flows can be wired here later.
-    setError("Social login is not configured for this environment.");
+    setLoginError("Social login is not configured for this environment.");
   };
 
   const handleDevBypass = async () => {
     setLoading(true);
-    setError(null);
+    setLoginError(null);
     try {
       const emailToUse = devEmail || email || "pm@example.com";
       await authStore.getState().loginDevBypass({
@@ -87,7 +78,7 @@ export default function LoginPageClient({
       });
       router.replace(next || "/app");
     } catch (err: any) {
-      setError(err.message || "Dev bypass login failed");
+      setLoginError(err.message || "Dev bypass login failed");
     } finally {
       setLoading(false);
     }
@@ -108,7 +99,7 @@ export default function LoginPageClient({
         {registered && registrationMessage && (
           <p className="text-sm text-emerald-400">{decodeURIComponent(registrationMessage)}</p>
         )}
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {loginError && <p className="text-sm text-red-400" role="alert">{loginError}</p>}
 
         <p className="text-xs text-slate-400">
           Just created an account but don&apos;t see a verification screen?{" "}

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { mapUserRoleToPersona, Persona } from "@/lib/auth/roles";
 import { getApiBaseUrl } from "@/lib/apiBase";
+import { devLog } from "@/lib/debug";
 
 export type AuthMode = "cognito" | "devBypass";
 
@@ -32,10 +33,35 @@ interface AuthState {
   user?: CurrentUser;
   devBypass?: DevBypassSession;
   status: AuthStatus;
+
+  /**
+   * Bootstrap auth from persisted storage in a single call.
+   *
+   * 1. Rehydrates zustand from localStorage.
+   * 2. If no token or token expired → sets unauthenticated.
+   * 3. If token looks valid → calls `/api/auth/me`.
+   *    - 200 → authenticated.
+   *    - 401 → silently clears tokens, sets unauthenticated.
+   *    - Network error → sets unauthenticated (no error banner).
+   *
+   * Returns without throwing.  Callers never need try/catch.
+   */
+  bootstrapSession: () => Promise<void>;
+  /** @deprecated Use `bootstrapSession()` instead. Kept for backward compat. */
   initializeFromStorage: () => void;
+  /**
+   * Authenticate with email + password.
+   * Throws on failure so the caller can display inline login errors.
+   */
   loginWithPassword: (email: string, password: string) => Promise<void>;
   loginDevBypass: (session: DevBypassSession) => Promise<void>;
-  loadMe: () => Promise<void>;
+  /**
+   * Fetch the current user profile from `/api/auth/me`.
+   *
+   * @param context - `"bootstrap"` silently clears on 401.
+   *                  `"login"` re-throws so the caller can show a login error.
+   */
+  loadMe: (context?: "bootstrap" | "login") => Promise<void>;
   logout: (reason?: "manual" | "unauthorized") => void;
 }
 
@@ -49,25 +75,80 @@ interface PersistedAuthState {
   user?: CurrentUser;
 }
 
+/** Sentinel so `bootstrapSession` only runs once per page-load. */
+let bootstrapPromise: Promise<void> | null = null;
+
 export const authStore = create<AuthState>()(
   persist(
     (set, get) => ({
       mode: null,
       status: "idle",
 
+      bootstrapSession: async () => {
+        // Deduplicate: if bootstrap is already in-flight, return the same promise.
+        if (bootstrapPromise) return bootstrapPromise;
+
+        bootstrapPromise = (async () => {
+          try {
+            // Step 1 — rehydrate persisted state from localStorage.
+            authStore.persist.rehydrate();
+
+            const { accessToken, expiresAt, mode, devBypass, user } = get();
+
+            // Dev-bypass mode — already has user from previous session.
+            if (mode === "devBypass" && devBypass) {
+              set({ status: "initializing" });
+              await get().loadMe("bootstrap");
+              return;
+            }
+
+            // No token at all → unauthenticated, no /me call.
+            if (!accessToken) {
+              devLog("auth", "bootstrap: no token, unauthenticated");
+              set({ status: "unauthenticated", mode: null, user: undefined });
+              return;
+            }
+
+            // Token expired locally → clear and bail.
+            if (expiresAt && expiresAt <= Date.now()) {
+              devLog("auth", "bootstrap: token expired locally, clearing");
+              set({
+                status: "unauthenticated",
+                mode: null,
+                user: undefined,
+                accessToken: undefined,
+                idToken: undefined,
+                refreshToken: undefined,
+                expiresAt: undefined,
+              });
+              return;
+            }
+
+            // Token looks fresh — validate with /me.
+            // If user is already hydrated from localStorage, optimistically mark
+            // authenticated then verify in the background.
+            set({ status: user ? "authenticated" : "initializing" });
+            await get().loadMe("bootstrap");
+          } catch {
+            // bootstrapSession must never throw.
+            devLog("auth", "bootstrap: unexpected error, treating as unauthenticated");
+          }
+        })();
+
+        return bootstrapPromise;
+      },
+
       initializeFromStorage: () => {
+        // Legacy compat — synchronous subset of bootstrapSession.
         const { expiresAt, accessToken } = get();
         if (!accessToken || !expiresAt) {
           set({ status: "unauthenticated", mode: null, user: undefined });
           return;
         }
-        const now = Date.now();
-        if (expiresAt <= now) {
+        if (expiresAt <= Date.now()) {
           set({ status: "unauthenticated", mode: null, user: undefined, accessToken: undefined, idToken: undefined, refreshToken: undefined });
           return;
         }
-        // We have a non-expired token; mark as unauthenticated-but-with-session so
-        // loadMe can complete the picture.
         set((state) => ({ status: state.user ? "authenticated" : "initializing" }));
       },
 
@@ -86,7 +167,8 @@ export const authStore = create<AuthState>()(
             body = {};
           }
           if (!r.ok) {
-            throw new Error(body?.message || "Login failed");
+            // Surface backend message for login errors (e.g. "Invalid email or password")
+            throw new Error(body?.error?.message || body?.message || "Login failed");
           }
           return body as { accessToken: string; idToken: string; refreshToken?: string; expiresIn: number };
         });
@@ -105,7 +187,8 @@ export const authStore = create<AuthState>()(
           devBypass: undefined,
         });
 
-        await get().loadMe();
+        // Login /me call should throw so the login page can show the error.
+        await get().loadMe("login");
       },
 
       loginDevBypass: async (session: DevBypassSession) => {
@@ -119,13 +202,13 @@ export const authStore = create<AuthState>()(
           status: "initializing",
         });
 
-        await get().loadMe();
+        await get().loadMe("login");
       },
 
-      loadMe: async () => {
+      loadMe: async (context = "bootstrap") => {
         try {
           const base = getApiBaseUrl();
-          const me = await fetch(`${base}/api/auth/me`, {
+          const response = await fetch(`${base}/api/auth/me`, {
             headers: (() => {
               const headers = new Headers();
               const { mode, accessToken, devBypass } = get();
@@ -139,39 +222,74 @@ export const authStore = create<AuthState>()(
               }
               return headers;
             })(),
-          }).then(async (r) => {
-            const text = await r.text();
-            let body: any = {};
-            try {
-              body = text ? JSON.parse(text) : {};
-            } catch {
-              body = {};
-            }
-            if (!r.ok) {
-              throw new Error(body?.message || "Unable to load session");
-            }
-            return body as { id: string; orgId: string; email: string; name: string; role: string };
           });
+
+          // — 401/403: token is invalid or expired on the server side.
+          if (response.status === 401 || response.status === 403) {
+            devLog("auth", `loadMe ${response.status}: clearing tokens (context=${context})`);
+            set({
+              mode: null,
+              accessToken: undefined,
+              idToken: undefined,
+              refreshToken: undefined,
+              expiresAt: undefined,
+              devBypass: undefined,
+              user: undefined,
+              status: "unauthenticated",
+            });
+            // In login context, surface a message so the caller can show it.
+            if (context === "login") {
+              throw new Error("Unable to load your profile. Please try logging in again.");
+            }
+            // In bootstrap context, do NOT throw — silent clear.
+            return;
+          }
+
+          const text = await response.text();
+          let body: any = {};
+          try {
+            body = text ? JSON.parse(text) : {};
+          } catch {
+            body = {};
+          }
+
+          if (!response.ok) {
+            // Non-401 server error.
+            throw new Error(body?.error?.message || body?.message || "Unable to load session");
+          }
+
+          const me = body as { id: string; orgId: string; email: string; name: string; role: string };
           const persona = mapUserRoleToPersona(me.role as any);
           const user: CurrentUser = { ...me, persona };
           set({ user, status: "authenticated" });
         } catch (error) {
-          // If we fail to load /api/auth/me, treat as logged out.
-          set({
-            mode: null,
-            accessToken: undefined,
-            idToken: undefined,
-            refreshToken: undefined,
-            expiresAt: undefined,
-            devBypass: undefined,
-            user: undefined,
-            status: "unauthenticated",
-          });
-          throw error;
+          const currentStatus = get().status;
+          // Only clear state if we haven't already (e.g. from the 401 handler above).
+          if (currentStatus !== "unauthenticated") {
+            set({
+              mode: null,
+              accessToken: undefined,
+              idToken: undefined,
+              refreshToken: undefined,
+              expiresAt: undefined,
+              devBypass: undefined,
+              user: undefined,
+              status: "unauthenticated",
+            });
+          }
+          // Only re-throw in login context so login page can show the error.
+          // In bootstrap context, swallow the error — the user just sees the
+          // login page without a scary error message.
+          if (context === "login") {
+            throw error;
+          }
+          devLog("auth", "loadMe bootstrap error (swallowed):", error);
         }
       },
 
       logout: () => {
+        // Reset the bootstrap sentinel so a fresh login can re-bootstrap.
+        bootstrapPromise = null;
         set({
           mode: null,
           accessToken: undefined,
@@ -186,19 +304,9 @@ export const authStore = create<AuthState>()(
     }),
     {
       name: "lb_auth_v1",
-      // Wrap localStorage access so it returns undefined during SSR (no
-      // window).  Without this the persist middleware throws on the server.
       storage: createJSONStorage(() =>
         typeof window !== "undefined" ? localStorage : (undefined as any)
       ),
-      // IMPORTANT — prevent zustand from auto-rehydrating from localStorage
-      // when the store module is first imported.  Without this flag the
-      // client's initial render can differ from the server render because
-      // persisted state (user, tokens) is merged before React hydrates,
-      // causing React error #418 / #423 and DOM appendChild failures.
-      //
-      // Each consumer must call `authStore.persist.rehydrate()` inside a
-      // useEffect so rehydration happens *after* the hydration pass.
       skipHydration: true,
       partialize: (state): PersistedAuthState => ({
         mode: state.mode,
