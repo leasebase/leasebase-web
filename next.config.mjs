@@ -16,15 +16,9 @@ const nextConfig = {
       },
     ];
   },
-  async rewrites() {
-    const apiUrl = process.env.API_BASE_URL || 'http://localhost:4000';
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${apiUrl}/api/:path*`,
-      },
-    ];
-  },
+  // No rewrites / API proxy.  All browser-side API calls use the explicit
+  // NEXT_PUBLIC_API_BASE_URL (e.g. https://api.dev.leasebase.co) so there
+  // is no hidden same-origin proxying to debug.
 };
 
 export default nextConfig;

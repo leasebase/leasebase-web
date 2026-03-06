@@ -1,20 +1,12 @@
-import { headers } from "next/headers";
-import LoginPageClient from "./auth/login/LoginPageClient";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-type SearchParams = Record<string, string | string[] | undefined>;
-
-const asString = (value: string | string[] | undefined): string | undefined =>
-  typeof value === "string" ? value : undefined;
-
-export default function HomePage({
-  searchParams,
-}: {
-  searchParams?: SearchParams;
-}) {
-  headers();
-  const next = asString(searchParams?.next) ?? "/app";
-  return <LoginPageClient next={next} />;
+/**
+ * Root page — immediately redirects to the login page.
+ *
+ * In practice the middleware already handles "/" → "/auth/login", but this
+ * server-side redirect acts as a safety net for any path that bypasses
+ * middleware (e.g. direct RSC fetches during client navigation).
+ */
+export default function HomePage() {
+  redirect("/auth/login");
 }

@@ -1,33 +1,17 @@
+/**
+ * Return the base URL for the Leasebase API.
+ *
+ * The value comes from the NEXT_PUBLIC_API_BASE_URL environment variable which
+ * Next.js inlines into the client bundle at build time.  In production this is
+ * typically `https://api.dev.leasebase.co`; locally it defaults to
+ * `http://localhost:4000` (set in .env.local).
+ *
+ * If the env var is not set at all the function returns "" (empty string),
+ * which results in same-origin relative fetches — a safe fallback during early
+ * bootstrapping but not recommended for production.
+ */
 export function getApiBaseUrl(): string {
-  const env = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-  // If we have a configured base URL and we're on the server, just use it.
-  if (typeof window === "undefined") {
-    return env || "";
-  }
-
-  // No env set: default to same origin /api
-  if (!env) {
-    return `${window.location.origin}/api`;
-  }
-
-  try {
-    const url = new URL(env, window.location.origin);
-
-    // If the configured URL points at the same origin as the web app but
-    // does not include /api, assume the API is served under /api.
-    if (url.origin === window.location.origin && !url.pathname.startsWith("/api")) {
-      url.pathname = `/api${url.pathname === "/" ? "" : url.pathname}`;
-    }
-
-    // Normalise: strip trailing slash
-    let out = url.toString();
-    if (out.endsWith("/")) {
-      out = out.slice(0, -1);
-    }
-    return out;
-  } catch {
-    // If env is not a valid URL, fall back to it as-is.
-    return env;
-  }
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+  // Strip trailing slash so callers can append "/path" cleanly.
+  return base.endsWith("/") ? base.slice(0, -1) : base;
 }

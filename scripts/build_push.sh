@@ -9,7 +9,7 @@ set -euo pipefail
 #   GITHUB_SHA     — full commit SHA (set by GitHub Actions)
 #
 # Optional:
-#   API_BASE_URL   — backend API URL baked into the Next.js build
+#   NEXT_PUBLIC_API_BASE_URL — API base URL baked into the client JS bundle
 ###############################################################################
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -29,11 +29,8 @@ IMAGE_LATEST="${IMAGE_BASE}:dev-latest"
 
 echo "▸ Building image: ${IMAGE_SHA}"
 
-# ── Build ────────────────────────────────────────────────────────────────────
+# ── Build ────────────────────────────────────────────────────────────────────────
 BUILD_ARGS=()
-if [[ -n "${API_BASE_URL:-}" ]]; then
-  BUILD_ARGS+=(--build-arg "API_BASE_URL=${API_BASE_URL}")
-fi
 if [[ -n "${NEXT_PUBLIC_API_BASE_URL:-}" ]]; then
   BUILD_ARGS+=(--build-arg "NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}")
 fi

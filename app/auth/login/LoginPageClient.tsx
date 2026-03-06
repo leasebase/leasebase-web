@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authStore } from "@/lib/auth/store";
+import { devLog } from "@/lib/debug";
 
 type LoginPageClientProps = {
   next?: string;
@@ -37,6 +38,7 @@ export default function LoginPageClient({
   // here merges localStorage data back into the store without causing a
   // hydration mismatch (React #418 / #423).
   useEffect(() => {
+    devLog("login", "rehydrating auth store");
     authStore.persist.rehydrate();
     setHydrated(true);
   }, []);
@@ -44,10 +46,12 @@ export default function LoginPageClient({
   // If already authenticated, skip login and go to the dashboard.
   useEffect(() => {
     if (!hydrated) return;
+    devLog("login", "auth status =", status, "user =", user?.email ?? "(none)");
     if (status === "idle") {
       authStore.getState().initializeFromStorage();
     }
     if (status === "authenticated" && user) {
+      devLog("login", "already authenticated, redirecting to", next);
       router.replace(next);
     }
   }, [hydrated, status, user, next, router]);

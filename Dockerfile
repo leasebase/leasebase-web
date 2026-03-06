@@ -16,12 +16,10 @@ RUN npm ci
 # Copy the rest of the source
 COPY . .
 
-# API URLs — baked into the Next.js build.
-# API_BASE_URL:              used by next.config.mjs server-side rewrites.
-# NEXT_PUBLIC_API_BASE_URL:  used by browser-side code (apiBase.ts).
-ARG API_BASE_URL=http://localhost:4000
+# NEXT_PUBLIC_API_BASE_URL is baked into the client JS bundle at build time.
+# Set via --build-arg in CI (e.g. https://api.dev.leasebase.co for dev).
+# Locally it defaults to empty; .env.local supplies http://localhost:4000.
 ARG NEXT_PUBLIC_API_BASE_URL=
-ENV API_BASE_URL=${API_BASE_URL}
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 
 # Build the Next.js app
@@ -35,10 +33,10 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Runtime env vars are injected at deploy time (ECS task definition, etc.):
-#   API_BASE_URL, NEXT_PUBLIC_API_BASE_URL,
+# Runtime env vars injected at deploy time (ECS task definition):
 #   NEXT_PUBLIC_COGNITO_USER_POOL_ID, NEXT_PUBLIC_COGNITO_CLIENT_ID,
 #   NEXT_PUBLIC_COGNITO_DOMAIN, DEV_ONLY_MOCK_AUTH
+# Note: NEXT_PUBLIC_API_BASE_URL is baked at build time, not runtime.
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs \
