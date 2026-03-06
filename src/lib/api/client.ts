@@ -51,7 +51,7 @@ export async function apiRequest<T = any>({ path, anonymous, ...init }: ApiReque
     headers,
   });
 
-  if (response.status === 401 || response.status === 403) {
+  if (response.status === 401) {
     // REFRESH-HOOK: Before clearing, attempt token refresh here.
     // const refreshed = await refreshAccessToken();
     // if (refreshed) { /* retry original request once */ }
@@ -61,6 +61,17 @@ export async function apiRequest<T = any>({ path, anonymous, ...init }: ApiReque
     // Parse error body for a better message.
     const text = await response.text().catch(() => "");
     let message = "Unauthorized";
+    try {
+      const body = text ? JSON.parse(text) : {};
+      message = body?.error?.message || body?.message || message;
+    } catch { /* non-JSON */ }
+    throw new Error(message);
+  }
+
+  if (response.status === 403) {
+    // 403 = authenticated but not authorized. Do NOT clear auth state.
+    const text = await response.text().catch(() => "");
+    let message = "Forbidden";
     try {
       const body = text ? JSON.parse(text) : {};
       message = body?.error?.message || body?.message || message;
