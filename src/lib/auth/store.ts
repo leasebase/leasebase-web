@@ -47,8 +47,6 @@ interface AuthState {
    * Returns without throwing.  Callers never need try/catch.
    */
   bootstrapSession: () => Promise<void>;
-  /** @deprecated Use `bootstrapSession()` instead. Kept for backward compat. */
-  initializeFromStorage: () => void;
   /**
    * Authenticate with email + password.
    * Throws on failure so the caller can display inline login errors.
@@ -138,20 +136,6 @@ export const authStore = create<AuthState>()(
         return bootstrapPromise;
       },
 
-      initializeFromStorage: () => {
-        // Legacy compat — synchronous subset of bootstrapSession.
-        const { expiresAt, accessToken } = get();
-        if (!accessToken || !expiresAt) {
-          set({ status: "unauthenticated", mode: null, user: undefined });
-          return;
-        }
-        if (expiresAt <= Date.now()) {
-          set({ status: "unauthenticated", mode: null, user: undefined, accessToken: undefined, idToken: undefined, refreshToken: undefined });
-          return;
-        }
-        set((state) => ({ status: state.user ? "authenticated" : "initializing" }));
-      },
-
       loginWithPassword: async (email, password) => {
         const base = getApiBaseUrl();
         const res = await fetch(`${base}/api/auth/login`, {
@@ -224,7 +208,9 @@ export const authStore = create<AuthState>()(
             })(),
           });
 
-          // — 401/403: token is invalid or expired on the server side.
+          // /me 401/403 → session is invalid. Unlike apiRequest (where 403
+          // means "no permission"), a 403 from /me means the account is
+          // disabled or the session is revoked, so we clear auth state.
           if (response.status === 401 || response.status === 403) {
             devLog("auth", `loadMe ${response.status}: clearing tokens (context=${context})`);
             set({
@@ -287,7 +273,7 @@ export const authStore = create<AuthState>()(
         }
       },
 
-      logout: () => {
+      logout: (_reason?: "manual" | "unauthorized") => {
         // Reset the bootstrap sentinel so a fresh login can re-bootstrap.
         bootstrapPromise = null;
         set({

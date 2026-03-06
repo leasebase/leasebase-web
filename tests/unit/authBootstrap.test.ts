@@ -167,36 +167,6 @@ describe("loadMe", () => {
 });
 
 /* ------------------------------------------------------------------ */
-/*  initializeFromStorage (legacy compat)                              */
-/* ------------------------------------------------------------------ */
-
-describe("initializeFromStorage", () => {
-  test("no token → unauthenticated", () => {
-    authStore.getState().initializeFromStorage();
-    expect(authStore.getState().status).toBe("unauthenticated");
-  });
-
-  test("expired token → clears and unauthenticated", () => {
-    authStore.setState({
-      accessToken: "expired",
-      expiresAt: Date.now() - 1000,
-    });
-    authStore.getState().initializeFromStorage();
-    expect(authStore.getState().status).toBe("unauthenticated");
-    expect(authStore.getState().accessToken).toBeUndefined();
-  });
-
-  test("valid token → initializing", () => {
-    authStore.setState({
-      accessToken: "valid",
-      expiresAt: Date.now() + 60_000,
-    });
-    authStore.getState().initializeFromStorage();
-    expect(authStore.getState().status).toBe("initializing");
-  });
-});
-
-/* ------------------------------------------------------------------ */
 /*  loginWithPassword                                                  */
 /* ------------------------------------------------------------------ */
 

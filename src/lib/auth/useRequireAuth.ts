@@ -28,7 +28,7 @@ export function useRequireAuth(): UseRequireAuthResult {
     devLog("auth", "useRequireAuth status =", state.status);
 
     if (state.status === "idle") {
-      // bootstrapSession handles rehydrate + initializeFromStorage + loadMe
+      // bootstrapSession handles rehydrate + token check + /me validation
       // in one atomic flow.  It never throws.
       authStore.getState().bootstrapSession();
       return;

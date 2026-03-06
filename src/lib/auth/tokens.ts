@@ -29,7 +29,8 @@ export function getAccessToken(): string | undefined {
   return authStore.getState().accessToken;
 }
 
-/** Return the current Cognito refresh token, or `undefined` if absent. */
+/** Return the current Cognito refresh token, or `undefined` if absent.
+ *  Reserved for future refresh-token rotation support. */
 export function getRefreshToken(): string | undefined {
   return authStore.getState().refreshToken;
 }
@@ -80,7 +81,8 @@ export function setTokens(tokens: {
 
 /* ─── Clear ────────────────────────────────────────────────────── */
 
-/** Remove access + id tokens but preserve the refresh token (for future use). */
+/** Remove access + id tokens but preserve the refresh token.
+ *  Reserved for future refresh-token rotation support. */
 export function clearAccessToken(): void {
   authStore.setState({
     accessToken: undefined,
