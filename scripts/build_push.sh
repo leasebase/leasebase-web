@@ -34,6 +34,9 @@ BUILD_ARGS=()
 if [[ -n "${API_BASE_URL:-}" ]]; then
   BUILD_ARGS+=(--build-arg "API_BASE_URL=${API_BASE_URL}")
 fi
+if [[ -n "${NEXT_PUBLIC_API_BASE_URL:-}" ]]; then
+  BUILD_ARGS+=(--build-arg "NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}")
+fi
 
 docker buildx build \
   --no-cache \

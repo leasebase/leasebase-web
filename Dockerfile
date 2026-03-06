@@ -16,9 +16,13 @@ RUN npm ci
 # Copy the rest of the source
 COPY . .
 
-# API URL for server-side rewrites - must be set at build time
+# API URLs — baked into the Next.js build.
+# API_BASE_URL:              used by next.config.mjs server-side rewrites.
+# NEXT_PUBLIC_API_BASE_URL:  used by browser-side code (apiBase.ts).
 ARG API_BASE_URL=http://localhost:4000
+ARG NEXT_PUBLIC_API_BASE_URL=
 ENV API_BASE_URL=${API_BASE_URL}
+ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 
 # Build the Next.js app
 RUN npm run build
