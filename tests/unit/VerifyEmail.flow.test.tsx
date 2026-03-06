@@ -4,7 +4,7 @@ import VerifyEmailPage from "@/app/auth/verify-email/page";
 
 // Minimal shim for getApiBaseUrl in tests
 jest.mock("@/lib/apiBase", () => ({
-  getApiBaseUrl: () => "http://localhost:4000/api",
+  getApiBaseUrl: () => "http://localhost:4000",
 }));
 
 // Mock next/navigation hooks used in the pages

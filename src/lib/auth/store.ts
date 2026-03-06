@@ -73,7 +73,7 @@ export const authStore = create<AuthState>()(
 
       loginWithPassword: async (email, password) => {
         const base = getApiBaseUrl();
-        const res = await fetch(`${base}/auth/login`, {
+        const res = await fetch(`${base}/api/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
@@ -125,7 +125,7 @@ export const authStore = create<AuthState>()(
       loadMe: async () => {
         try {
           const base = getApiBaseUrl();
-          const me = await fetch(`${base}/auth/me`, {
+          const me = await fetch(`${base}/api/auth/me`, {
             headers: (() => {
               const headers = new Headers();
               const { mode, accessToken, devBypass } = get();
@@ -156,7 +156,7 @@ export const authStore = create<AuthState>()(
           const user: CurrentUser = { ...me, persona };
           set({ user, status: "authenticated" });
         } catch (error) {
-          // If we fail to load /auth/me, treat as logged out.
+          // If we fail to load /api/auth/me, treat as logged out.
           set({
             mode: null,
             accessToken: undefined,

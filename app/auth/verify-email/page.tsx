@@ -26,7 +26,7 @@ function VerifyEmailContent() {
     setSuccess(null);
 
     try {
-      const res = await fetch(`${getApiBaseUrl()}/auth/confirm-email`, {
+      const res = await fetch(`${getApiBaseUrl()}/api/auth/confirm-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code }),
@@ -55,7 +55,7 @@ function VerifyEmailContent() {
     setSuccess(null);
 
     try {
-      const res = await fetch(`${getApiBaseUrl()}/auth/resend-confirmation`, {
+      const res = await fetch(`${getApiBaseUrl()}/api/auth/resend-confirmation`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

@@ -93,7 +93,7 @@ function RegisterContent() {
     }
 
     try {
-      const res = await fetch(`${getApiBaseUrl()}/auth/register`, {
+      const res = await fetch(`${getApiBaseUrl()}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

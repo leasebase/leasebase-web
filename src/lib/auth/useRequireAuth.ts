@@ -36,7 +36,7 @@ export function useRequireAuth(): UseRequireAuthResult {
     }
 
     if (state.status === "initializing" && !state.user) {
-      devLog("auth", "loading /auth/me");
+      devLog("auth", "loading /api/auth/me");
       authStore
         .getState()
         .loadMe()

@@ -2,7 +2,7 @@ import { getApiBaseUrl } from "@/lib/apiBase";
 import { authStore } from "@/lib/auth/store";
 
 export interface ApiRequestOptions extends RequestInit {
-  /** Relative API path like "auth/me" or "/auth/me". */
+  /** Relative API path like "api/auth/me" or "/api/auth/me". */
   path: string;
   /** When true, do not automatically attach auth headers. */
   anonymous?: boolean;
