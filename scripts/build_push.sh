@@ -33,9 +33,6 @@ BUILD_ARGS=()
 if [[ -n "${NEXT_PUBLIC_API_BASE_URL:-}" ]]; then
   BUILD_ARGS+=(--build-arg "NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}")
 fi
-if [[ -n "${NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH:-}" ]]; then
-  BUILD_ARGS+=(--build-arg "NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH=${NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH}")
-fi
 
 docker buildx build \
   --no-cache \

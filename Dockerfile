@@ -22,11 +22,6 @@ COPY . .
 ARG NEXT_PUBLIC_API_BASE_URL=
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 
-# Enable dev bypass auth for non-production deployments (dev/staging).
-# Set via --build-arg in CI. Defaults to empty (disabled).
-ARG NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH=
-ENV NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH=${NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH}
-
 # Build the Next.js app
 RUN npm run build
 
