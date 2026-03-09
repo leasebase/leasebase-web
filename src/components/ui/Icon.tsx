@@ -5,6 +5,7 @@ import {
   Building2,
   DoorOpen,
   FileText,
+  FolderOpen,
   Users,
   CreditCard,
   Wrench,
@@ -13,6 +14,12 @@ import {
   Settings,
   Calendar,
   HardHat,
+  AlertTriangle,
+  Bell,
+  CheckCircle2,
+  Clock,
+  TrendingUp,
+  Plus,
   type LucideIcon,
 } from "lucide-react";
 
@@ -21,6 +28,7 @@ const iconMap: Record<string, LucideIcon> = {
   properties: Building2,
   units: DoorOpen,
   leases: FileText,
+  documents: FolderOpen,
   tenants: Users,
   payments: CreditCard,
   maintenance: Wrench,
@@ -29,6 +37,12 @@ const iconMap: Record<string, LucideIcon> = {
   settings: Settings,
   showings: Calendar,
   vendor: HardHat,
+  alert: AlertTriangle,
+  bell: Bell,
+  check: CheckCircle2,
+  clock: Clock,
+  trend: TrendingUp,
+  plus: Plus,
 };
 
 export interface IconProps {
