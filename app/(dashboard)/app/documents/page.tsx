@@ -1,19 +1,140 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { FolderOpen } from "lucide-react";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { FolderOpen, FileText } from "lucide-react";
+import { authStore } from "@/lib/auth/store";
+import { fetchTenantDocuments } from "@/services/tenant/adapters/documentAdapter";
+import type { DocumentRow } from "@/services/tenant/types";
 
+/**
+ * Documents — LIVE for tenant (Phase 2).
+ * Fetches via GET /api/documents/mine (lease-scoped, server-side filtered).
+ * s3_key is excluded from the response for safety.
+ */
 export default function Page() {
+  const { user } = authStore();
+  const isTenant = user?.persona === "tenant";
+  const [documents, setDocuments] = useState<DocumentRow[]>([]);
+  const [isLoading, setIsLoading] = useState(isTenant);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isTenant) return;
+    let cancelled = false;
+    async function load() {
+      try {
+        const result = await fetchTenantDocuments();
+        if (!cancelled) {
+          setDocuments(result.data);
+          if (result.source === "unavailable") setError(result.error);
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [isTenant]);
+
   return (
     <>
-      <PageHeader title="Documents" description="Upload, manage, and e-sign documents — leases, notices, and receipts." />
-      <EmptyState
-        icon={<FolderOpen size={48} strokeWidth={1.5} />}
-        title="Coming soon"
-        description="This section is under development. propertyManager, owner, tenant will have access."
-        className="mt-8"
+      <PageHeader
+        title="Documents"
+        description={
+          isTenant
+            ? "View lease documents, notices, and receipts."
+            : "Upload, manage, and e-sign documents — leases, notices, and receipts."
+        }
       />
+
+      {isTenant ? (
+        <div className="mt-6">
+          {isLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} variant="text" className="h-14 w-full rounded-md" />
+              ))}
+            </div>
+          ) : error ? (
+            <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">
+              {error}
+            </div>
+          ) : documents.length === 0 ? (
+            <EmptyState
+              icon={<FolderOpen size={48} strokeWidth={1.5} />}
+              title="No documents available"
+              description="Your lease documents will appear here once your property manager uploads them."
+            />
+          ) : (
+            <div className="space-y-2">
+              {documents.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900 p-4"
+                >
+                  <FileText size={20} className="shrink-0 text-slate-400" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-slate-100 truncate">{doc.name}</p>
+                    <p className="text-xs text-slate-400">
+                      {doc.mime_type} · {new Date(doc.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : user?.persona === "propertyManager" ? (
+        <PMDocumentsSection />
+      ) : (
+        <EmptyState
+          icon={<FolderOpen size={48} strokeWidth={1.5} />}
+          title="Coming soon"
+          description="Document management is under development."
+          className="mt-8"
+        />
+      )}
     </>
+  );
+}
+
+function PMDocumentsSection() {
+  const [docs, setDocs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const { fetchPMDocuments } = await import("@/services/pm/pmApiService");
+        const res = await fetchPMDocuments();
+        if (!cancelled) setDocs(res.data);
+      } catch (e: any) { if (!cancelled) setError(e.message); }
+      finally { if (!cancelled) setIsLoading(false); }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  if (isLoading) return <div className="mt-6 space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} variant="text" className="h-14 w-full rounded-md" />)}</div>;
+  if (error) return <div className="mt-6 rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>;
+  if (docs.length === 0) return <EmptyState icon={<FolderOpen size={48} strokeWidth={1.5} />} title="No documents" description="No documents found for your assigned properties." className="mt-6" />;
+
+  return (
+    <div className="mt-6 space-y-2">
+      {docs.map((doc: any) => (
+        <div key={doc.id} className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900 p-4">
+          <FileText size={20} className="shrink-0 text-slate-400" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-slate-100 truncate">{doc.name}</p>
+            <p className="text-xs text-slate-400">{doc.related_type} · {doc.mime_type} · {new Date(doc.created_at).toLocaleDateString()}</p>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
