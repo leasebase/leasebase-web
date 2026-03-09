@@ -49,7 +49,7 @@ function PMUnitDetail() {
         </div>
         <dl className="grid grid-cols-2 gap-3 text-sm">
           <div><dt className="text-slate-500">Rent</dt><dd className="text-slate-200">${(unit.rent_amount / 100).toLocaleString()}/mo</dd></div>
-          <div><dt className="text-slate-500">Sq Ft</dt><dd className="text-slate-200">{unit.sq_ft ?? "—"}</dd></div>
+          <div><dt className="text-slate-500">Sq Ft</dt><dd className="text-slate-200">{unit.square_feet ?? "—"}</dd></div>
           <div>
             <dt className="text-slate-500">Property</dt>
             <dd className="text-slate-200">

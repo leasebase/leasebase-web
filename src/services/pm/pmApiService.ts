@@ -143,6 +143,7 @@ export async function postPMMaintenanceComment(
 export interface PMPaymentListRow extends PMPaymentRow {
   unit_number: string;
   property_name: string;
+  type?: string;
 }
 
 export async function fetchPMPayments(
