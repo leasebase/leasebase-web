@@ -49,6 +49,15 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: us-west-2
 
+      - name: Verify deploy region
+        run: |
+          ACTUAL=$(aws configure get region 2>/dev/null || echo "$AWS_REGION")
+          if [[ "$ACTUAL" != "us-west-2" ]]; then
+            echo "::error::Region guardrail failed: expected us-west-2, got ${ACTUAL}"
+            exit 1
+          fi
+          echo "✓ Region verified: ${ACTUAL}"
+
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 

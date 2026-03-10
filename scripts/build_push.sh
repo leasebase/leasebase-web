@@ -15,11 +15,23 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# ── Region guardrail ─────────────────────────────────────────────────────────
+assert_region() {
+  local region="$1"
+  local allowed="${LEASEBASE_ALLOW_REGION:-us-west-2}"
+  if [[ "$region" != "$allowed" ]]; then
+    echo "ERROR: Region guardrail: refusing to push to '${region}' (expected '${allowed}'). Set LEASEBASE_ALLOW_REGION=${region} to override." >&2
+    exit 1
+  fi
+}
+
 # ── Load config ──────────────────────────────────────────────────────────────
 CONFIG="$REPO_ROOT/${DEPLOY_CONFIG:?DEPLOY_CONFIG is required}"
 AWS_REGION=$(jq -r '.aws_region' "$CONFIG")
 AWS_ACCOUNT_ID=$(jq -r '.aws_account_id' "$CONFIG")
 ECR_REPO=$(jq -r '.ecr_repository' "$CONFIG")
+
+assert_region "$AWS_REGION"
 
 ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 IMAGE_BASE="${ECR_REGISTRY}/${ECR_REPO}"
@@ -33,6 +45,7 @@ BUILD_ARGS=()
 if [[ -n "${NEXT_PUBLIC_API_BASE_URL:-}" ]]; then
   BUILD_ARGS+=(--build-arg "NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}")
 fi
+BUILD_ARGS+=(--build-arg "NEXT_PUBLIC_BUILD_SHA=${GITHUB_SHA}")
 
 docker buildx build \
   --no-cache \
