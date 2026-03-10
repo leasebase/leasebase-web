@@ -3,6 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
   async headers() {
+    const buildSha = process.env.NEXT_PUBLIC_BUILD_SHA || 'dev-local';
     return [
       {
         // Prevent aggressive caching of HTML pages by shared caches
@@ -11,6 +12,10 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'no-store, max-age=0',
+          },
+          {
+            key: 'X-App-Version',
+            value: buildSha,
           },
         ],
       },

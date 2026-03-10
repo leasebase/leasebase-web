@@ -38,8 +38,8 @@ function flatten(obj, prefix = "") {
 }
 
 // ── read tokens ────────────────────────────────────────────────────
-const colors = flatten(readJson("colors.json"), "color");
-const typography = flatten(readJson("typography.json"), "typography");
+const colors = flatten(readJson("colors.json"));
+const typography = flatten(readJson("typography.json"));
 const spacing = flatten(readJson("spacing.json"));
 const radius = flatten(readJson("radius.json"));
 const shadows = flatten(readJson("shadows.json"));
