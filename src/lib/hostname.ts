@@ -153,6 +153,52 @@ export function getSignInUrl(): string {
 }
 
 /**
+ * Build a full sign-in page URL with optional query parameters.
+ *
+ * Unlike `getSignInUrl()` (which may return just the portal origin for
+ * the login subdomain), this always targets the `/auth/login` path so
+ * that success messages ("Email confirmed", "Password reset") are shown.
+ *
+ * Same-origin result: `/auth/login?message=...`
+ * Cross-origin result: `https://login.leasebase.co/auth/login?message=...`
+ */
+export function buildSignInRedirect(params?: Record<string, string>): string {
+  const base = getSignInUrl();
+  const qs =
+    params && Object.keys(params).length > 0
+      ? `?${new URLSearchParams(params).toString()}`
+      : "";
+
+  if (base.startsWith("http")) {
+    // Cross-origin: base is a portal origin (e.g. https://login.leasebase.co).
+    // Append the login page path.
+    return `${base}/auth/login${qs}`;
+  }
+  // Same-origin: base is already "/auth/login".
+  return `${base}${qs}`;
+}
+
+/**
+ * Navigate the browser to the sign-in page.
+ *
+ * Uses `window.location.href` for cross-origin redirects and
+ * `router.push`/`router.replace` for same-origin navigation.
+ *
+ * @param url - The target URL (from `buildSignInRedirect` or `getSignInUrl`).
+ * @param router - Next.js router instance (only needed for same-origin).
+ */
+export function navigateToSignIn(
+  url: string,
+  router?: { push: (url: string) => void },
+): void {
+  if (url.startsWith("http")) {
+    window.location.href = url;
+  } else if (router) {
+    router.push(url);
+  }
+}
+
+/**
  * Return the signup URL — either the signup subdomain or the local
  * `/auth/register` fallback for generic localhost dev.
  */

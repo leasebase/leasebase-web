@@ -2,8 +2,8 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { getApiBaseUrl } from "@/lib/apiBase";
+import { buildSignInRedirect, navigateToSignIn, getSignInUrl } from "@/lib/hostname";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { Input } from "@/components/ui/Input";
@@ -41,8 +41,8 @@ function ConfirmEmailContent() {
         throw new Error(body.message || body.error?.message || "Unable to confirm email");
       }
 
-      const message = encodeURIComponent("Email confirmed");
-      router.push(`/auth/login?message=${message}`);
+      const redirectUrl = buildSignInRedirect({ message: "Email confirmed" });
+      navigateToSignIn(redirectUrl, router);
     } catch (err: any) {
       setError(err.message || "Unable to confirm email");
     } finally {
@@ -140,12 +140,12 @@ function ConfirmEmailContent() {
             >
               {resending ? "Resending…" : "Resend code"}
             </button>
-            <Link
-              href="/auth/login"
+            <a
+              href={getSignInUrl()}
               className="text-slate-500 hover:text-slate-700 transition-colors"
             >
               Back to sign in
-            </Link>
+            </a>
           </div>
         </div>
       </AuthCard>

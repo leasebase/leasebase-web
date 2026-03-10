@@ -2,8 +2,8 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { getApiBaseUrl } from "@/lib/apiBase";
+import { buildSignInRedirect, navigateToSignIn, getSignInUrl } from "@/lib/hostname";
 import { validatePassword } from "@/lib/validation/password";
 import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 import { AuthShell } from "@/components/auth/AuthShell";
@@ -58,8 +58,8 @@ function ResetPasswordContent() {
         throw new Error(body.message || body.error?.message || "Unable to reset password");
       }
 
-      const message = encodeURIComponent("Password reset successful");
-      router.push(`/auth/login?message=${message}`);
+      const redirectUrl = buildSignInRedirect({ message: "Password reset successful" });
+      navigateToSignIn(redirectUrl, router);
     } catch (err: any) {
       setError(err.message || "Unable to reset password");
     } finally {
@@ -213,12 +213,12 @@ function ResetPasswordContent() {
             >
               {resending ? "Resending…" : "Resend code"}
             </button>
-            <Link
-              href="/auth/login"
+            <a
+              href={getSignInUrl()}
               className="text-slate-500 hover:text-slate-700 transition-colors"
             >
               Back to sign in
-            </Link>
+            </a>
           </div>
         </div>
       </AuthCard>

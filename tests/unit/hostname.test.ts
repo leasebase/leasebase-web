@@ -4,6 +4,8 @@ import {
   getPortalOrigin,
   getBaseAppDomain,
   getSignInUrl,
+  buildSignInRedirect,
+  navigateToSignIn,
 } from "@/lib/hostname";
 
 // Default env: leasebase.co
@@ -221,5 +223,86 @@ describe("getSignInUrl", () => {
     process.env.NEXT_PUBLIC_APP_DOMAIN = "localhost";
     setHostname("tenant.localhost");
     expect(getSignInUrl()).toBe("/auth/login");
+  });
+});
+
+describe("buildSignInRedirect", () => {
+  const originalWindow = globalThis.window;
+
+  afterEach(() => {
+    Object.defineProperty(globalThis, "window", {
+      value: originalWindow,
+      writable: true,
+    });
+  });
+
+  function setHostname(hostname: string) {
+    Object.defineProperty(globalThis, "window", {
+      value: { location: { hostname } },
+      writable: true,
+    });
+  }
+
+  test("signup portal → cross-origin login page with message", () => {
+    setHostname("signup.leasebase.co");
+    expect(buildSignInRedirect({ message: "Email confirmed" })).toBe(
+      "https://login.leasebase.co/auth/login?message=Email+confirmed",
+    );
+  });
+
+  test("signup portal → cross-origin login page without params", () => {
+    setHostname("signup.leasebase.co");
+    expect(buildSignInRedirect()).toBe(
+      "https://login.leasebase.co/auth/login",
+    );
+  });
+
+  test("persona portal → same-origin /auth/login with message", () => {
+    setHostname("owner.leasebase.co");
+    expect(buildSignInRedirect({ message: "Password reset successful" })).toBe(
+      "/auth/login?message=Password+reset+successful",
+    );
+  });
+
+  test("localhost → same-origin /auth/login with message", () => {
+    setHostname("localhost");
+    expect(buildSignInRedirect({ message: "Email confirmed" })).toBe(
+      "/auth/login?message=Email+confirmed",
+    );
+  });
+
+  test("empty params object → no query string", () => {
+    setHostname("localhost");
+    expect(buildSignInRedirect({})).toBe("/auth/login");
+  });
+});
+
+describe("navigateToSignIn", () => {
+  const originalWindow = globalThis.window;
+
+  afterEach(() => {
+    Object.defineProperty(globalThis, "window", {
+      value: originalWindow,
+      writable: true,
+    });
+  });
+
+  test("cross-origin URL → sets window.location.href", () => {
+    const mockLocation = { href: "" };
+    Object.defineProperty(globalThis, "window", {
+      value: { location: mockLocation },
+      writable: true,
+    });
+
+    navigateToSignIn("https://login.leasebase.co/auth/login?message=test");
+    expect(mockLocation.href).toBe(
+      "https://login.leasebase.co/auth/login?message=test",
+    );
+  });
+
+  test("same-origin URL → calls router.push", () => {
+    const push = jest.fn();
+    navigateToSignIn("/auth/login?message=test", { push });
+    expect(push).toHaveBeenCalledWith("/auth/login?message=test");
   });
 });

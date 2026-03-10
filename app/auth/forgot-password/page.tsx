@@ -2,8 +2,8 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { getApiBaseUrl } from "@/lib/apiBase";
+import { getSignInUrl } from "@/lib/hostname";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { Input } from "@/components/ui/Input";
@@ -107,12 +107,12 @@ function ForgotPasswordContent() {
           )}
 
           <p className="text-center text-sm text-slate-500">
-            <Link
-              href="/auth/login"
+            <a
+              href={getSignInUrl()}
               className="font-medium text-brand-600 hover:text-brand-500 transition-colors"
             >
               Back to sign in
-            </Link>
+            </a>
           </p>
         </div>
       </AuthCard>

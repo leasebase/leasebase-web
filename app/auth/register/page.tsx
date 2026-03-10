@@ -4,7 +4,7 @@ import { Suspense, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, Home, ChevronLeft } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/apiBase";
-import { getSignInUrl } from "@/lib/hostname";
+import { getSignInUrl, buildSignInRedirect, navigateToSignIn } from "@/lib/hostname";
 import { validatePassword, isPasswordComplexityError } from "@/lib/validation/password";
 import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 import { AuthShell } from "@/components/auth/AuthShell";
@@ -148,7 +148,8 @@ function RegisterContent() {
       );
 
       if (data.userConfirmed) {
-        router.push(`/auth/login?registered=true&message=${message}`);
+        const redirectUrl = buildSignInRedirect({ registered: "true", message: decodeURIComponent(message) });
+        navigateToSignIn(redirectUrl, router);
       } else {
         router.push(`/auth/confirm-email?email=${encodeURIComponent(email)}`);
       }
