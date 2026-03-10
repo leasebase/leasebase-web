@@ -36,7 +36,7 @@ export const appNavItems: AppNavItem[] = [
   // ── Portfolio ──
   { path: "/app/properties", label: "Properties", icon: "properties", personas: ["propertyManager", "owner"], group: "portfolio" },
   { path: "/app/units", label: "Units", icon: "units", personas: ["propertyManager"], group: "portfolio" },
-  { path: "/app/tenants", label: "Tenants", icon: "tenants", personas: ["propertyManager"], group: "portfolio" },
+  { path: "/app/tenants", label: "Tenants", icon: "tenants", personas: ["propertyManager", "owner"], group: "portfolio" },
   { path: "/app/leases", label: "Leases", icon: "leases", personas: ["propertyManager", "owner", "tenant"], group: "portfolio" },
 
   // ── Operations ──

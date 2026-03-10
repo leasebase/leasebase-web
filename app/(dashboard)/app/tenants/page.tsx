@@ -1,18 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
-import { Users, Plus, Mail } from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
+import { Users, Plus, Mail, Search } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchPMTenants } from "@/services/pm/pmApiService";
 import type { PMTenantListRow } from "@/services/pm/pmApiService";
 import type { PMPaginationMeta } from "@/services/pm/types";
+import { fetchTenants } from "@/services/tenants/tenantApiService";
+import type { TenantListRow, PaginationMeta } from "@/services/tenants/tenantApiService";
 import { InviteTenantModal } from "@/components/invitations/InviteTenantModal";
 
+/* ─── Shared status badge helper ─── */
+function statusBadge(status: string) {
+  const variant = status === "ACTIVE" ? "success" : status === "DEACTIVATED" ? "danger" : "neutral";
+  return <Badge variant={variant}>{status}</Badge>;
+}
+
+/* ─── PM Tenants (unchanged behavior) ─── */
 function PMTenantsPage() {
   const [tenants, setTenants] = useState<PMTenantListRow[]>([]);
   const [meta, setMeta] = useState<PMPaginationMeta | null>(null);
@@ -76,10 +86,26 @@ function PMTenantsPage() {
   );
 }
 
-export default function Page() {
-  const { user } = authStore();
+/* ─── Owner / Admin Tenants ─── */
+function OwnerTenantsPage() {
+  const [tenants, setTenants] = useState<TenantListRow[]>([]);
+  const [meta, setMeta] = useState<PaginationMeta | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
-  if (user?.persona === "propertyManager") return <PMTenantsPage />;
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const loadTenants = useCallback(() => {
+    setIsLoading(true);
+    fetchTenants({ search: search || undefined, status: statusFilter || undefined })
+      .then((res) => { setTenants(res.data); setMeta(res.meta); })
+      .catch((e: any) => setError(e.message))
+      .finally(() => setIsLoading(false));
+  }, [search, statusFilter]);
+
+  useEffect(() => { loadTenants(); }, [loadTenants]);
+
   return (
     <>
       <PageHeader title="Tenants" description="Manage tenant records, contacts, and lease associations." />
@@ -91,16 +117,80 @@ export default function Page() {
           <Button variant="secondary" icon={<Mail size={16} />}>Invitations</Button>
         </Link>
       </div>
-      <EmptyState
-        icon={<Users size={48} strokeWidth={1.5} />}
-        title="No tenants yet"
-        description="Invite your first tenant to manage contacts and lease associations."
-        action={
-          <Button variant="primary" icon={<Plus size={16} />} onClick={() => setInviteOpen(true)}>Invite Tenant</Button>
-        }
-        className="mt-8"
-      />
-      <InviteTenantModal open={inviteOpen} onClose={() => setInviteOpen(false)} />
+
+      {/* Search & Filter */}
+      <div className="mt-4 flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search by name or email…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-md border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none"
+        >
+          <option value="">All statuses</option>
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+          <option value="DEACTIVATED">Deactivated</option>
+        </select>
+      </div>
+
+      <div className="mt-4">
+        {isLoading ? (
+          <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} variant="text" className="h-14 w-full rounded-md" />)}</div>
+        ) : error ? (
+          <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">{error}</div>
+        ) : tenants.length === 0 ? (
+          <EmptyState
+            icon={<Users size={48} strokeWidth={1.5} />}
+            title="No tenants"
+            description={search || statusFilter ? "No tenants match your search or filter." : "Invite your first tenant to get started."}
+            action={
+              !search && !statusFilter
+                ? <Button variant="primary" icon={<Plus size={16} />} onClick={() => setInviteOpen(true)}>Invite Tenant</Button>
+                : undefined
+            }
+          />
+        ) : (
+          <div className="space-y-2">
+            {tenants.map((t) => (
+              <Link key={t.id} href={`/app/tenants/${t.id}`}
+                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-300">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-slate-900">{t.name}</p>
+                    {statusBadge(t.status)}
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {t.email}
+                    {t.unit_number && ` · Unit ${t.unit_number}`}
+                    {t.property_name && ` · ${t.property_name}`}
+                  </p>
+                </div>
+                <div className="text-right text-xs text-slate-500">
+                  {t.phone && <p>{t.phone}</p>}
+                  {t.lease_status && <p className="mt-0.5">Lease: {t.lease_status}</p>}
+                </div>
+              </Link>
+            ))}
+            {meta && meta.total > 0 && <p className="text-xs text-slate-500 text-center pt-2">Showing {tenants.length} of {meta.total}</p>}
+          </div>
+        )}
+      </div>
+      <InviteTenantModal open={inviteOpen} onClose={() => setInviteOpen(false)} onSuccess={loadTenants} />
     </>
   );
+}
+
+export default function Page() {
+  const { user } = authStore();
+  if (user?.persona === "propertyManager") return <PMTenantsPage />;
+  return <OwnerTenantsPage />;
 }
