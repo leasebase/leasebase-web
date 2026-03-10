@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Wrench, AlertTriangle, Clock } from "lucide-react";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { Tooltip } from "@/components/ui/Tooltip";
 import type { MaintenanceOverviewViewModel } from "@/services/dashboard/types";
 
 interface MaintenanceOverviewCardProps {
@@ -30,7 +31,9 @@ export function MaintenanceOverviewCard({ vm }: MaintenanceOverviewCardProps) {
         <div className="grid grid-cols-2 gap-3">
           <StatusStat label="Open" value={vm.open} icon={<Wrench size={14} />} />
           <StatusStat label="In Progress" value={vm.inProgress} icon={<Wrench size={14} />} />
-          <StatusStat label="Waiting" value={vm.waiting} icon={<Clock size={14} />} />
+          <Tooltip content="Open 3+ days without an assignee">
+            <StatusStat label="Needs review" value={vm.waiting} icon={<Clock size={14} />} />
+          </Tooltip>
           <StatusStat
             label="Urgent"
             value={vm.urgent}

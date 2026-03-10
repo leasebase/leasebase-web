@@ -4,6 +4,7 @@ import Link from "next/link";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { Tooltip } from "@/components/ui/Tooltip";
 import type { PropertyHealthRow, PropertyHealthViewModel } from "@/services/dashboard/types";
 
 interface PropertyHealthTableProps {
@@ -23,6 +24,12 @@ const statusVariant: Record<PropertyHealthRow["status"], "success" | "warning" |
   healthy: "success",
   attention: "warning",
   critical: "danger",
+};
+
+const statusLabel: Record<PropertyHealthRow["status"], string> = {
+  healthy: "On track",
+  attention: "Review suggested",
+  critical: "Needs attention",
 };
 
 const columns: Column<PropertyHealthRow>[] = [
@@ -101,9 +108,11 @@ const columns: Column<PropertyHealthRow>[] = [
     header: "Status",
     sortable: true,
     render: (row) => (
-      <Badge variant={statusVariant[row.status]}>
-        {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
-      </Badge>
+      <Tooltip content="Based on occupancy, overdue balance, and maintenance volume">
+        <Badge variant={statusVariant[row.status]}>
+          {statusLabel[row.status]}
+        </Badge>
+      </Tooltip>
     ),
   },
 ];
@@ -112,9 +121,9 @@ const statusFilter = {
   key: "status",
   label: "Status",
   options: [
-    { label: "Healthy", value: "healthy" },
-    { label: "Attention", value: "attention" },
-    { label: "Critical", value: "critical" },
+    { label: "On track", value: "healthy" },
+    { label: "Review suggested", value: "attention" },
+    { label: "Needs attention", value: "critical" },
   ],
 };
 
