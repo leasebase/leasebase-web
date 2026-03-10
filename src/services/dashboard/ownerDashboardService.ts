@@ -831,8 +831,41 @@ export function computeSetupStage(kpis: DashboardKpis): SetupStage {
 
 /* ─── Main orchestrator ─── */
 
+/**
+ * Fetches and assembles the full Owner dashboard from individual microservice endpoints.
+ *
+ * ## Network profile
+ *   1. **6 parallel domain fetches** (properties, leases, payments, ledger, maintenance, documents)
+ *   2. **N sequential-batched unit sub-requests** — one GET /api/properties/:id/units per property,
+ *      capped at UNIT_FANOUT_CONCURRENCY (6) concurrent requests.
+ *   Total HTTP calls: 6 + ceil(propertyCount / 6) batches.
+ *
+ * ## Why this is acceptable short-term
+ *   - Typical owner portfolios have <20 properties → 6 + 4 batches ≈ 10 round-trips.
+ *   - Each domain fetcher uses full pagination traversal — no silent undercounts.
+ *   - Per-domain failure isolation ensures partial data is surfaced, not a full error.
+ *
+ * ## When to migrate to a BFF endpoint
+ *   When property count exceeds BFF_THRESHOLD (50), the fan-out becomes expensive.
+ *   At that point, a single `GET /api/dashboard/owner` BFF endpoint should replace
+ *   this orchestration. See `ownerDashboardAggregationContract.ts` for the
+ *   recommended response shape.
+ *
+ * ## Block → Endpoint → Direct/Derived → Limitation
+ *   Page Header          | properties, units, leases                     | Derived  | —
+ *   Priority Actions     | all 6 domains                                 | Derived  | tenant count from lease proxy
+ *   KPI Row (4 cards)    | payments, ledger, units, leases, maintenance   | Mixed    | occupancy needs units+leases live
+ *   Cash Flow            | ledger, payments, leases, units                | Derived  | needs ledger+payments live
+ *   Maintenance Overview | maintenance, units, properties                 | Mixed    | "needs review" = heuristic (3d + no assignee)
+ *   Lease Risk           | leases                                        | Mixed    | month-to-month = ACTIVE past end_date
+ *   Vacancy/Readiness    | units, leases                                 | Derived  | needs units+leases live
+ *   Property Health      | all 6 domains                                 | Derived  | status thresholds are frontend heuristics
+ *   Recommended Actions  | all (via deriveOwnerInsights)                  | Derived  | —
+ *   Recent Activity      | payments, maintenance, leases                  | Derived  | no tenant/document events; max 10 items
+ *   Onboarding Checklist | all + documents                                | Derived  | tenant step uses lease proxy
+ */
 export async function fetchOwnerDashboard(): Promise<OwnerDashboardData> {
-  // Fetch all domains in parallel (except units which depend on property IDs)
+  // 6 parallel domain fetches (units depend on property IDs, fetched separately below)
   const [propertiesResult, leasesResult, paymentsResult, ledgerResult, maintenanceResult, documentsResult] =
     await Promise.all([
       fetchPropertiesDomain(),

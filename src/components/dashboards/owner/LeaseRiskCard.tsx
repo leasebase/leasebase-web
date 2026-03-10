@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FileWarning, CalendarClock } from "lucide-react";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { Tooltip } from "@/components/ui/Tooltip";
 import type { LeaseRiskViewModel } from "@/services/dashboard/types";
 
 interface LeaseRiskCardProps {
@@ -30,7 +31,9 @@ export function LeaseRiskCard({ vm }: LeaseRiskCardProps) {
         <div className="flex flex-wrap gap-3">
           <TierBadge label="Expiring in 30 days" count={vm.expiring30} variant={vm.expiring30 > 0 ? "danger" : "neutral"} />
           <TierBadge label="Expiring in 60 days" count={vm.expiring60} variant={vm.expiring60 > 0 ? "warning" : "neutral"} />
-          <TierBadge label="Month-to-month" count={vm.monthToMonth} variant={vm.monthToMonth > 0 ? "info" : "neutral"} />
+          <Tooltip content="Active leases past their end date — may be month-to-month">
+            <TierBadge label="Possibly month-to-month" count={vm.monthToMonth} variant={vm.monthToMonth > 0 ? "info" : "neutral"} />
+          </Tooltip>
         </div>
 
         {/* Top expirations */}
@@ -63,7 +66,7 @@ export function LeaseRiskCard({ vm }: LeaseRiskCardProps) {
         )}
 
         {!hasRisk && (
-          <p className="text-sm text-slate-500">No leases at risk. All leases are in good standing.</p>
+          <p className="text-sm text-slate-500">No upcoming expirations or overdue renewals detected.</p>
         )}
       </CardBody>
     </Card>

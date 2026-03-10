@@ -36,16 +36,16 @@ const leases = [
 ];
 
 const payments = [
-  { id: "pay1", amount: 150000, status: "SUCCEEDED", created_at: new Date().toISOString() },
+  { id: "pay1", lease_id: "l1", amount: 150000, status: "SUCCEEDED", created_at: new Date().toISOString() },
 ];
 
 const ledger = [
-  { id: "led1", type: "CHARGE", amount: 120000, status: "PENDING", due_date: "2024-01-01" },
+  { id: "led1", lease_id: "l1", type: "CHARGE", amount: 120000, status: "PENDING", due_date: "2024-01-01" },
 ];
 
 const workOrders = [
-  { id: "wo1", status: "OPEN", created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: "wo2", status: "COMPLETED", created_at: "2024-06-01T00:00:00.000Z" },
+  { id: "wo1", unit_id: "u1", status: "OPEN", priority: "MEDIUM", description: "Leaky faucet", assignee_id: null, created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: "wo2", unit_id: "u2", status: "COMPLETED", priority: "LOW", description: "Replace bulb", assignee_id: "maint-1", created_at: "2024-06-01T00:00:00.000Z" },
 ];
 
 /* ── computeKpis ── */

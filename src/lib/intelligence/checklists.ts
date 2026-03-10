@@ -47,7 +47,9 @@ export function ownerOnboardingSteps(data: OwnerDashboardData): ChecklistStep[] 
     {
       key: "invite-tenants",
       label: "Invite tenants to the platform",
-      done: hasLeases, // leases imply tenants exist
+      // Proxy: OWNER can't call /api/tenants — inferred from active lease existence.
+      // Will show as done if any lease exists, even without a confirmed tenant invite.
+      done: hasLeases,
       href: "/app/tenants",
       ctaLabel: "Invite Tenants",
     },

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Home, CheckCircle2, AlertCircle } from "lucide-react";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { Tooltip } from "@/components/ui/Tooltip";
 import type { VacancyReadinessViewModel } from "@/services/dashboard/types";
 
 interface VacancyReadinessCardProps {
@@ -25,12 +26,14 @@ export function VacancyReadinessCard({ vm }: VacancyReadinessCardProps) {
       </CardHeader>
       <CardBody>
         <div className="grid grid-cols-2 gap-3">
-          <ReadinessStat
-            label="Vacant Units"
-            value={vm.vacantUnits}
-            icon={<Home size={14} />}
-            variant={vm.vacantUnits > 0 ? "warning" : "neutral"}
-          />
+          <Tooltip content="Units without an active lease">
+            <ReadinessStat
+              label="Vacant Units"
+              value={vm.vacantUnits}
+              icon={<Home size={14} />}
+              variant={vm.vacantUnits > 0 ? "warning" : "neutral"}
+            />
+          </Tooltip>
           <ReadinessStat
             label="Ready to Lease"
             value={vm.readyToLease}

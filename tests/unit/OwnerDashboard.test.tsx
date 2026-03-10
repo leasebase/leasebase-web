@@ -22,7 +22,7 @@ jest.mock("next/link", () => {
 
 /* ── Fixtures ── */
 
-function sourced(value: number, source: "live" | "stub" | "unavailable" = "live") {
+function sourced<T = number>(value: T, source: "live" | "stub" | "unavailable" = "live") {
   return { value, source };
 }
 
