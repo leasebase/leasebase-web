@@ -22,6 +22,10 @@ COPY . .
 ARG NEXT_PUBLIC_API_BASE_URL=
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 
+# Commit SHA baked at build time for version visibility (X-App-Version header).
+ARG NEXT_PUBLIC_BUILD_SHA=unknown
+ENV NEXT_PUBLIC_BUILD_SHA=${NEXT_PUBLIC_BUILD_SHA}
+
 # Build the Next.js app
 RUN npm run build
 

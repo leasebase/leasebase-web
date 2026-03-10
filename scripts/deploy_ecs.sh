@@ -12,6 +12,16 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# ── Region guardrail ─────────────────────────────────────────────────────────
+assert_region() {
+  local region="$1"
+  local allowed="${LEASEBASE_ALLOW_REGION:-us-west-2}"
+  if [[ "$region" != "$allowed" ]]; then
+    echo "ERROR: Region guardrail: refusing to deploy to '${region}' (expected '${allowed}'). Set LEASEBASE_ALLOW_REGION=${region} to override." >&2
+    exit 1
+  fi
+}
+
 # ── Load config ──────────────────────────────────────────────────────────────
 CONFIG="$REPO_ROOT/${DEPLOY_CONFIG:?DEPLOY_CONFIG is required}"
 AWS_REGION=$(jq -r '.aws_region' "$CONFIG")
@@ -22,6 +32,8 @@ TASK_FAMILY=$(jq -r '.task_family' "$CONFIG")
 CONTAINER_NAME=$(jq -r '.container_name' "$CONFIG")
 
 IMAGE="${IMAGE:?IMAGE is required}"
+
+assert_region "$AWS_REGION"
 
 echo "▸ Deploying ${IMAGE} → ${ECS_CLUSTER}/${ECS_SERVICE}"
 

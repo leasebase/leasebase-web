@@ -13,6 +13,7 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx}",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -48,6 +49,18 @@ const config: Config = {
           raised:  v("color-surface-raised"),
           overlay: v("color-surface-overlay"),
         },
+        /* ── Semantic text / border colors ── */
+        content: {
+          primary:   v("color-color-neutral-900"),
+          secondary: v("color-color-neutral-600"),
+          muted:     v("color-color-neutral-400"),
+          inverted:  v("color-color-neutral-0"),
+        },
+        border: {
+          DEFAULT: v("color-color-neutral-200"),
+          strong:  v("color-color-neutral-300"),
+          muted:   v("color-color-neutral-100"),
+        },
         success: {
           DEFAULT: v("color-semantic-success-500"),
           light:   v("color-semantic-success-100"),
@@ -80,6 +93,15 @@ const config: Config = {
       fontFamily: {
         sans: [v("typography-font-family-sans")],
         mono: [v("typography-font-family-mono")],
+      },
+      spacing: {
+        "sp-xs":  v("spacing-semantic-xs"),
+        "sp-sm":  v("spacing-semantic-sm"),
+        "sp-md":  v("spacing-semantic-md"),
+        "sp-lg":  v("spacing-semantic-lg"),
+        "sp-xl":  v("spacing-semantic-xl"),
+        "sp-2xl": v("spacing-semantic-2xl"),
+        "sp-3xl": v("spacing-semantic-3xl"),
       },
       borderRadius: {
         DEFAULT: v("radius-md"),

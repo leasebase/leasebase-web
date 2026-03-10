@@ -20,3 +20,5 @@ export { Avatar, type AvatarProps, type AvatarSize } from "./Avatar";
 export { DropdownMenu, type DropdownMenuProps, type DropdownMenuItem } from "./DropdownMenu";
 export { Icon, type IconProps } from "./Icon";
 export { PageHeader, type PageHeaderProps } from "./PageHeader";
+export { ProgressBar, type ProgressBarProps } from "./ProgressBar";
+export { PageContainer, type PageContainerProps, type PageContainerSize } from "./PageContainer";
