@@ -238,19 +238,48 @@ describe("toOwnerDashboardViewModel", () => {
       openWorkOrders: { value: 1, source: "live" },
       trendAvailable: false,
     },
+    cashFlow: {
+      billedThisMonth: { value: 0, source: "live" },
+      collectedThisMonth: { value: 150000, source: "live" },
+      overdueAmount: { value: 120000, source: "live" },
+      upcomingDue: { value: 0, source: "live" },
+      perProperty: [],
+    },
+    maintenanceOverview: {
+      open: { value: 1, source: "live" },
+      inProgress: { value: 0, source: "live" },
+      waiting: { value: 0, source: "live" },
+      urgent: { value: 0, source: "live" },
+      oldestOpenAgeDays: { value: 10, source: "live" },
+      mostAffectedProperty: { value: null, source: "live" },
+    },
+    leaseRisk: {
+      expiring30: { value: 0, source: "live" },
+      expiring60: { value: 0, source: "live" },
+      monthToMonth: { value: 0, source: "live" },
+      topExpirations: [],
+    },
+    vacancyReadiness: {
+      vacantUnits: { value: 1, source: "live" },
+      readyToLease: { value: 1, source: "live" },
+      missingRentConfig: { value: 0, source: "live" },
+      missingSetup: { value: 0, source: "live" },
+    },
+    propertyHealth: [],
     properties: [
       { id: "p1", name: "Main St", address: "123 Main, NY, NY, 10001", totalUnits: 2, occupiedUnits: 2, occupancyRate: 100 },
     ],
+    documentCount: 0,
     setupStage: "active",
     domainErrors: {
       properties: null, units: null, leases: null,
-      payments: null, ledger: null, maintenance: null, activity: null,
+      payments: null, ledger: null, maintenance: null, documents: null, activity: null,
     },
   };
 
-  test("produces 8 KPI items", () => {
+  test("produces 4 KPI items", () => {
     const vm = toOwnerDashboardViewModel(dashboardData);
-    expect(vm.kpis.items).toHaveLength(8);
+    expect(vm.kpis.items).toHaveLength(4);
   });
 
   test("sorts alerts by severity (danger → warning → info)", () => {
@@ -273,8 +302,9 @@ describe("toOwnerDashboardViewModel", () => {
       ),
     };
     const vm = toOwnerDashboardViewModel(data);
-    const unitsKpi = vm.kpis.items.find((k) => k.key === "totalUnits");
-    expect(unitsKpi?.value).toBe("—");
+    // Occupancy depends on units — should show dash when units unavailable
+    const occupancyKpi = vm.kpis.items.find((k) => k.key === "occupancy");
+    expect(occupancyKpi?.value).toBe("—");
   });
 
   test("provides setup-stage-aware quick actions", () => {
