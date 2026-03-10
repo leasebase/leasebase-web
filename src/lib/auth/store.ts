@@ -12,7 +12,7 @@ export interface CurrentUser {
   email: string;
   name: string;
   role: string;
-  persona: Persona;
+  persona: Persona | null;
 }
 
 export interface DevBypassSession {

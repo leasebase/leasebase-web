@@ -2,9 +2,9 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Building2, Home, User, ChevronLeft } from "lucide-react";
+import { Building2, Home, ChevronLeft } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/apiBase";
+import { getSignInUrl } from "@/lib/hostname";
 import { validatePassword, isPasswordComplexityError } from "@/lib/validation/password";
 import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 import { AuthShell } from "@/components/auth/AuthShell";
@@ -12,7 +12,7 @@ import { AuthCard } from "@/components/auth/AuthCard";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
-export type UserType = "PROPERTY_MANAGER" | "OWNER" | "TENANT";
+export type UserType = "PROPERTY_MANAGER" | "OWNER";
 
 interface UserTypeOption {
   value: UserType;
@@ -33,12 +33,6 @@ const userTypeOptions: UserTypeOption[] = [
     label: "Landlord / Owner",
     description: "Own and rent out your properties",
     icon: <Home size={22} />,
-  },
-  {
-    value: "TENANT",
-    label: "Tenant",
-    description: "Rent a property and manage your lease",
-    icon: <User size={22} />,
   },
 ];
 
@@ -200,12 +194,12 @@ function RegisterContent() {
 
             <p className="text-center text-sm text-slate-500">
               Already have an account?{" "}
-              <Link
-                href="/auth/login"
+              <a
+                href={getSignInUrl()}
                 className="font-medium text-brand-600 hover:text-brand-500 transition-colors"
               >
                 Sign in
-              </Link>
+              </a>
             </p>
           </div>
         </AuthCard>
@@ -349,12 +343,12 @@ function RegisterContent() {
 
           <p className="text-center text-sm text-slate-500">
             Already have an account?{" "}
-            <Link
-              href="/auth/login"
+            <a
+              href={getSignInUrl()}
               className="font-medium text-brand-600 hover:text-brand-500 transition-colors"
             >
               Sign in
-            </Link>
+            </a>
           </p>
         </div>
       </AuthCard>

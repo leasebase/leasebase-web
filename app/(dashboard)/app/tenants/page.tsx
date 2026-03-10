@@ -6,35 +6,42 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
-import { Users, Plus } from "lucide-react";
+import { Users, Plus, Mail } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchPMTenants } from "@/services/pm/pmApiService";
 import type { PMTenantListRow } from "@/services/pm/pmApiService";
 import type { PMPaginationMeta } from "@/services/pm/types";
+import { InviteTenantModal } from "@/components/invitations/InviteTenantModal";
 
 function PMTenantsPage() {
   const [tenants, setTenants] = useState<PMTenantListRow[]>([]);
   const [meta, setMeta] = useState<PMPaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const res = await fetchPMTenants();
-        if (!cancelled) { setTenants(res.data); setMeta(res.meta); }
-      } catch (e: any) { if (!cancelled) setError(e.message); }
-      finally { if (!cancelled) setIsLoading(false); }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, []);
+  function loadTenants() {
+    setIsLoading(true);
+    fetchPMTenants()
+      .then((res) => { setTenants(res.data); setMeta(res.meta); })
+      .catch((e: any) => setError(e.message))
+      .finally(() => setIsLoading(false));
+  }
+
+  useEffect(() => { loadTenants(); }, []);
 
   return (
     <>
       <PageHeader title="Tenants" description="Tenants across your assigned properties." />
-      <div className="mt-6">
+      <div className="mt-4 flex items-center gap-2">
+        <Button variant="primary" icon={<Plus size={16} />} onClick={() => setInviteOpen(true)}>
+          Invite Tenant
+        </Button>
+        <Link href="/app/tenants/invitations">
+          <Button variant="secondary" icon={<Mail size={16} />}>Invitations</Button>
+        </Link>
+      </div>
+      <div className="mt-4">
         {isLoading ? (
           <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} variant="text" className="h-14 w-full rounded-md" />)}</div>
         ) : error ? (
@@ -43,11 +50,9 @@ function PMTenantsPage() {
           <EmptyState
             icon={<Users size={48} strokeWidth={1.5} />}
             title="No tenants"
-            description="No tenants found in your assigned properties."
+            description="No tenants found. Invite your first tenant to get started."
             action={
-              <Link href="/app/tenants">
-                <Button variant="primary" icon={<Plus size={16} />}>Invite Tenant</Button>
-              </Link>
+              <Button variant="primary" icon={<Plus size={16} />} onClick={() => setInviteOpen(true)}>Invite Tenant</Button>
             }
           />
         ) : (
@@ -66,25 +71,36 @@ function PMTenantsPage() {
           </div>
         )}
       </div>
+      <InviteTenantModal open={inviteOpen} onClose={() => setInviteOpen(false)} onSuccess={loadTenants} />
     </>
   );
 }
 
 export default function Page() {
   const { user } = authStore();
+  const [inviteOpen, setInviteOpen] = useState(false);
   if (user?.persona === "propertyManager") return <PMTenantsPage />;
   return (
     <>
       <PageHeader title="Tenants" description="Manage tenant records, contacts, and lease associations." />
+      <div className="mt-4 flex items-center gap-2">
+        <Button variant="primary" icon={<Plus size={16} />} onClick={() => setInviteOpen(true)}>
+          Invite Tenant
+        </Button>
+        <Link href="/app/tenants/invitations">
+          <Button variant="secondary" icon={<Mail size={16} />}>Invitations</Button>
+        </Link>
+      </div>
       <EmptyState
         icon={<Users size={48} strokeWidth={1.5} />}
         title="No tenants yet"
-        description="Add your first tenant to manage contacts and lease associations."
+        description="Invite your first tenant to manage contacts and lease associations."
         action={
-          <Button variant="primary" icon={<Plus size={16} />}>Add Tenant</Button>
+          <Button variant="primary" icon={<Plus size={16} />} onClick={() => setInviteOpen(true)}>Invite Tenant</Button>
         }
         className="mt-8"
       />
+      <InviteTenantModal open={inviteOpen} onClose={() => setInviteOpen(false)} />
     </>
   );
 }

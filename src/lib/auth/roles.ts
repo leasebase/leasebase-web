@@ -8,7 +8,13 @@ export type BackendUserRole =
   | "TENANT"
   | (string & {});
 
-export function mapUserRoleToPersona(role: BackendUserRole | null | undefined): Persona {
+/**
+ * Map a backend role to a frontend persona.
+ *
+ * Returns `null` for unknown/missing roles — callers MUST handle this as a
+ * fail-closed condition. Never defaults to tenant.
+ */
+export function mapUserRoleToPersona(role: BackendUserRole | null | undefined): Persona | null {
   const normalized = (role || "").toUpperCase();
 
   if (normalized === "ORG_ADMIN" || normalized === "PM_STAFF") {
@@ -21,7 +27,6 @@ export function mapUserRoleToPersona(role: BackendUserRole | null | undefined): 
     return "tenant";
   }
 
-  // Default to tenant for unknown/future roles so they at least get a
-  // reasonable dashboard without exposing privileged PM/Owner features.
-  return "tenant";
+  // Fail closed: unknown or missing role produces null.
+  return null;
 }

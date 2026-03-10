@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { authStore } from "@/lib/auth/store";
+import { getPortalUrlForRole, getSignUpUrl } from "@/lib/hostname";
 import { devLog } from "@/lib/debug";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthCard } from "@/components/auth/AuthCard";
@@ -44,11 +44,18 @@ export default function LoginPageClient({
     authStore.getState().bootstrapSession();
   }, []);
 
-  // If already authenticated (or becomes authenticated after bootstrap), redirect.
+  // If already authenticated (or becomes authenticated after bootstrap), redirect
+  // to the correct persona portal.
   useEffect(() => {
     devLog("login", "auth status =", status, "user =", user?.email ?? "(none)");
     if (status === "authenticated" && user) {
-      devLog("login", "already authenticated, redirecting to", next);
+      const portalUrl = getPortalUrlForRole(user.role);
+      if (portalUrl && typeof window !== "undefined" && !window.location.href.startsWith(portalUrl.replace(/\/app$/, ""))) {
+        devLog("login", "cross-domain redirect to", portalUrl);
+        window.location.href = portalUrl;
+        return;
+      }
+      devLog("login", "already on correct portal, redirecting to", next);
       router.replace(next);
     }
   }, [status, user, next, router]);
@@ -59,6 +66,13 @@ export default function LoginPageClient({
     setLoginError(null);
     try {
       await authStore.getState().loginWithPassword(email, password);
+      // After login, determine the correct portal based on the user's role.
+      const loggedInUser = authStore.getState().user;
+      const portalUrl = loggedInUser ? getPortalUrlForRole(loggedInUser.role) : null;
+      if (portalUrl && typeof window !== "undefined" && !window.location.href.startsWith(portalUrl.replace(/\/app$/, ""))) {
+        window.location.href = portalUrl;
+        return;
+      }
       router.replace(next);
     } catch (err: any) {
       setLoginError(err.message || "Login failed");
@@ -233,12 +247,12 @@ export default function LoginPageClient({
           {/* Footer link */}
           <p className="text-center text-sm text-slate-500">
             Don&apos;t have an account?{" "}
-            <Link
-              href="/auth/register"
+            <a
+              href={getSignUpUrl()}
               className="font-medium text-brand-600 hover:text-brand-500 transition-colors"
             >
               Sign up
-            </Link>
+            </a>
           </p>
         </div>
       </AuthCard>
