@@ -4,6 +4,10 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getApiBaseUrl } from "@/lib/apiBase";
+import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthCard } from "@/components/auth/AuthCard";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 
 function VerifyEmailContent() {
   const router = useRouter();
@@ -78,72 +82,93 @@ function VerifyEmailContent() {
   };
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Verify your email</h1>
-        <p className="mt-1 text-sm text-slate-300">
-          We&apos;ve sent a 6-digit verification code to
-          {" "}
-          <span className="font-medium text-slate-100">{email || "your email"}</span>.
-          {" "}
-          Enter it below to finish setting up your Leasebase account.
-        </p>
-      </div>
+    <AuthShell>
+      <AuthCard>
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h2 className="text-2xl font-semibold tracking-tight text-white">
+              Verify your email
+            </h2>
+            <p className="text-sm text-slate-400">
+              We&apos;ve sent a 6-digit verification code to{" "}
+              <span className="font-medium text-slate-200">{email || "your email"}</span>.{" "}
+              Enter it below to finish setting up your Leasebase account.
+            </p>
+          </div>
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
-      {success && <p className="text-sm text-emerald-400">{success}</p>}
+          {error && (
+            <div className="rounded-lg border border-danger/30 bg-danger-50/5 px-4 py-3 text-sm text-danger" role="alert">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="rounded-lg border border-brand-800/40 bg-brand-950/30 px-4 py-3 text-sm text-brand-300">
+              {success}
+            </div>
+          )}
 
-      <form className="space-y-3" onSubmit={handleSubmit}>
-        <div className="space-y-1 text-sm">
-          <label className="block text-slate-200">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-sm"
-            required
-          />
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <Input
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input
+              label="Verification code"
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="123456"
+              className="tracking-[0.3em]"
+              required
+            />
+            <Button
+              type="submit"
+              loading={submitting}
+              className="w-full"
+              size="lg"
+            >
+              Verify email
+            </Button>
+          </form>
+
+          <div className="flex items-center justify-between text-sm">
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resending}
+              className="font-medium text-brand-400 hover:text-brand-300 transition-colors disabled:opacity-60"
+            >
+              {resending ? "Resending…" : "Resend code"}
+            </button>
+            <Link
+              href="/auth/login"
+              className="text-slate-500 hover:text-slate-300 transition-colors"
+            >
+              Back to sign in
+            </Link>
+          </div>
         </div>
-        <div className="space-y-1 text-sm">
-          <label className="block text-slate-200">Verification code</label>
-          <input
-            type="text"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-sm tracking-[0.3em]"
-            placeholder="123456"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={submitting}
-          className="mt-2 w-full rounded-md bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 disabled:opacity-60"
-        >
-          {submitting ? "Verifying…" : "Verify email"}
-        </button>
-      </form>
-
-      <div className="flex items-center justify-between text-sm text-slate-400">
-        <button
-          type="button"
-          onClick={handleResend}
-          disabled={resending}
-          className="text-emerald-400 hover:underline disabled:opacity-60"
-        >
-          {resending ? "Resending…" : "Resend code"}
-        </button>
-        <Link href="/auth/login" className="hover:underline">
-          Back to sign in
-        </Link>
-      </div>
-    </div>
+      </AuthCard>
+    </AuthShell>
   );
 }
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={<div className="max-w-md mx-auto"><p>Loading…</p></div>}>
+    <Suspense
+      fallback={
+        <AuthShell>
+          <AuthCard>
+            <div className="flex items-center justify-center py-12">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+            </div>
+          </AuthCard>
+        </AuthShell>
+      }
+    >
       <VerifyEmailContent />
     </Suspense>
   );
