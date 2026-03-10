@@ -32,7 +32,7 @@ function AuthCallbackContent() {
         <div className="space-y-4 text-center">
           {error ? (
             <>
-              <h2 className="text-2xl font-semibold tracking-tight text-white">
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
                 Sign-in failed
               </h2>
               <div className="rounded-lg border border-danger/30 bg-danger-50/5 px-4 py-3 text-sm text-danger" role="alert">
@@ -40,7 +40,7 @@ function AuthCallbackContent() {
               </div>
               <Link
                 href="/auth/login"
-                className="inline-block text-sm font-medium text-brand-400 hover:text-brand-300 transition-colors"
+                className="inline-block text-sm font-medium text-brand-600 hover:text-brand-500 transition-colors"
               >
                 Back to sign in
               </Link>
@@ -50,10 +50,10 @@ function AuthCallbackContent() {
               <div className="flex justify-center">
                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
               </div>
-              <h2 className="text-2xl font-semibold tracking-tight text-white">
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
                 Completing sign-in…
               </h2>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-500">
                 Please wait while we complete your sign-in and redirect you.
               </p>
             </>

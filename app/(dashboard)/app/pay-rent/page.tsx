@@ -95,17 +95,17 @@ export default function Page() {
         ) : (
           <Card>
             <CardHeader>
-              <h2 className="text-sm font-semibold text-slate-100">Rent Payment</h2>
+              <h2 className="text-sm font-semibold text-slate-900">Rent Payment</h2>
             </CardHeader>
             <CardBody>
               <dl className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-slate-400">Amount Due</dt>
-                  <dd className="text-2xl font-bold text-slate-100">{rentFormatted}</dd>
+                  <dd className="text-2xl font-bold text-slate-900">{rentFormatted}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-slate-400">Lease Period</dt>
-                  <dd className="text-slate-100">
+                  <dd className="text-slate-900">
                     {new Date(lease.start_date).toLocaleDateString()} – {new Date(lease.end_date).toLocaleDateString()}
                   </dd>
                 </div>
@@ -120,7 +120,7 @@ export default function Page() {
               </dl>
 
               {error && (
-                <div className="mt-4 rounded-md border border-red-800/50 bg-red-950/30 px-3 py-2 text-xs text-red-300">
+                <div className="mt-4 rounded-md border border-red-800/50 bg-red-950/30 px-3 py-2 text-xs text-red-700">
                   {error}
                 </div>
               )}

@@ -63,7 +63,7 @@ export default function Page() {
           ))}
         </div>
       ) : error ? (
-        <div className="mt-6 rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">
+        <div className="mt-6 rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       ) : payments.length === 0 ? (
@@ -77,16 +77,16 @@ export default function Page() {
         <div className="mt-6 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-800 text-left text-xs text-slate-400">
+              <tr className="border-b border-slate-200 text-left text-xs text-slate-400">
                 <th className="pb-2 pr-4">Date</th>
                 <th className="pb-2 pr-4">Amount</th>
                 <th className="pb-2 pr-4">Method</th>
                 <th className="pb-2">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-slate-200">
               {payments.map((p) => (
-                <tr key={p.id} className="text-slate-200">
+                <tr key={p.id} className="text-slate-700">
                   <td className="py-3 pr-4">{new Date(p.created_at).toLocaleDateString()}</td>
                   <td className="py-3 pr-4 font-medium">
                     ${(p.amount / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}

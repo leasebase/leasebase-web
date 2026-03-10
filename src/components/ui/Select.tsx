@@ -17,7 +17,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="space-y-1 text-sm">
         {label && (
-          <label htmlFor={id} className="block font-medium text-slate-200">
+          <label htmlFor={id} className="block font-medium text-slate-700">
             {label}
           </label>
         )}
@@ -26,8 +26,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           id={id}
           aria-invalid={!!error}
           aria-describedby={error ? errorId : undefined}
-          className={`w-full rounded-md border bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 ${
-            error ? "border-danger" : "border-slate-700 hover:border-slate-600"
+          className={`w-full rounded-md border bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+            error ? "border-danger" : "border-slate-300 hover:border-slate-400"
           } disabled:opacity-50 ${className}`}
           {...rest}
         >

@@ -16,7 +16,7 @@ interface AuthCardProps {
 export function AuthCard({ children, className = "" }: AuthCardProps) {
   return (
     <div
-      className={`w-full max-w-md rounded-2xl border border-slate-800/80 bg-slate-950/80 p-8 shadow-xl backdrop-blur-sm sm:p-10 ${className}`}
+      className={`w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-xl sm:p-10 ${className}`}
     >
       {children}
     </div>

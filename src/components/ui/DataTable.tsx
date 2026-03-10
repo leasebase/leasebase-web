@@ -136,10 +136,10 @@ export function DataTable<T extends Record<string, any>>({
   /* ── Loading skeleton ── */
   if (loading) {
     return (
-      <div className={`rounded-lg border border-slate-800 overflow-hidden ${className}`}>
+      <div className={`rounded-lg border border-slate-200 overflow-hidden ${className}`}>
         <table className="w-full text-sm" role="table">
           <thead>
-            <tr className="border-b border-slate-800 bg-slate-900/50">
+            <tr className="border-b border-slate-200 bg-slate-50">
               {columns.map((col) => (
                 <th key={col.key} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
                   {col.header}
@@ -149,10 +149,10 @@ export function DataTable<T extends Record<string, any>>({
           </thead>
           <tbody>
             {Array.from({ length: 3 }).map((_, i) => (
-              <tr key={i} className="border-b border-slate-800/50">
+              <tr key={i} className="border-b border-slate-200">
                 {columns.map((col) => (
                   <td key={col.key} className="px-4 py-3">
-                    <div className="h-4 w-24 rounded bg-slate-800 animate-pulse" />
+                    <div className="h-4 w-24 rounded bg-slate-200 animate-pulse" />
                   </td>
                 ))}
               </tr>
@@ -166,7 +166,7 @@ export function DataTable<T extends Record<string, any>>({
   /* ── Error ── */
   if (error) {
     return (
-      <div className={`rounded-lg border border-red-800/40 bg-red-950/20 p-6 text-center text-sm text-red-300 ${className}`} role="alert">
+      <div className={`rounded-lg border border-red-200 bg-red-50 p-6 text-center text-sm text-red-700 ${className}`} role="alert">
         {error}
       </div>
     );
@@ -175,7 +175,7 @@ export function DataTable<T extends Record<string, any>>({
   /* ── Empty ── */
   if (rows.length === 0) {
     return (
-      <div className={`rounded-lg border border-slate-800 p-8 text-center text-sm text-slate-400 ${className}`}>
+      <div className={`rounded-lg border border-slate-200 p-8 text-center text-sm text-slate-400 ${className}`}>
         {emptyMessage}
       </div>
     );
@@ -185,15 +185,15 @@ export function DataTable<T extends Record<string, any>>({
   const SortIcon = ({ colKey }: { colKey: string }) => {
     if (sort?.key !== colKey) return <ArrowUpDown size={12} className="text-slate-600" />;
     return sort.dir === "asc"
-      ? <ArrowUp size={12} className="text-brand-400" />
-      : <ArrowDown size={12} className="text-brand-400" />;
+      ? <ArrowUp size={12} className="text-brand-600" />
+      : <ArrowDown size={12} className="text-brand-600" />;
   };
 
   return (
-    <div className={`rounded-lg border border-slate-800 overflow-hidden ${className}`}>
+    <div className={`rounded-lg border border-slate-200 overflow-hidden ${className}`}>
       {/* Toolbar */}
       {showToolbar && (
-        <div className="flex flex-wrap items-center gap-3 border-b border-slate-800 bg-slate-900/30 px-4 py-2.5">
+        <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-2.5">
           {searchable && (
             <div className="relative min-w-[180px] flex-1 max-w-xs">
               <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500" aria-hidden="true" />
@@ -201,7 +201,7 @@ export function DataTable<T extends Record<string, any>>({
                 type="search"
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-                className="w-full rounded-md border border-slate-700 bg-slate-900 pl-8 pr-3 py-1.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full rounded-md border border-slate-200 bg-white pl-8 pr-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 placeholder={searchPlaceholder}
                 aria-label="Table search"
               />
@@ -215,7 +215,7 @@ export function DataTable<T extends Record<string, any>>({
                 setActiveFilters((prev) => ({ ...prev, [f.key]: e.target.value }));
                 setPage(0);
               }}
-              className="rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
               aria-label={f.label}
             >
               <option value="">{f.label}: All</option>
@@ -230,15 +230,15 @@ export function DataTable<T extends Record<string, any>>({
       <div className={`overflow-x-auto ${stickyHeader ? "max-h-[70vh] overflow-y-auto" : ""}`}>
         <table className="w-full text-sm" role="table">
           <thead className={stickyHeader ? "sticky top-0 z-10" : ""}>
-            <tr className="border-b border-slate-800 bg-slate-900/50">
+            <tr className="border-b border-slate-200 bg-slate-50">
               {columns.map((col) => {
                 const isSortable = col.sortable === true;
                 return (
                   <th
                     key={col.key}
                     className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400 ${
-                      isSortable ? "cursor-pointer select-none hover:text-slate-200" : ""
-                    } ${stickyHeader ? "bg-slate-900" : ""}`}
+                      isSortable ? "cursor-pointer select-none hover:text-slate-700" : ""
+                    } ${stickyHeader ? "bg-white" : ""}`}
                     onClick={isSortable ? () => toggleSort(col.key) : undefined}
                     aria-sort={
                       sort?.key === col.key
@@ -264,9 +264,9 @@ export function DataTable<T extends Record<string, any>>({
               </tr>
             ) : (
               paginatedRows.map((row, i) => (
-                <tr key={getRowId(row, safePage * pageSize + i)} className="border-b border-slate-800/50 hover:bg-slate-900/40 transition-colors">
+                <tr key={getRowId(row, safePage * pageSize + i)} className="border-b border-slate-200 hover:bg-slate-50 transition-colors">
                   {columns.map((col) => (
-                    <td key={col.key} className="px-4 py-3 text-slate-200">
+                    <td key={col.key} className="px-4 py-3 text-slate-700">
                       {col.render ? col.render(row) : (row[col.key] as ReactNode)}
                     </td>
                   ))}
@@ -278,7 +278,7 @@ export function DataTable<T extends Record<string, any>>({
       </div>
 
       {showPagination && (
-        <div className="flex items-center justify-between border-t border-slate-800 px-4 py-2 text-xs text-slate-400">
+        <div className="flex items-center justify-between border-t border-slate-200 px-4 py-2 text-xs text-slate-400">
           <span>
             {safePage * pageSize + 1}–{Math.min((safePage + 1) * pageSize, sortedRows.length)} of {sortedRows.length}
           </span>
@@ -287,7 +287,7 @@ export function DataTable<T extends Record<string, any>>({
               type="button"
               disabled={safePage === 0}
               onClick={() => setPage((p) => p - 1)}
-              className="rounded px-2 py-1 hover:bg-slate-800 disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="rounded px-2 py-1 hover:bg-slate-100 disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-brand-500"
               aria-label="Previous page"
             >
               ‹ Prev
@@ -296,7 +296,7 @@ export function DataTable<T extends Record<string, any>>({
               type="button"
               disabled={safePage >= totalPages - 1}
               onClick={() => setPage((p) => p + 1)}
-              className="rounded px-2 py-1 hover:bg-slate-800 disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="rounded px-2 py-1 hover:bg-slate-100 disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-brand-500"
               aria-label="Next page"
             >
               Next ›

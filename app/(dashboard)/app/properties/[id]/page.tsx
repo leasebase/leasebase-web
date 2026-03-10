@@ -24,15 +24,15 @@ function OverviewPanel({ property, units }: { property: PMPropertyRow; units: PM
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-4 space-y-2">
+        <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Address</h3>
-          <p className="text-sm text-slate-200">{property.address_line1}</p>
-          <p className="text-sm text-slate-300">{property.city}, {property.state} {property.postal_code}</p>
+          <p className="text-sm text-slate-700">{property.address_line1}</p>
+          <p className="text-sm text-slate-600">{property.city}, {property.state} {property.postal_code}</p>
         </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-4 space-y-2">
+        <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Details</h3>
-          <p className="text-sm text-slate-300">Status: <Badge variant={property.status === "ACTIVE" ? "success" : "neutral"}>{property.status || "—"}</Badge></p>
-          <p className="text-sm text-slate-300">Country: <span className="text-slate-100">{property.country || "—"}</span></p>
+          <p className="text-sm text-slate-600">Status: <Badge variant={property.status === "ACTIVE" ? "success" : "neutral"}>{property.status || "—"}</Badge></p>
+          <p className="text-sm text-slate-600">Country: <span className="text-slate-900">{property.country || "—"}</span></p>
         </div>
       </div>
       <RecommendedActions insights={insights} title="Property Insights" />
@@ -51,9 +51,9 @@ function UnitsPanel({ units }: { units: (PMUnitRow & { property_name: string })[
     <div className="space-y-2">
       {units.map((u) => (
         <Link key={u.id} href={`/app/units/${u.id}`}
-          className="flex items-center justify-between rounded-md border border-slate-700/50 p-3 transition-colors hover:border-slate-600">
+          className="flex items-center justify-between rounded-md border border-slate-700/50 p-3 transition-colors hover:border-slate-300">
           <div>
-            <span className="text-sm font-medium text-slate-100">Unit {u.unit_number}</span>
+            <span className="text-sm font-medium text-slate-900">Unit {u.unit_number}</span>
             <span className="ml-3 text-xs text-slate-400">{u.bedrooms}bd/{u.bathrooms}ba</span>
           </div>
           <div className="flex items-center gap-2">
@@ -68,9 +68,9 @@ function UnitsPanel({ units }: { units: (PMUnitRow & { property_name: string })[
 
 function PlaceholderPanel({ label, href }: { label: string; href: string }) {
   return (
-    <div className="rounded-lg border border-slate-800 p-8 text-center">
+    <div className="rounded-lg border border-slate-200 p-8 text-center">
       <p className="text-sm text-slate-400 mb-3">No {label.toLowerCase()} data linked to this property yet.</p>
-      <Link href={href} className="text-sm text-brand-400 hover:underline">View all {label.toLowerCase()} →</Link>
+      <Link href={href} className="text-sm text-brand-600 hover:underline">View all {label.toLowerCase()} →</Link>
     </div>
   );
 }
@@ -111,7 +111,7 @@ function PMPropertyDetail() {
   }, [property, units]);
 
   if (isLoading) return <div className="space-y-3"><Skeleton variant="text" className="h-8 w-64" /><Skeleton variant="text" className="h-40 w-full rounded-lg" /></div>;
-  if (error) return <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>;
+  if (error) return <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">{error}</div>;
   if (!property) return null;
 
   return (

@@ -21,7 +21,7 @@ export function Pagination({ page, totalPages, onPageChange, className = "" }: P
         disabled={page <= 1}
         onClick={() => onPageChange(page - 1)}
         aria-label="Previous page"
-        className="rounded p-1.5 text-slate-400 hover:bg-slate-800 hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+        className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
       >
         <ChevronLeft size={16} />
       </button>
@@ -40,7 +40,7 @@ export function Pagination({ page, totalPages, onPageChange, className = "" }: P
             className={`min-w-[2rem] rounded px-2 py-1 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
               p === page
                 ? "bg-brand-600 text-white"
-                : "text-slate-300 hover:bg-slate-800"
+                : "text-slate-600 hover:bg-slate-200"
             }`}
           >
             {p}
@@ -53,7 +53,7 @@ export function Pagination({ page, totalPages, onPageChange, className = "" }: P
         disabled={page >= totalPages}
         onClick={() => onPageChange(page + 1)}
         aria-label="Next page"
-        className="rounded p-1.5 text-slate-400 hover:bg-slate-800 hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+        className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
       >
         <ChevronRight size={16} />
       </button>

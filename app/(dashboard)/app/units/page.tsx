@@ -38,7 +38,7 @@ function PMUnitsPage() {
         {isLoading ? (
           <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} variant="text" className="h-14 w-full rounded-md" />)}</div>
         ) : error ? (
-          <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>
+          <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">{error}</div>
         ) : units.length === 0 ? (
           <EmptyState
             icon={<DoorOpen size={48} strokeWidth={1.5} />}
@@ -54,9 +54,9 @@ function PMUnitsPage() {
           <div className="space-y-2">
             {units.map((u) => (
               <Link key={u.id} href={`/app/units/${u.id}`}
-                className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 p-4 transition-colors hover:border-slate-700">
+                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-200">
                 <div>
-                  <span className="text-sm font-medium text-slate-100">Unit {u.unit_number}</span>
+                  <span className="text-sm font-medium text-slate-900">Unit {u.unit_number}</span>
                   <span className="ml-2 text-xs text-slate-400">— {u.property_name}</span>
                 </div>
                 <div className="flex items-center gap-2">

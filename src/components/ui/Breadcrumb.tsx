@@ -26,13 +26,13 @@ export function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
               {i > 0 && <ChevronRight size={12} aria-hidden="true" />}
               {isLast || !item.href ? (
                 <span
-                  className={isLast ? "text-slate-200" : ""}
+                  className={isLast ? "text-slate-700" : ""}
                   aria-current={isLast ? "page" : undefined}
                 >
                   {item.label}
                 </span>
               ) : (
-                <Link href={item.href} className="hover:text-slate-200 transition-colors">
+                <Link href={item.href} className="hover:text-slate-700 transition-colors">
                   {item.label}
                 </Link>
               )}

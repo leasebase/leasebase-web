@@ -26,7 +26,7 @@ export function EmptyState({
       <div className="mb-4 text-slate-500" aria-hidden="true">
         {icon ?? <Inbox size={48} strokeWidth={1.5} />}
       </div>
-      <h3 className="text-lg font-semibold text-slate-200">{title}</h3>
+      <h3 className="text-lg font-semibold text-slate-700">{title}</h3>
       {description && (
         <p className="mt-1 max-w-sm text-sm text-slate-400">{description}</p>
       )}

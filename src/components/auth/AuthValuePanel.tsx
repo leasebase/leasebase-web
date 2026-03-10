@@ -23,7 +23,7 @@ const VALUE_POINTS = [
  */
 export function AuthValuePanel() {
   return (
-    <div className="relative hidden md:flex flex-col justify-between overflow-hidden bg-surface-default p-10 lg:p-14">
+    <div className="relative hidden md:flex flex-col justify-between overflow-hidden bg-brand-950 p-10 lg:p-14">
       {/* Subtle dot-grid background pattern */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03]"
@@ -80,7 +80,7 @@ export function AuthValuePanel() {
         className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
         style={{
           background:
-            "linear-gradient(to top, var(--lb-color-color-brand-primary-950) 0%, transparent 100%)",
+            "linear-gradient(to top, var(--lb-color-brand-primary-950) 0%, transparent 100%)",
         }}
         aria-hidden="true"
       />

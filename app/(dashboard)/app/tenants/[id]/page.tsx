@@ -31,7 +31,7 @@ function PMTenantDetail() {
   }, [id]);
 
   if (isLoading) return <div className="space-y-3"><Skeleton variant="text" className="h-8 w-48" /><Skeleton variant="text" className="h-32 w-full rounded-lg" /></div>;
-  if (error) return <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>;
+  if (error) return <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">{error}</div>;
   if (!tenant) return null;
 
   const insights = deriveTenantDetailInsights(tenant);
@@ -39,14 +39,14 @@ function PMTenantDetail() {
   return (
     <>
       <PageHeader title={tenant.name} description={`${tenant.email} · Unit ${tenant.unit_number} · ${tenant.property_name}`} />
-      <div className="mt-6 rounded-lg border border-slate-800 bg-slate-900 p-4 space-y-3">
+      <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 space-y-3">
         <div className="flex items-center gap-2">
           <span className="text-xs text-slate-400">Lease status:</span>
           <Badge variant={tenant.lease_status === "ACTIVE" ? "success" : "neutral"}>{tenant.lease_status}</Badge>
         </div>
-        {tenant.phone && <p className="text-sm text-slate-300">Phone: {tenant.phone}</p>}
-        <p className="text-sm text-slate-300">Rent: ${(tenant.rent_amount / 100).toLocaleString()}/mo</p>
-        <p className="text-sm text-slate-300">Lease: {new Date(tenant.start_date).toLocaleDateString()} — {new Date(tenant.end_date).toLocaleDateString()}</p>
+        {tenant.phone && <p className="text-sm text-slate-600">Phone: {tenant.phone}</p>}
+        <p className="text-sm text-slate-600">Rent: ${(tenant.rent_amount / 100).toLocaleString()}/mo</p>
+        <p className="text-sm text-slate-600">Lease: {new Date(tenant.start_date).toLocaleDateString()} — {new Date(tenant.end_date).toLocaleDateString()}</p>
       </div>
       <RecommendedActions insights={insights} title="Tenant Insights" className="mt-6" />
     </>

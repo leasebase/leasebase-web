@@ -38,7 +38,7 @@ function PMTenantsPage() {
         {isLoading ? (
           <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} variant="text" className="h-14 w-full rounded-md" />)}</div>
         ) : error ? (
-          <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>
+          <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">{error}</div>
         ) : tenants.length === 0 ? (
           <EmptyState
             icon={<Users size={48} strokeWidth={1.5} />}
@@ -54,9 +54,9 @@ function PMTenantsPage() {
           <div className="space-y-2">
             {tenants.map((t) => (
               <Link key={t.id} href={`/app/tenants/${t.id}`}
-                className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 p-4 transition-colors hover:border-slate-700">
+                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-200">
                 <div>
-                  <p className="text-sm font-medium text-slate-100">{t.name}</p>
+                  <p className="text-sm font-medium text-slate-900">{t.name}</p>
                   <p className="text-xs text-slate-400">{t.email} · Unit {t.unit_number} · {t.property_name}</p>
                 </div>
                 {t.phone && <span className="text-xs text-slate-500">{t.phone}</span>}

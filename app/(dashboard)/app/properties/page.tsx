@@ -45,7 +45,7 @@ function PMPropertiesPage() {
             ))}
           </div>
         ) : error ? (
-          <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>
+          <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">{error}</div>
         ) : properties.length === 0 ? (
           <EmptyState
             icon={<Building2 size={48} strokeWidth={1.5} />}
@@ -63,11 +63,11 @@ function PMPropertiesPage() {
               <Link
                 key={p.id}
                 href={`/app/properties/${p.id}`}
-                className="block rounded-lg border border-slate-800 bg-slate-900 p-4 transition-colors hover:border-slate-700"
+                className="block rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-200"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-slate-100">{p.name}</p>
+                    <p className="text-sm font-medium text-slate-900">{p.name}</p>
                     <p className="mt-1 text-xs text-slate-400">
                       {p.address_line1}, {p.city}, {p.state} {p.postal_code}
                     </p>

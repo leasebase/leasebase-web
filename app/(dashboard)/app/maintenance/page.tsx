@@ -85,7 +85,7 @@ export default function Page() {
               ))}
             </div>
           ) : error ? (
-            <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">
+            <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">
               {error}
             </div>
           ) : requests.length === 0 ? (
@@ -107,11 +107,11 @@ export default function Page() {
                 <Link
                   key={wo.id}
                   href={`/app/maintenance/${wo.id}`}
-                  className="block rounded-lg border border-slate-800 bg-slate-900 p-4 transition-colors hover:border-slate-700"
+                  className="block rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-200"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-slate-100 truncate">
+                      <p className="text-sm font-medium text-slate-900 truncate">
                         {wo.description}
                       </p>
                       <p className="mt-1 text-xs text-slate-400">
@@ -166,17 +166,17 @@ function PMMaintenancePage() {
   }, []);
 
   if (isLoading) return <div className="mt-6 space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} variant="text" className="h-16 w-full rounded-md" />)}</div>;
-  if (error) return <div className="mt-6 rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>;
+  if (error) return <div className="mt-6 rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">{error}</div>;
   if (items.length === 0) return <EmptyState icon={<Wrench size={48} strokeWidth={1.5} />} title="No work orders" description="No maintenance requests for your assigned properties." className="mt-6" />;
 
   return (
     <div className="mt-6 space-y-3">
       {items.map((wo: any) => (
         <Link key={wo.id} href={`/app/maintenance/${wo.id}`}
-          className="block rounded-lg border border-slate-800 bg-slate-900 p-4 transition-colors hover:border-slate-700">
+          className="block rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-200">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-slate-100 truncate">{wo.description}</p>
+              <p className="text-sm font-medium text-slate-900 truncate">{wo.description}</p>
               <p className="mt-1 text-xs text-slate-400">{wo.property_name} · Unit {wo.unit_number} · {wo.category}</p>
             </div>
             <div className="flex shrink-0 gap-2">

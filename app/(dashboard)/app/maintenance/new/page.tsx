@@ -152,7 +152,7 @@ export default function Page() {
             />
 
             {error && (
-              <p className="rounded-md bg-red-950/30 border border-red-800/50 px-3 py-2 text-sm text-red-300" role="alert">
+              <p className="rounded-md bg-red-950/30 border border-red-800/50 px-3 py-2 text-sm text-red-700" role="alert">
                 {error}
               </p>
             )}

@@ -159,22 +159,22 @@ export function CommandPalette({ open, onClose, extraCommands = [] }: CommandPal
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="relative z-10 w-full max-w-lg rounded-xl border border-slate-700 bg-slate-900 shadow-modal overflow-hidden"
+        className="relative z-10 w-full max-w-lg rounded-xl border border-slate-200 bg-white shadow-modal overflow-hidden"
       >
         {/* Search input */}
-        <div className="flex items-center gap-2 border-b border-slate-800 px-4 py-3">
+        <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
           <Search size={16} className="shrink-0 text-slate-500" aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => { setQuery(e.target.value); setActiveIndex(0); }}
-            className="flex-1 bg-transparent text-sm text-slate-100 placeholder:text-slate-500 outline-none"
+            className="flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-500 outline-none"
             placeholder="Type a command or search…"
             aria-label="Command search"
             autoComplete="off"
           />
-          <kbd className="hidden sm:inline-block rounded border border-slate-700 px-1.5 py-0.5 text-[10px] text-slate-500">
+          <kbd className="hidden sm:inline-block rounded border border-slate-200 px-1.5 py-0.5 text-[10px] text-slate-500">
             Esc
           </kbd>
         </div>
@@ -207,8 +207,8 @@ export function CommandPalette({ open, onClose, extraCommands = [] }: CommandPal
                       onMouseEnter={() => setActiveIndex(idx)}
                       className={`flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                         isActive
-                          ? "bg-brand-500/10 text-brand-300"
-                          : "text-slate-300 hover:bg-slate-800"
+                          ? "bg-brand-500/10 text-brand-600"
+                          : "text-slate-600 hover:bg-slate-200"
                       }`}
                     >
                       <IconCmp size={16} className="shrink-0" />
@@ -222,10 +222,10 @@ export function CommandPalette({ open, onClose, extraCommands = [] }: CommandPal
         </div>
 
         {/* Footer hints */}
-        <div className="flex items-center gap-4 border-t border-slate-800 px-4 py-2 text-[10px] text-slate-500">
-          <span><kbd className="rounded border border-slate-700 px-1">↑↓</kbd> navigate</span>
-          <span><kbd className="rounded border border-slate-700 px-1">↵</kbd> select</span>
-          <span><kbd className="rounded border border-slate-700 px-1">esc</kbd> close</span>
+        <div className="flex items-center gap-4 border-t border-slate-200 px-4 py-2 text-[10px] text-slate-500">
+          <span><kbd className="rounded border border-slate-200 px-1">↑↓</kbd> navigate</span>
+          <span><kbd className="rounded border border-slate-200 px-1">↵</kbd> select</span>
+          <span><kbd className="rounded border border-slate-200 px-1">esc</kbd> close</span>
         </div>
       </div>
     </div>,

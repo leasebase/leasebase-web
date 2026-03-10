@@ -65,15 +65,15 @@ function PMMaintenanceDetail() {
   }
 
   if (isLoading) return <div className="space-y-3"><Skeleton variant="text" className="h-8 w-64" /><Skeleton variant="text" className="h-40 w-full rounded-lg" /></div>;
-  if (error) return <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>;
+  if (error) return <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">{error}</div>;
   if (!item) return null;
 
   return (
     <>
       <PageHeader title="Work Order" description={`${item.property_name} · Unit ${item.unit_number}`} />
       <div className="mt-6 space-y-6">
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-4 space-y-3">
-          <p className="text-sm text-slate-100">{item.description}</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-3">
+          <p className="text-sm text-slate-900">{item.description}</p>
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant={STATUS_VARIANTS[item.status] || "neutral"}>{item.status.replace("_", " ")}</Badge>
             <Badge variant={item.priority === "HIGH" ? "danger" : item.priority === "MEDIUM" ? "warning" : "neutral"}>{item.priority}</Badge>
@@ -88,15 +88,15 @@ function PMMaintenanceDetail() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-          <h3 className="text-sm font-medium text-slate-300 mb-3">Comments</h3>
+        <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <h3 className="text-sm font-medium text-slate-600 mb-3">Comments</h3>
           {comments.length === 0 ? (
             <p className="text-xs text-slate-500">No comments yet.</p>
           ) : (
             <div className="space-y-3 mb-4">
               {comments.map((c) => (
-                <div key={c.id} className="border-l-2 border-slate-700 pl-3">
-                  <p className="text-sm text-slate-200">{c.comment}</p>
+                <div key={c.id} className="border-l-2 border-slate-200 pl-3">
+                  <p className="text-sm text-slate-700">{c.comment}</p>
                   <p className="text-xs text-slate-500 mt-1">{c.author_name} · {new Date(c.created_at).toLocaleString()}</p>
                 </div>
               ))}
@@ -109,7 +109,7 @@ function PMMaintenanceDetail() {
               onChange={(e) => setNewComment(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
               placeholder="Add a comment…"
-              className="flex-1 rounded-md border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="flex-1 rounded-md border border-slate-200 bg-slate-800 px-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
             <Button variant="primary" size="sm" icon={<Send size={14} />} loading={submitting} onClick={handleAddComment}>
               Send

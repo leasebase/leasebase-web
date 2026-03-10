@@ -51,15 +51,15 @@ const config: Config = {
         },
         /* ── Semantic text / border colors ── */
         content: {
-          primary:   v("color-color-neutral-900"),
-          secondary: v("color-color-neutral-600"),
-          muted:     v("color-color-neutral-400"),
-          inverted:  v("color-color-neutral-0"),
+          primary:   v("color-neutral-900"),
+          secondary: v("color-neutral-600"),
+          muted:     v("color-neutral-400"),
+          inverted:  v("color-neutral-0"),
         },
         border: {
-          DEFAULT: v("color-color-neutral-200"),
-          strong:  v("color-color-neutral-300"),
-          muted:   v("color-color-neutral-100"),
+          DEFAULT: v("color-neutral-200"),
+          strong:  v("color-neutral-300"),
+          muted:   v("color-neutral-100"),
         },
         success: {
           DEFAULT: v("color-semantic-success-500"),

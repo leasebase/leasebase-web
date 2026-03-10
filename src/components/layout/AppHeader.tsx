@@ -28,10 +28,10 @@ function HeaderBreadcrumbs({ pathname }: { pathname: string }) {
     .filter(Boolean);
 
   return (
-    <nav aria-label="Breadcrumb" className="text-xs text-slate-400">
+    <nav aria-label="Breadcrumb" className="text-xs text-slate-500">
       <ol className="flex items-center gap-1">
         <li>
-          <Link href="/app" className="transition-colors hover:text-slate-200">
+          <Link href="/app" className="transition-colors hover:text-slate-900">
             Home
           </Link>
         </li>
@@ -44,13 +44,13 @@ function HeaderBreadcrumbs({ pathname }: { pathname: string }) {
             <li key={href} className="flex items-center gap-1">
               <ChevronRight size={12} aria-hidden="true" />
               {isLast ? (
-                <span className="text-slate-200" aria-current="page">
+                <span className="text-slate-800" aria-current="page">
                   {label}
                 </span>
               ) : (
                 <Link
                   href={href}
-                  className="transition-colors hover:text-slate-200"
+                  className="transition-colors hover:text-slate-900"
                 >
                   {label}
                 </Link>
@@ -113,14 +113,14 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-800 bg-surface/80 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-slate-200 bg-surface/80 backdrop-blur">
       <div className="flex items-center justify-between gap-4 px-4 py-2.5">
         {/* Left: hamburger + breadcrumbs */}
         <div className="flex min-w-0 items-center gap-3">
           <button
             ref={hamburgerRef}
             type="button"
-            className="rounded p-1.5 text-slate-300 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500 md:hidden"
+            className="rounded p-1.5 text-slate-600 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500 md:hidden"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -147,7 +147,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
             <input
               id="global-search"
               type="search"
-              className="w-full rounded-lg border border-slate-700 bg-surface pl-8 pr-3 py-1.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full rounded-lg border border-slate-200 bg-white pl-8 pr-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
               placeholder="Search…"
             />
           </div>
@@ -159,7 +159,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
             <button
               type="button"
               onClick={onOpenCommandPalette}
-              className="hidden items-center gap-1.5 rounded-lg border border-slate-700 bg-surface px-2.5 py-1.5 text-xs text-slate-400 hover:bg-surface-raised hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 md:inline-flex"
+              className="hidden items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-500 hover:bg-surface-raised hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 md:inline-flex"
               aria-label="Open command palette"
             >
               <Command size={14} />
@@ -169,7 +169,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
 
           <Link
             href="/app/notifications"
-            className="rounded-full p-2 text-slate-300 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="rounded-full p-2 text-slate-500 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
             aria-label="Notifications"
           >
             <Bell size={18} />
@@ -183,7 +183,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
                 aria-label="User menu"
               >
                 <Avatar name={user?.name || user?.email} size="sm" />
-                <span className="hidden max-w-[8rem] truncate text-xs font-medium text-slate-200 sm:block">
+                <span className="hidden max-w-[8rem] truncate text-xs font-medium text-slate-700 sm:block">
                   {user?.name || user?.email || ""}
                 </span>
               </button>

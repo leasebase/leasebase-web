@@ -40,16 +40,16 @@ function PMPaymentsPage() {
         {isLoading ? (
           <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} variant="text" className="h-14 w-full rounded-md" />)}</div>
         ) : error ? (
-          <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>
+          <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">{error}</div>
         ) : payments.length === 0 ? (
           <EmptyState icon={<CreditCard size={48} strokeWidth={1.5} />} title="No payments" description="No payments found for your assigned properties." />
         ) : (
           <div className="space-y-2">
             {payments.map((p) => (
               <Link key={p.id} href={`/app/payments/${p.id}`}
-                className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 p-4 transition-colors hover:border-slate-700">
+                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-200">
                 <div>
-                  <p className="text-sm font-medium text-slate-100">${(p.amount / 100).toLocaleString()}</p>
+                  <p className="text-sm font-medium text-slate-900">${(p.amount / 100).toLocaleString()}</p>
                   <p className="text-xs text-slate-400">{p.property_name} · Unit {p.unit_number} · {new Date(p.created_at).toLocaleDateString()}</p>
                 </div>
                 <Badge variant={PAY_VARIANTS[p.status] || "neutral"}>{p.status}</Badge>
