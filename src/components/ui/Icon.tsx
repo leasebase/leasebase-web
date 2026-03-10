@@ -20,6 +20,9 @@ import {
   Clock,
   TrendingUp,
   Plus,
+  Receipt,
+  Banknote,
+  History,
   type LucideIcon,
 } from "lucide-react";
 
@@ -43,6 +46,10 @@ const iconMap: Record<string, LucideIcon> = {
   clock: Clock,
   trend: TrendingUp,
   plus: Plus,
+  "rent-roll": Receipt,
+  "pay-rent": Banknote,
+  "payment-history": History,
+  notifications: Bell,
 };
 
 export interface IconProps {

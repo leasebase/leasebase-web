@@ -11,6 +11,11 @@ import { PMEmptyState } from "./pm/PMEmptyState";
 import { PMKpiGrid } from "./pm/PMKpiGrid";
 import { PMTasksList } from "./pm/PMTasksList";
 import { PMMaintenanceWidget } from "./pm/PMMaintenanceWidget";
+import { PriorityActions } from "@/components/ui/PriorityActions";
+import { RecommendedActions } from "@/components/ui/RecommendedActions";
+import { WorkflowChecklist } from "@/components/ui/WorkflowChecklist";
+import { derivePMPriorityActions, derivePMInsights } from "@/lib/intelligence/deriveActions";
+import { pmOnboardingSteps } from "@/lib/intelligence/checklists";
 
 /**
  * PM Dashboard — thin component.
@@ -82,6 +87,9 @@ export function PMDashboard() {
   }
 
   const vm: PMDashboardViewModel = toPMDashboardViewModel(data);
+  const priorityActions = derivePMPriorityActions(data);
+  const insights = derivePMInsights(data);
+  const onboardingSteps = pmOnboardingSteps(data);
 
   return (
     <section aria-labelledby="pm-heading" className="space-y-6">
@@ -104,12 +112,28 @@ export function PMDashboard() {
         <PMKpiGrid vm={vm.kpis} />
       </WidgetErrorBoundary>
 
+      <WidgetErrorBoundary name="Priority Actions">
+        <PriorityActions actions={priorityActions} />
+      </WidgetErrorBoundary>
+
+      <WidgetErrorBoundary name="Portfolio Setup">
+        <WorkflowChecklist
+          title="Portfolio setup"
+          steps={onboardingSteps}
+          dismissKey="lb-pm-onboarding-dismissed"
+        />
+      </WidgetErrorBoundary>
+
       <WidgetErrorBoundary name="Tasks">
         <PMTasksList vm={vm.tasks} />
       </WidgetErrorBoundary>
 
       <WidgetErrorBoundary name="Maintenance">
         <PMMaintenanceWidget vm={vm.maintenance} />
+      </WidgetErrorBoundary>
+
+      <WidgetErrorBoundary name="Recommended Actions">
+        <RecommendedActions insights={insights} />
       </WidgetErrorBoundary>
     </section>
   );

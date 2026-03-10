@@ -21,3 +21,4 @@ export { DropdownMenu, type DropdownMenuProps, type DropdownMenuItem } from "./D
 export { Icon, type IconProps } from "./Icon";
 export { PageHeader, type PageHeaderProps } from "./PageHeader";
 export { ProgressBar, type ProgressBarProps } from "./ProgressBar";
+export { PageContainer, type PageContainerProps, type PageContainerSize } from "./PageContainer";

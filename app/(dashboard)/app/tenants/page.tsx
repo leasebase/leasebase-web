@@ -5,7 +5,8 @@ import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Users } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Users, Plus } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchPMTenants } from "@/services/pm/pmApiService";
 import type { PMTenantListRow } from "@/services/pm/pmApiService";
@@ -39,7 +40,16 @@ function PMTenantsPage() {
         ) : error ? (
           <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>
         ) : tenants.length === 0 ? (
-          <EmptyState icon={<Users size={48} strokeWidth={1.5} />} title="No tenants" description="No tenants found in your assigned properties." />
+          <EmptyState
+            icon={<Users size={48} strokeWidth={1.5} />}
+            title="No tenants"
+            description="No tenants found in your assigned properties."
+            action={
+              <Link href="/app/tenants">
+                <Button variant="primary" icon={<Plus size={16} />}>Invite Tenant</Button>
+              </Link>
+            }
+          />
         ) : (
           <div className="space-y-2">
             {tenants.map((t) => (
@@ -66,7 +76,15 @@ export default function Page() {
   return (
     <>
       <PageHeader title="Tenants" description="Manage tenant records, contacts, and lease associations." />
-      <EmptyState icon={<Users size={48} strokeWidth={1.5} />} title="Coming soon" description="This section is under development." className="mt-8" />
+      <EmptyState
+        icon={<Users size={48} strokeWidth={1.5} />}
+        title="No tenants yet"
+        description="Add your first tenant to manage contacts and lease associations."
+        action={
+          <Button variant="primary" icon={<Plus size={16} />}>Add Tenant</Button>
+        }
+        className="mt-8"
+      />
     </>
   );
 }

@@ -6,7 +6,8 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Building2 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Building2, Plus } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchPMProperties } from "@/services/pm/pmApiService";
 import type { PMPropertyRow, PMPaginationMeta } from "@/services/pm/types";
@@ -50,6 +51,11 @@ function PMPropertiesPage() {
             icon={<Building2 size={48} strokeWidth={1.5} />}
             title="No properties"
             description="You have no properties assigned to your account."
+            action={
+              <Link href="/app/properties">
+                <Button variant="primary" icon={<Plus size={16} />}>Add Property</Button>
+              </Link>
+            }
           />
         ) : (
           <div className="space-y-3">
@@ -93,8 +99,11 @@ export default function Page() {
       <PageHeader title="Properties" description="Manage your property portfolio — buildings, addresses, and unit counts." />
       <EmptyState
         icon={<Building2 size={48} strokeWidth={1.5} />}
-        title="Coming soon"
-        description="This section is under development."
+        title="No properties yet"
+        description="Add your first property to start managing your portfolio."
+        action={
+          <Button variant="primary" icon={<Plus size={16} />}>Add Property</Button>
+        }
         className="mt-8"
       />
     </>

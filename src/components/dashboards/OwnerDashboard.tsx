@@ -14,6 +14,11 @@ import { QuickActions } from "./owner/QuickActions";
 import { PropertiesSummary } from "./owner/PropertiesSummary";
 import { OwnerDashboardSkeleton } from "./owner/OwnerDashboardSkeleton";
 import { OwnerEmptyState } from "./owner/OwnerEmptyState";
+import { PriorityActions } from "@/components/ui/PriorityActions";
+import { RecommendedActions } from "@/components/ui/RecommendedActions";
+import { WorkflowChecklist } from "@/components/ui/WorkflowChecklist";
+import { deriveOwnerPriorityActions, deriveOwnerInsights } from "@/lib/intelligence/deriveActions";
+import { ownerOnboardingSteps } from "@/lib/intelligence/checklists";
 
 export function OwnerDashboard() {
   const [data, setData] = useState<OwnerDashboardData | null>(null);
@@ -72,6 +77,9 @@ export function OwnerDashboard() {
   }
 
   const vm: OwnerDashboardViewModel = toOwnerDashboardViewModel(data);
+  const priorityActions = deriveOwnerPriorityActions(data);
+  const insights = deriveOwnerInsights(data);
+  const onboardingSteps = ownerOnboardingSteps(data);
 
   return (
     <section aria-labelledby="owner-heading" className="space-y-6">
@@ -82,6 +90,18 @@ export function OwnerDashboard() {
 
       <WidgetErrorBoundary name="KPI Grid">
         <KpiGrid vm={vm.kpis} />
+      </WidgetErrorBoundary>
+
+      <WidgetErrorBoundary name="Priority Actions">
+        <PriorityActions actions={priorityActions} />
+      </WidgetErrorBoundary>
+
+      <WidgetErrorBoundary name="Onboarding Checklist">
+        <WorkflowChecklist
+          title="Getting started"
+          steps={onboardingSteps}
+          dismissKey="lb-owner-onboarding-dismissed"
+        />
       </WidgetErrorBoundary>
 
       <WidgetErrorBoundary name="Alerts">
@@ -97,10 +117,14 @@ export function OwnerDashboard() {
           <ActivityFeed vm={vm.activityFeed} />
         </WidgetErrorBoundary>
 
-        <WidgetErrorBoundary name="Portfolio Health">
-          <PortfolioHealthWidget vm={vm.portfolioHealth} />
+        <WidgetErrorBoundary name="Recommended Actions">
+          <RecommendedActions insights={insights} />
         </WidgetErrorBoundary>
       </div>
+
+      <WidgetErrorBoundary name="Portfolio Health">
+        <PortfolioHealthWidget vm={vm.portfolioHealth} />
+      </WidgetErrorBoundary>
 
       <WidgetErrorBoundary name="Properties Summary">
         <PropertiesSummary vm={vm.propertiesSummary} />

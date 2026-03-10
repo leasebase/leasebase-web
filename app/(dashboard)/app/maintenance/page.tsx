@@ -15,7 +15,9 @@ import type { WorkOrderRow } from "@/services/tenant/types";
 const STATUS_VARIANTS: Record<string, "success" | "warning" | "danger" | "info" | "neutral"> = {
   OPEN: "warning",
   IN_PROGRESS: "info",
+  WAITING: "neutral",
   RESOLVED: "success",
+  COMPLETED: "success",
   CLOSED: "neutral",
 };
 

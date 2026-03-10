@@ -153,11 +153,11 @@ describe("TenantDashboard", () => {
       expect(screen.getByText("Tenant dashboard")).toBeInTheDocument();
     });
 
-    // KPI header
-    expect(screen.getByText("$1,450")).toBeInTheDocument();
+    // KPI header (also appears in hero balance card)
+    expect(screen.getAllByText("$1,450").length).toBeGreaterThanOrEqual(1);
 
-    // Quick actions
-    expect(screen.getByText("Pay Rent")).toBeInTheDocument();
+    // Quick actions (also appears in hero CTA)
+    expect(screen.getAllByText("Pay Rent").length).toBeGreaterThanOrEqual(1);
 
     // Stubbed widgets show provenance labels
     expect(screen.getByText("Payments")).toBeInTheDocument();

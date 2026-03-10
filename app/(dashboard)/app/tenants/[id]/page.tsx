@@ -8,6 +8,8 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { authStore } from "@/lib/auth/store";
 import { fetchPMTenant } from "@/services/pm/pmApiService";
 import type { PMTenantDetailRow } from "@/services/pm/pmApiService";
+import { RecommendedActions } from "@/components/ui/RecommendedActions";
+import { deriveTenantDetailInsights } from "@/lib/intelligence/deriveActions";
 
 function PMTenantDetail() {
   const { id } = useParams<{ id: string }>();
@@ -32,6 +34,8 @@ function PMTenantDetail() {
   if (error) return <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>;
   if (!tenant) return null;
 
+  const insights = deriveTenantDetailInsights(tenant);
+
   return (
     <>
       <PageHeader title={tenant.name} description={`${tenant.email} · Unit ${tenant.unit_number} · ${tenant.property_name}`} />
@@ -44,6 +48,7 @@ function PMTenantDetail() {
         <p className="text-sm text-slate-300">Rent: ${(tenant.rent_amount / 100).toLocaleString()}/mo</p>
         <p className="text-sm text-slate-300">Lease: {new Date(tenant.start_date).toLocaleDateString()} — {new Date(tenant.end_date).toLocaleDateString()}</p>
       </div>
+      <RecommendedActions insights={insights} title="Tenant Insights" className="mt-6" />
     </>
   );
 }
