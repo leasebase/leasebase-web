@@ -18,11 +18,11 @@ export function AlertsPanel({ vm }: AlertsPanelProps) {
   if (!vm.hasAlerts) return null;
 
   return (
-    <div className="rounded-lg border border-slate-800 bg-slate-950/70">
-      <div className="border-b border-slate-800 px-4 py-3">
-        <h2 className="text-sm font-semibold text-slate-100">Alerts</h2>
+    <div className="rounded-lg border border-slate-200 bg-white">
+      <div className="border-b border-slate-200 px-4 py-3">
+        <h2 className="text-sm font-semibold text-slate-900">Alerts</h2>
       </div>
-      <ul className="divide-y divide-slate-800/50">
+      <ul className="divide-y divide-slate-200">
         {vm.alerts.map((alert, i) => {
           const cfg = severityConfig[alert.severity];
           const IconCmp = cfg.icon;
@@ -30,11 +30,11 @@ export function AlertsPanel({ vm }: AlertsPanelProps) {
             <li key={`${alert.type}-${i}`}>
               <Link
                 href={alert.link}
-                className="flex items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-slate-900/50"
+                className="flex items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-slate-50"
               >
                 <div className={`h-8 w-1 shrink-0 rounded-full ${cfg.bar}`} />
                 <IconCmp size={16} className="shrink-0 text-slate-400" />
-                <span className="text-slate-200">{alert.message}</span>
+                <span className="text-slate-700">{alert.message}</span>
               </Link>
             </li>
           );

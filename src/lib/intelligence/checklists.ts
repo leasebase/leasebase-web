@@ -61,7 +61,7 @@ export function ownerOnboardingSteps(data: OwnerDashboardData): ChecklistStep[] 
     {
       key: "upload-docs",
       label: "Upload property documents",
-      done: false, // cannot determine from dashboard KPIs — always shown until dismissed
+      done: data.documentCount > 0,
       href: "/app/documents",
       ctaLabel: "Upload",
     },

@@ -17,9 +17,9 @@ interface PortfolioHealthProps {
 
 export function PortfolioHealthWidget({ vm }: PortfolioHealthProps) {
   return (
-    <div className="rounded-lg border border-slate-800 bg-slate-950/70">
-      <div className="border-b border-slate-800 px-4 py-3">
-        <h2 className="text-sm font-semibold text-slate-100">Portfolio Health</h2>
+    <div className="rounded-lg border border-slate-200 bg-white">
+      <div className="border-b border-slate-200 px-4 py-3">
+        <h2 className="text-sm font-semibold text-slate-900">Portfolio Health</h2>
       </div>
       <div className="space-y-4 px-4 py-4">
         <Tooltip content={provenanceLabel[vm.occupancyRate.source]}>
@@ -40,9 +40,9 @@ export function PortfolioHealthWidget({ vm }: PortfolioHealthProps) {
 
         <div className="flex items-center gap-2 text-sm">
           <Wrench size={14} className="text-slate-400" />
-          <span className="text-slate-400">Open Work Orders:</span>
+          <span className="text-slate-500">Open Work Orders:</span>
           <Tooltip content={provenanceLabel[vm.openWorkOrders.source]}>
-            <span className="font-medium text-slate-200">
+            <span className="font-medium text-slate-900">
               {vm.openWorkOrders.source === "unavailable" ? "—" : vm.openWorkOrders.value}
             </span>
           </Tooltip>

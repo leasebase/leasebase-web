@@ -113,6 +113,31 @@ export function deriveOwnerPriorityActions(data: OwnerDashboardData): PriorityAc
     });
   }
 
+  // Document gap — no documents uploaded
+  if (data.documentCount === 0 && data.setupStage === "active") {
+    actions.push({
+      id: "owner-no-docs",
+      title: "Upload property documents",
+      description: "No documents on file. Upload leases, insurance, or inspection reports.",
+      severity: "info",
+      ctaLabel: "Upload Documents",
+      ctaHref: "/app/documents",
+    });
+  }
+
+  // Vacant units missing rent config (from vacancyReadiness)
+  if (data.vacancyReadiness.missingRentConfig.value > 0 && data.vacancyReadiness.missingRentConfig.source !== "unavailable") {
+    const count = data.vacancyReadiness.missingRentConfig.value;
+    actions.push({
+      id: "owner-missing-rent",
+      title: `${count} vacant unit${count > 1 ? "s" : ""} missing rent configuration`,
+      description: "Set a rent amount on vacant units so they can be listed.",
+      severity: "warning",
+      ctaLabel: "Configure Units",
+      ctaHref: "/app/units",
+    });
+  }
+
   return actions;
 }
 

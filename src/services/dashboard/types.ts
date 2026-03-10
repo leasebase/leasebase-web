@@ -93,7 +93,77 @@ export interface PortfolioHealth {
   trendAvailable: boolean;
 }
 
-/* ── Property Summary ── */
+/* ── Cash Flow / Receivables ── */
+
+export interface CashFlowPropertyBreakdown {
+  propertyId: string;
+  propertyName: string;
+  billed: number;     // cents
+  collected: number;  // cents
+  overdue: number;    // cents
+}
+
+export interface CashFlowData {
+  billedThisMonth: Sourced<number>;     // cents
+  collectedThisMonth: Sourced<number>;  // cents
+  overdueAmount: Sourced<number>;       // cents
+  upcomingDue: Sourced<number>;         // cents (next 30 days)
+  perProperty: CashFlowPropertyBreakdown[];
+}
+
+/* ── Maintenance Overview ── */
+
+export interface MaintenanceOverviewData {
+  open: Sourced<number>;
+  inProgress: Sourced<number>;
+  waiting: Sourced<number>;   // OPEN older than 3 days with no assignee
+  urgent: Sourced<number>;    // priority === HIGH
+  oldestOpenAgeDays: Sourced<number>;
+  mostAffectedProperty: Sourced<{ id: string; name: string; count: number } | null>;
+}
+
+/* ── Lease Risk / Expirations ── */
+
+export interface LeaseExpirationItem {
+  leaseId: string;
+  unitId: string;
+  endDate: string;  // ISO
+  daysLeft: number;
+  rentAmount: number; // cents
+}
+
+export interface LeaseRiskData {
+  expiring30: Sourced<number>;
+  expiring60: Sourced<number>;
+  monthToMonth: Sourced<number>;
+  topExpirations: LeaseExpirationItem[];
+}
+
+/* ── Vacancy / Setup Readiness ── */
+
+export interface VacancyReadinessData {
+  vacantUnits: Sourced<number>;
+  readyToLease: Sourced<number>;    // vacant + has rent configured
+  missingRentConfig: Sourced<number>; // vacant + rent_amount === 0
+  missingSetup: Sourced<number>;    // units with no active lease AND no rent
+}
+
+/* ── Property Health Row (for DataTable) ── */
+
+export interface PropertyHealthRow {
+  id: string;
+  name: string;
+  totalUnits: number;
+  occupancy: number;          // percentage 0-100
+  collectedCents: number;
+  billedCents: number;
+  overdueCents: number;
+  openMaintenance: number;
+  expiringLeases: number;     // within 60 days
+  status: "healthy" | "attention" | "critical";
+}
+
+/* ── Property Summary (legacy) ── */
 
 export interface PropertySummary {
   id: string;
@@ -102,6 +172,16 @@ export interface PropertySummary {
   totalUnits: number;
   occupiedUnits: number;
   occupancyRate: number; // percentage 0-100
+}
+
+/* ── Document Row ── */
+
+export interface DocumentRow {
+  id: string;
+  related_type: string;
+  related_id: string;
+  name: string;
+  created_at: string;
 }
 
 /* ── Per-domain error tracking ── */
@@ -113,6 +193,7 @@ export interface DomainErrors {
   payments: string | null;
   ledger: string | null;
   maintenance: string | null;
+  documents: string | null;
   activity: string | null;
 }
 
@@ -123,7 +204,13 @@ export interface OwnerDashboardData {
   alerts: DashboardAlert[];
   recentActivity: ActivityEvent[];
   portfolioHealth: PortfolioHealth;
+  cashFlow: CashFlowData;
+  maintenanceOverview: MaintenanceOverviewData;
+  leaseRisk: LeaseRiskData;
+  vacancyReadiness: VacancyReadinessData;
+  propertyHealth: PropertyHealthRow[];
   properties: PropertySummary[];
+  documentCount: number;
   setupStage: SetupStage;
   domainErrors: DomainErrors;
 }
@@ -188,11 +275,81 @@ export interface PropertiesSummaryViewModel {
   hasProperties: boolean;
 }
 
+/* ── New block VMs ── */
+
+export interface CashFlowBreakdownVM {
+  propertyId: string;
+  propertyName: string;
+  billed: string;     // formatted
+  collected: string;  // formatted
+  overdue: string;    // formatted
+}
+
+export interface CashFlowViewModel {
+  billedThisMonth: string;
+  collectedThisMonth: string;
+  overdueAmount: string;
+  upcomingDue: string;
+  collectionPercent: number; // 0-100
+  perProperty: CashFlowBreakdownVM[];
+  source: DataSource;
+}
+
+export interface MaintenanceOverviewViewModel {
+  open: number;
+  inProgress: number;
+  waiting: number;
+  urgent: number;
+  oldestOpenAgeDays: number;
+  mostAffectedProperty: { id: string; name: string; count: number } | null;
+  source: DataSource;
+}
+
+export interface LeaseExpirationVM {
+  leaseId: string;
+  unitId: string;
+  endDate: string;  // formatted
+  daysLeft: number;
+  rentAmount: string; // formatted
+}
+
+export interface LeaseRiskViewModel {
+  expiring30: number;
+  expiring60: number;
+  monthToMonth: number;
+  topExpirations: LeaseExpirationVM[];
+  source: DataSource;
+}
+
+export interface VacancyReadinessViewModel {
+  vacantUnits: number;
+  readyToLease: number;
+  missingRentConfig: number;
+  missingSetup: number;
+  source: DataSource;
+}
+
+export interface PropertyHealthViewModel {
+  rows: PropertyHealthRow[];
+  hasData: boolean;
+}
+
+export interface PageHeaderViewModel {
+  title: string;
+  subtitle: string;
+}
+
 export interface OwnerDashboardViewModel {
+  header: PageHeaderViewModel;
   kpis: KpiGridViewModel;
   alerts: AlertsViewModel;
   activityFeed: ActivityFeedViewModel;
   portfolioHealth: PortfolioHealthViewModel;
+  cashFlow: CashFlowViewModel;
+  maintenanceOverview: MaintenanceOverviewViewModel;
+  leaseRisk: LeaseRiskViewModel;
+  vacancyReadiness: VacancyReadinessViewModel;
+  propertyHealthTable: PropertyHealthViewModel;
   quickActions: QuickActionsViewModel;
   propertiesSummary: PropertiesSummaryViewModel;
   setupStage: SetupStage;
