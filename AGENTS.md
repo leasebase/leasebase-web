@@ -8,8 +8,8 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 - It is **frontend-only**:
   - No backend API code lives here.
   - No mobile code lives here.
-- The web client talks to the backend API running from the separate backend repo:
-  - Backend/API: `../leasebase` (a.k.a. `leasebase-backend`), `services/api` (NestJS + Prisma + PostgreSQL).
+- The web client talks to the local dev API running from a separate repo:
+  - Schema & Dev API: `../leasebase-schema-dev`, `services/api` (NestJS + Prisma + PostgreSQL).
   - Mobile app: `../leasebase-mobile`.
 - All **web/frontend concerns** (pages, components, styling, web routing, web-only utilities) belong here once the app is bootstrapped.
 - Backend services, database schema/migrations, and infrastructure code live in `../leasebase` and should not be added to this repo.
