@@ -8,6 +8,7 @@ import { toTenantDashboardViewModel } from "@/services/tenant/viewModel";
 import { WidgetErrorBoundary } from "./owner/WidgetErrorBoundary";
 import { TenantDashboardSkeleton } from "./tenant/TenantDashboardSkeleton";
 import { TenantEmptyState } from "./tenant/TenantEmptyState";
+import { TenantWelcomeBanner } from "./tenant/TenantWelcomeBanner";
 import { TenantKpiHeader } from "./tenant/TenantKpiHeader";
 import { TenantActionCards } from "./tenant/TenantActionCards";
 import { TenantPaymentsWidget } from "./tenant/TenantPaymentsWidget";
@@ -85,6 +86,14 @@ export function TenantDashboard() {
         title="Tenant dashboard"
         description="Check your rent status, lease details, and maintenance requests."
       />
+
+      {/* ── Welcome banner (first 7 days after invitation acceptance) ── */}
+      {data.profile && (
+        <TenantWelcomeBanner
+          userId={data.profile.user_id}
+          profileCreatedAt={data.profile.created_at}
+        />
+      )}
 
       {/* ── Hero: Balance due + Pay Rent CTA ── */}
       <div className="rounded-xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-900/80 to-brand-950/30 p-6">
