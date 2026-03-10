@@ -29,15 +29,15 @@ export function SidebarNavItem({
         collapsed ? "justify-center px-2 py-2" : "px-2.5 py-2"
       } ${
         active
-          ? "bg-brand-500/10 font-medium text-brand-400"
-          : "text-slate-300 hover:bg-surface-raised hover:text-slate-100"
+          ? "bg-brand-500/10 font-medium text-brand-600"
+          : "text-slate-600 hover:bg-surface-raised hover:text-slate-900"
       }`}
       aria-current={active ? "page" : undefined}
     >
       <Icon
         name={icon || ""}
         size={18}
-        className={active ? "text-brand-400" : ""}
+        className={active ? "text-brand-600" : ""}
       />
       {!collapsed && <span>{label}</span>}
     </Link>

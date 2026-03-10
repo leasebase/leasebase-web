@@ -108,21 +108,21 @@ export default function Page() {
         {/* Account info from auth store */}
         <Card>
           <CardHeader>
-            <h2 className="text-sm font-semibold text-slate-100">Account</h2>
+            <h2 className="text-sm font-semibold text-slate-900">Account</h2>
           </CardHeader>
           <CardBody>
             <dl className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <dt className="text-slate-400">Name</dt>
-                <dd className="text-slate-100">{user?.name ?? "—"}</dd>
+                <dd className="text-slate-900">{user?.name ?? "—"}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-slate-400">Email</dt>
-                <dd className="text-slate-100">{user?.email ?? "—"}</dd>
+                <dd className="text-slate-900">{user?.email ?? "—"}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-slate-400">Role</dt>
-                <dd className="text-slate-100">{user?.role ?? "—"}</dd>
+                <dd className="text-slate-900">{user?.role ?? "—"}</dd>
               </div>
             </dl>
           </CardBody>
@@ -133,7 +133,7 @@ export default function Page() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-slate-100">Tenant Profile</h2>
+                <h2 className="text-sm font-semibold text-slate-900">Tenant Profile</h2>
                 <div className="flex items-center gap-2">
                   <Badge variant={profileSource === "live" ? "success" : "neutral"}>
                     {profileSource === "live" ? "Live" : "Unavailable"}
@@ -162,7 +162,7 @@ export default function Page() {
                         value={editPhone}
                         onChange={(e) => setEditPhone(e.target.value)}
                         placeholder="+1 (555) 123-4567"
-                        className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-500 focus:outline-none"
+                        className="w-full rounded-md border border-slate-200 bg-slate-800 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 focus:border-brand-500 focus:outline-none"
                       />
                     </div>
                     <div>
@@ -173,11 +173,11 @@ export default function Page() {
                         onChange={(e) => setEditEmergencyContact(e.target.value)}
                         placeholder="Name, phone, relationship"
                         maxLength={500}
-                        className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-500 focus:outline-none"
+                        className="w-full rounded-md border border-slate-200 bg-slate-800 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 focus:border-brand-500 focus:outline-none"
                       />
                     </div>
                     {editError && (
-                      <div className="rounded-md border border-red-800/50 bg-red-950/30 px-3 py-2 text-xs text-red-300">
+                      <div className="rounded-md border border-red-800/50 bg-red-950/30 px-3 py-2 text-xs text-red-700">
                         {editError}
                       </div>
                     )}
@@ -194,21 +194,21 @@ export default function Page() {
                   <dl className="space-y-3 text-sm">
                     <div className="flex justify-between">
                       <dt className="text-slate-400">Phone</dt>
-                      <dd className="text-slate-100">{profile.phone ?? "Not set"}</dd>
+                      <dd className="text-slate-900">{profile.phone ?? "Not set"}</dd>
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-slate-400">Emergency Contact</dt>
-                      <dd className="text-slate-100">{profile.emergency_contact ?? "Not set"}</dd>
+                      <dd className="text-slate-900">{profile.emergency_contact ?? "Not set"}</dd>
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-slate-400">Lease ID</dt>
-                      <dd className="text-slate-100 font-mono text-xs">
+                      <dd className="text-slate-900 font-mono text-xs">
                         {profile.lease_id ?? "Not linked"}
                       </dd>
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-slate-400">Member since</dt>
-                      <dd className="text-slate-100">
+                      <dd className="text-slate-900">
                         {new Date(profile.created_at).toLocaleDateString()}
                       </dd>
                     </div>

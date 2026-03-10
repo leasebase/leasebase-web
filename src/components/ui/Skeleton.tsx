@@ -14,7 +14,7 @@ export function Skeleton({
   width,
   height,
 }: SkeletonProps) {
-  const base = "animate-pulse bg-slate-800";
+  const base = "animate-pulse bg-slate-200";
 
   const variantClasses: Record<string, string> = {
     text: "h-4 rounded",
@@ -42,7 +42,7 @@ export function Skeleton({
 
 export function SkeletonCard({ className = "" }: { className?: string }) {
   return (
-    <div className={`rounded-lg border border-slate-800 bg-slate-900 p-4 space-y-3 ${className}`}>
+    <div className={`rounded-lg border border-slate-200 bg-white p-4 space-y-3 ${className}`}>
       <Skeleton variant="text" className="h-5 w-1/3" />
       <Skeleton variant="text" className="h-4 w-2/3" />
       <Skeleton variant="text" className="h-4 w-1/2" />

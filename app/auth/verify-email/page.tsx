@@ -86,12 +86,12 @@ function VerifyEmailContent() {
       <AuthCard>
         <div className="space-y-6">
           <div className="space-y-2">
-            <h2 className="text-2xl font-semibold tracking-tight text-white">
+            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
               Verify your email
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-500">
               We&apos;ve sent a 6-digit verification code to{" "}
-              <span className="font-medium text-slate-200">{email || "your email"}</span>.{" "}
+              <span className="font-medium text-slate-700">{email || "your email"}</span>.{" "}
               Enter it below to finish setting up your Leasebase account.
             </p>
           </div>
@@ -102,7 +102,7 @@ function VerifyEmailContent() {
             </div>
           )}
           {success && (
-            <div className="rounded-lg border border-brand-800/40 bg-brand-950/30 px-4 py-3 text-sm text-brand-300">
+            <div className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-700">
               {success}
             </div>
           )}
@@ -139,13 +139,13 @@ function VerifyEmailContent() {
               type="button"
               onClick={handleResend}
               disabled={resending}
-              className="font-medium text-brand-400 hover:text-brand-300 transition-colors disabled:opacity-60"
+              className="font-medium text-brand-600 hover:text-brand-500 transition-colors disabled:opacity-60"
             >
               {resending ? "Resending…" : "Resend code"}
             </button>
             <Link
               href="/auth/login"
-              className="text-slate-500 hover:text-slate-300 transition-colors"
+              className="text-slate-500 hover:text-slate-700 transition-colors"
             >
               Back to sign in
             </Link>

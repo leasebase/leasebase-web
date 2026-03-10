@@ -69,11 +69,11 @@ export default function Page() {
       {isLoading ? (
         <div className="mt-6 space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-16 animate-pulse rounded-lg bg-slate-800/50" />
+            <div key={i} className="h-16 animate-pulse rounded-lg bg-slate-100" />
           ))}
         </div>
       ) : error && notifications.length === 0 ? (
-        <div className="mt-6 rounded-lg border border-red-800/50 bg-red-950/30 p-6 text-center text-sm text-red-300">
+        <div className="mt-6 rounded-lg border border-red-800/50 bg-red-950/30 p-6 text-center text-sm text-red-700">
           {error}
         </div>
       ) : notifications.length === 0 ? (
@@ -85,7 +85,7 @@ export default function Page() {
         />
       ) : (
         <Card className="mt-6">
-          <ul className="divide-y divide-slate-800/50">
+          <ul className="divide-y divide-slate-200">
             {notifications.map((n) => {
               const isUnread = !n.read_at;
               let link: string | null = null;
@@ -99,7 +99,7 @@ export default function Page() {
                 <li
                   key={n.id}
                   className={`flex items-start gap-3 px-4 py-3 text-sm ${
-                    isUnread ? "bg-slate-900/30" : ""
+                    isUnread ? "bg-slate-50" : ""
                   }`}
                 >
                   <span
@@ -109,9 +109,9 @@ export default function Page() {
                     aria-hidden="true"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className={`font-medium ${isUnread ? "text-slate-100" : "text-slate-300"}`}>
+                    <p className={`font-medium ${isUnread ? "text-slate-900" : "text-slate-600"}`}>
                       {link ? (
-                        <Link href={link} className="hover:text-brand-400">
+                        <Link href={link} className="hover:text-brand-600">
                           {n.title}
                         </Link>
                       ) : (
@@ -126,7 +126,7 @@ export default function Page() {
                   {isUnread && (
                     <button
                       onClick={() => handleMarkRead(n.id)}
-                      className="shrink-0 text-xs text-brand-400 hover:text-brand-300"
+                      className="shrink-0 text-xs text-brand-600 hover:text-brand-600"
                     >
                       Mark read
                     </button>

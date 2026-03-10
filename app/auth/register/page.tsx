@@ -172,10 +172,10 @@ function RegisterContent() {
         <AuthCard className="max-w-lg">
           <div className="space-y-6">
             <div className="space-y-2">
-              <h2 className="text-2xl font-semibold tracking-tight text-white">
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
                 Create your account
               </h2>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-500">
                 First, tell us how you&apos;ll be using Leasebase.
               </p>
             </div>
@@ -185,14 +185,14 @@ function RegisterContent() {
                 <button
                   key={option.value}
                   onClick={() => handleUserTypeSelect(option.value)}
-                  className="w-full flex items-start gap-4 rounded-xl border border-slate-700/60 bg-slate-900/60 p-4 text-left transition-all hover:border-brand-500/60 hover:bg-slate-800/60 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full flex items-start gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-left transition-all hover:border-brand-500 hover:bg-brand-50/50 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
-                  <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-500/10 text-brand-400">
+                  <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
                     {option.icon}
                   </div>
                   <div>
-                    <h3 className="font-medium text-slate-100">{option.label}</h3>
-                    <p className="mt-0.5 text-sm text-slate-400">{option.description}</p>
+                    <h3 className="font-medium text-slate-800">{option.label}</h3>
+                    <p className="mt-0.5 text-sm text-slate-500">{option.description}</p>
                   </div>
                 </button>
               ))}
@@ -202,7 +202,7 @@ function RegisterContent() {
               Already have an account?{" "}
               <Link
                 href="/auth/login"
-                className="font-medium text-brand-400 hover:text-brand-300 transition-colors"
+                className="font-medium text-brand-600 hover:text-brand-500 transition-colors"
               >
                 Sign in
               </Link>
@@ -223,17 +223,17 @@ function RegisterContent() {
           <div>
             <button
               onClick={handleBack}
-              className="mb-4 flex items-center gap-1 text-sm text-slate-400 transition-colors hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 rounded"
+              className="mb-4 flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 rounded"
             >
               <ChevronLeft size={16} />
               Back
             </button>
-            <h2 className="text-2xl font-semibold tracking-tight text-white">
+            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
               Create your account
             </h2>
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="mt-1 text-sm text-slate-500">
               Signing up as{" "}
-              <span className="font-medium text-brand-400">{selectedOption?.label}</span>
+              <span className="font-medium text-brand-600">{selectedOption?.label}</span>
             </p>
           </div>
 
@@ -276,7 +276,7 @@ function RegisterContent() {
 
             {/* Password with live requirements */}
             <div className="space-y-1 text-sm">
-              <label htmlFor="register-password" className="block font-medium text-slate-200">
+              <label htmlFor="register-password" className="block font-medium text-slate-700">
                 Password
               </label>
               <input
@@ -290,10 +290,10 @@ function RegisterContent() {
                 }}
                 aria-invalid={!!fieldErrors.password || (submitted && !pwResult.valid)}
                 aria-describedby="pw-requirements pw-error"
-                className={`w-full rounded-md border bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+                className={`w-full rounded-md border bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 ${
                   fieldErrors.password
                     ? "border-danger focus:ring-danger"
-                    : "border-slate-700 hover:border-slate-600"
+                    : "border-slate-300 hover:border-slate-400"
                 }`}
                 placeholder="At least 8 characters"
                 required
@@ -308,7 +308,7 @@ function RegisterContent() {
 
             {/* Confirm password */}
             <div className="space-y-1 text-sm">
-              <label htmlFor="register-confirm" className="block font-medium text-slate-200">
+              <label htmlFor="register-confirm" className="block font-medium text-slate-700">
                 Confirm Password
               </label>
               <input
@@ -322,10 +322,10 @@ function RegisterContent() {
                 }}
                 aria-invalid={confirmMismatch || !!fieldErrors.confirmPassword}
                 aria-describedby="confirm-error"
-                className={`w-full rounded-md border bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+                className={`w-full rounded-md border bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 ${
                   confirmMismatch || fieldErrors.confirmPassword
                     ? "border-danger focus:ring-danger"
-                    : "border-slate-700 hover:border-slate-600"
+                    : "border-slate-300 hover:border-slate-400"
                 }`}
                 required
               />
@@ -351,7 +351,7 @@ function RegisterContent() {
             Already have an account?{" "}
             <Link
               href="/auth/login"
-              className="font-medium text-brand-400 hover:text-brand-300 transition-colors"
+              className="font-medium text-brand-600 hover:text-brand-500 transition-colors"
             >
               Sign in
             </Link>

@@ -34,7 +34,7 @@ export function RadioGroup({
   return (
     <fieldset className={`space-y-1 text-sm ${className}`}>
       {label && (
-        <legend className="block font-medium text-slate-200 mb-1.5">
+        <legend className="block font-medium text-slate-700 mb-1.5">
           {label}
         </legend>
       )}
@@ -84,10 +84,10 @@ function RadioItem({ label, groupId, className = "", ...rest }: RadioItemProps) 
       <input
         type="radio"
         id={id}
-        className="h-4 w-4 border-slate-600 bg-slate-900 text-brand-500 focus:ring-2 focus:ring-brand-500 focus:ring-offset-0"
+        className="h-4 w-4 border-slate-300 bg-white text-brand-500 focus:ring-2 focus:ring-brand-500 focus:ring-offset-0"
         {...rest}
       />
-      <span className="text-slate-200">{label}</span>
+      <span className="text-slate-700">{label}</span>
     </label>
   );
 }

@@ -35,7 +35,7 @@ function SidebarNavGroups({
           )}
           {collapsed && (
             <div
-              className="mx-auto my-1 h-px w-6 bg-slate-800"
+              className="mx-auto my-1 h-px w-6 bg-slate-200"
               aria-hidden="true"
             />
           )}
@@ -76,14 +76,14 @@ export function AppSidebar() {
     <>
       {/* ─── Desktop sidebar ─── */}
       <nav
-        className={`hidden shrink-0 flex-col border-r border-slate-800 bg-surface transition-[width] duration-200 ease-in-out md:flex ${
+        className={`hidden shrink-0 flex-col border-r border-slate-200 bg-surface transition-[width] duration-200 ease-in-out md:flex ${
           sidebarCollapsed ? "w-[72px]" : "w-[240px]"
         }`}
         aria-label="Primary navigation"
       >
         {/* Branding */}
         <div
-          className={`flex items-center border-b border-slate-800 px-3 py-3 ${
+          className={`flex items-center border-b border-slate-200 px-3 py-3 ${
             sidebarCollapsed ? "justify-center" : "gap-2.5"
           }`}
         >
@@ -95,7 +95,7 @@ export function AppSidebar() {
               LB
             </span>
             {!sidebarCollapsed && (
-              <span className="text-sm font-semibold tracking-wide text-slate-100">
+              <span className="text-sm font-semibold tracking-wide text-slate-800">
                 Leasebase
               </span>
             )}
@@ -112,7 +112,7 @@ export function AppSidebar() {
         </div>
 
         {/* Footer: user info + collapse toggle */}
-        <div className="space-y-1 border-t border-slate-800 px-2 py-2">
+        <div className="space-y-1 border-t border-slate-200 px-2 py-2">
           {/* User mini-profile */}
           {user && (
             <div
@@ -128,7 +128,7 @@ export function AppSidebar() {
                 <>
                   <Avatar name={user.name || user.email} size="xs" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium text-slate-200">
+                    <p className="truncate text-xs font-medium text-slate-700">
                       {user.name || user.email}
                     </p>
                     <p className="truncate text-[10px] capitalize text-slate-500">
@@ -146,7 +146,7 @@ export function AppSidebar() {
           <button
             type="button"
             onClick={toggleSidebar}
-            className={`flex w-full items-center rounded-lg px-2.5 py-2 text-xs text-slate-400 transition-colors hover:bg-surface-raised hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+            className={`flex w-full items-center rounded-lg px-2.5 py-2 text-xs text-slate-500 transition-colors hover:bg-surface-raised hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 ${
               sidebarCollapsed ? "justify-center" : "gap-2"
             }`}
             aria-label={
@@ -174,11 +174,11 @@ export function AppSidebar() {
             aria-hidden="true"
           />
           <nav
-            className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col overflow-y-auto border-r border-slate-800 bg-surface md:hidden"
+            className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col overflow-y-auto border-r border-slate-200 bg-surface md:hidden"
             aria-label="Primary navigation"
           >
             {/* Mobile header */}
-            <div className="flex items-center justify-between border-b border-slate-800 px-3 py-3">
+            <div className="flex items-center justify-between border-b border-slate-200 px-3 py-3">
               <Link href="/app" className="flex items-center gap-2.5">
                 <span
                   className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 text-sm font-bold text-white"
@@ -186,14 +186,14 @@ export function AppSidebar() {
                 >
                   LB
                 </span>
-                <span className="text-sm font-semibold text-slate-100">
+                <span className="text-sm font-semibold text-slate-800">
                   Leasebase
                 </span>
               </Link>
               <button
                 type="button"
                 onClick={closeMobile}
-                className="rounded p-1 text-slate-400 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="rounded p-1 text-slate-400 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 aria-label="Close navigation"
               >
                 <X size={18} />

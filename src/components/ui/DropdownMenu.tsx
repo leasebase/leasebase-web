@@ -98,7 +98,7 @@ export function DropdownMenu({
           ref={menuRef}
           role="menu"
           onKeyDown={handleMenuKeyDown}
-          className={`absolute z-50 mt-1 min-w-[10rem] rounded-lg border border-slate-700 bg-slate-900 py-1 shadow-xl ${
+          className={`absolute z-50 mt-1 min-w-[10rem] rounded-lg border border-slate-200 bg-white py-1 shadow-xl ${
             align === "right" ? "right-0" : "left-0"
           }`}
         >
@@ -111,10 +111,10 @@ export function DropdownMenu({
                 item.onClick?.();
                 close();
               }}
-              className={`flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors focus:outline-none focus:bg-slate-800 ${
+              className={`flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors focus:outline-none focus:bg-slate-100 ${
                 item.danger
                   ? "text-danger hover:bg-danger/10"
-                  : "text-slate-200 hover:bg-slate-800"
+                  : "text-slate-700 hover:bg-slate-200"
               } ${item.disabled ? "opacity-40 cursor-not-allowed" : ""}`}
             >
               {item.icon && (

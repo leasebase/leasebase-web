@@ -95,10 +95,10 @@ export default function LoginPageClient({
         <div className="space-y-6">
           {/* Header */}
           <div className="space-y-2">
-            <h2 className="text-2xl font-semibold tracking-tight text-white">
+            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
               Welcome back
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-500">
               Sign in with your email or continue with a connected identity
               provider.
             </p>
@@ -106,7 +106,7 @@ export default function LoginPageClient({
 
           {/* Success banner */}
           {registered && registrationMessage && (
-            <div className="rounded-lg border border-brand-800/40 bg-brand-950/30 px-4 py-3 text-sm text-brand-300">
+            <div className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-700">
               {decodeURIComponent(registrationMessage)}
             </div>
           )}
@@ -119,12 +119,12 @@ export default function LoginPageClient({
           )}
 
           {/* Verify hint */}
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             Just created an account but don&apos;t see a verification screen?{" "}
             <button
               type="button"
               onClick={() => router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`)}
-              className="text-brand-400 hover:text-brand-300 hover:underline transition-colors"
+              className="text-brand-600 hover:text-brand-500 hover:underline transition-colors"
             >
               Verify your email or resend the code
             </button>
@@ -162,10 +162,10 @@ export default function LoginPageClient({
           {/* Social login */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-800" />
+              <div className="w-full border-t border-slate-200" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-slate-950/80 px-3 text-slate-500">or continue with</span>
+              <span className="bg-white px-3 text-slate-400">or continue with</span>
             </div>
           </div>
 
@@ -180,8 +180,8 @@ export default function LoginPageClient({
 
           {/* Dev bypass */}
           {devBypassEnabled && (
-            <div className="rounded-lg border border-dashed border-amber-800/50 bg-amber-950/10 p-4 space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-400">
+            <div className="rounded-lg border border-dashed border-amber-300 bg-amber-50 p-4 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
                 Developer bypass (local/dev only)
               </p>
               <p className="text-xs text-slate-500">
@@ -222,7 +222,7 @@ export default function LoginPageClient({
                 variant="secondary"
                 onClick={handleDevBypass}
                 loading={loading}
-                className="w-full border-brand-700 text-brand-300"
+                className="w-full border-brand-300 text-brand-700"
                 size="sm"
               >
                 Sign in with dev bypass
@@ -235,7 +235,7 @@ export default function LoginPageClient({
             Don&apos;t have an account?{" "}
             <Link
               href="/auth/register"
-              className="font-medium text-brand-400 hover:text-brand-300 transition-colors"
+              className="font-medium text-brand-600 hover:text-brand-500 transition-colors"
             >
               Sign up
             </Link>

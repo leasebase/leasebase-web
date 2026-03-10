@@ -95,7 +95,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         hamburgerRef,
       }}
     >
-      <div className="flex h-screen overflow-hidden bg-surface-base text-slate-50">
+      <div className="flex h-screen overflow-hidden bg-surface-base text-slate-900">
         {children}
       </div>
     </AppShellContext.Provider>
