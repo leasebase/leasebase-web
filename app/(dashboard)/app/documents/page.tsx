@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { FolderOpen, FileText } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { FolderOpen, FileText, Plus } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchTenantDocuments } from "@/services/tenant/adapters/documentAdapter";
 import type { DocumentRow } from "@/services/tenant/types";
@@ -90,10 +91,13 @@ export default function Page() {
       ) : user?.persona === "propertyManager" ? (
         <PMDocumentsSection />
       ) : (
-        <EmptyState
+      <EmptyState
           icon={<FolderOpen size={48} strokeWidth={1.5} />}
-          title="Coming soon"
-          description="Document management is under development."
+          title="No documents yet"
+          description="Upload leases, notices, and receipts to keep everything organized."
+          action={
+            <Button variant="primary" icon={<Plus size={16} />}>Upload Document</Button>
+          }
           className="mt-8"
         />
       )}

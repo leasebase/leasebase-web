@@ -142,6 +142,13 @@
   --lb-spacing-0.5: 0.125rem;
   --lb-spacing-1.5: 0.375rem;
   --lb-spacing-2.5: 0.625rem;
+  --lb-spacing-semantic-xs: 0.25rem;
+  --lb-spacing-semantic-sm: 0.5rem;
+  --lb-spacing-semantic-md: 1rem;
+  --lb-spacing-semantic-lg: 1.5rem;
+  --lb-spacing-semantic-xl: 2rem;
+  --lb-spacing-semantic-2xl: 3rem;
+  --lb-spacing-semantic-3xl: 4rem;
 
   /* ── Radius ── */
   --lb-radius-none: 0;

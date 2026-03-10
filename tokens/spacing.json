@@ -1,5 +1,5 @@
 {
-  "$description": "LeaseBase spacing tokens. Values in rem; 1 unit = 0.25rem (4px at default font-size).",
+  "$description": "LeaseBase spacing tokens. Values in rem; 1 unit = 0.25rem (4px at default font-size). Semantic aliases (xs–3xl) provide named sizes for component padding/margin.",
   "spacing": {
     "0":  "0",
     "0.5": "0.125rem",
@@ -28,5 +28,14 @@
     "56": "14rem",
     "60": "15rem",
     "64": "16rem"
+  },
+  "spacing-semantic": {
+    "xs":  "0.25rem",
+    "sm":  "0.5rem",
+    "md":  "1rem",
+    "lg":  "1.5rem",
+    "xl":  "2rem",
+    "2xl": "3rem",
+    "3xl": "4rem"
   }
 }

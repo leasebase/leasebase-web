@@ -6,7 +6,8 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { DoorOpen } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { DoorOpen, Plus } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchPMUnits } from "@/services/pm/pmApiService";
 import type { PMUnitRow, PMPaginationMeta } from "@/services/pm/types";
@@ -39,7 +40,16 @@ function PMUnitsPage() {
         ) : error ? (
           <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>
         ) : units.length === 0 ? (
-          <EmptyState icon={<DoorOpen size={48} strokeWidth={1.5} />} title="No units" description="No units found in your assigned properties." />
+          <EmptyState
+            icon={<DoorOpen size={48} strokeWidth={1.5} />}
+            title="No units"
+            description="No units found in your assigned properties."
+            action={
+              <Link href="/app/units">
+                <Button variant="primary" icon={<Plus size={16} />}>Add Unit</Button>
+              </Link>
+            }
+          />
         ) : (
           <div className="space-y-2">
             {units.map((u) => (
@@ -69,7 +79,15 @@ export default function Page() {
   return (
     <>
       <PageHeader title="Units" description="View all units across properties." />
-      <EmptyState icon={<DoorOpen size={48} strokeWidth={1.5} />} title="Coming soon" description="This section is under development." className="mt-8" />
+      <EmptyState
+        icon={<DoorOpen size={48} strokeWidth={1.5} />}
+        title="No units yet"
+        description="Create units for your properties to manage occupancy and rent."
+        action={
+          <Button variant="primary" icon={<Plus size={16} />}>Add Unit</Button>
+        }
+        className="mt-8"
+      />
     </>
   );
 }

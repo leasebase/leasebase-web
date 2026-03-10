@@ -5,43 +5,85 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { authStore } from "@/lib/auth/store";
 import { useRequireAuth } from "@/lib/auth/useRequireAuth";
-import { filterNavForPersona } from "@/lib/appNav";
+import { groupNavForPersona, type NavGroup } from "@/lib/appNav";
 import { Icon } from "@/components/ui/Icon";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { ToastProvider } from "@/components/ui/Toast";
-import { Menu, X, Bell, Search, LogOut, ChevronRight } from "lucide-react";
+import { CommandPalette } from "@/components/ui/CommandPalette";
+import {
+  Menu,
+  X,
+  Bell,
+  Search,
+  LogOut,
+  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Command,
+} from "lucide-react";
+
+const SIDEBAR_KEY = "lb-sidebar-collapsed";
 
 /* ─── Sidebar nav (shared desktop / mobile) ─── */
 function SidebarNav({
   pathname,
+  groups,
+  collapsed,
   onItemClick,
 }: {
   pathname: string;
+  groups: NavGroup[];
+  collapsed: boolean;
   onItemClick?: () => void;
 }) {
-  const { user } = authStore();
-  const navItems = filterNavForPersona(user?.persona);
-
   return (
-    <ul className="space-y-1 text-sm">
-      {navItems.map((item) => {
-        const active = pathname === item.path;
-        return (
-          <li key={item.path}>
-            <Link
-              href={item.path}
-              onClick={onItemClick}
-              className={`flex items-center gap-2.5 rounded-md px-2.5 py-2 transition-colors hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 ${
-                active ? "bg-slate-800 text-brand-300" : "text-slate-300"
-              }`}
-              aria-current={active ? "page" : undefined}
-            >
-              <Icon name={item.icon || ""} size={18} />
-              <span>{item.label}</span>
-            </Link>
-          </li>
-        );
-      })}
-    </ul>
+    <div className="space-y-4">
+      {groups.map((group) => (
+        <div key={group.key}>
+          {/* Group label — hidden when collapsed */}
+          {!collapsed && (
+            <p className="mb-1 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              {group.label}
+            </p>
+          )}
+          {collapsed && (
+            <div className="mx-auto my-1 h-px w-6 bg-slate-800" aria-hidden="true" />
+          )}
+          <ul className="space-y-0.5 text-sm">
+            {group.items.map((item) => {
+              const active = pathname === item.path;
+              const linkContent = (
+                <Link
+                  href={item.path}
+                  onClick={onItemClick}
+                  className={`flex items-center gap-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+                    collapsed ? "justify-center px-2 py-2" : "px-2.5 py-2"
+                  } ${
+                    active
+                      ? "bg-brand-500/10 text-brand-400 font-medium"
+                      : "text-slate-300 hover:bg-slate-800 hover:text-slate-100"
+                  }`}
+                  aria-current={active ? "page" : undefined}
+                >
+                  <Icon name={item.icon || ""} size={18} className={active ? "text-brand-400" : ""} />
+                  {!collapsed && <span>{item.label}</span>}
+                </Link>
+              );
+
+              return (
+                <li key={item.path}>
+                  {collapsed ? (
+                    <Tooltip content={item.label}>{linkContent}</Tooltip>
+                  ) : (
+                    linkContent
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -52,10 +94,8 @@ function Breadcrumbs({ pathname }: { pathname: string }) {
     .split("/")
     .filter(Boolean);
 
-  if (segments.length === 0) return null;
-
   return (
-    <nav aria-label="Breadcrumb" className="mb-4 text-xs text-slate-400">
+    <nav aria-label="Breadcrumb" className="text-xs text-slate-400">
       <ol className="flex items-center gap-1">
         <li>
           <Link href="/app" className="hover:text-slate-200">Home</Link>
@@ -85,7 +125,27 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { user, isLoading } = useRequireAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [cmdOpen, setCmdOpen] = useState(false);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
+
+  const groups = groupNavForPersona(user?.persona);
+
+  // Restore persisted sidebar state
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(SIDEBAR_KEY);
+      if (stored === "true") setSidebarCollapsed(true);
+    } catch {}
+  }, []);
+
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      try { localStorage.setItem(SIDEBAR_KEY, String(next)); } catch {}
+      return next;
+    });
+  }, []);
 
   const closeMobile = useCallback(() => {
     setMobileOpen(false);
@@ -102,6 +162,18 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     return () => { document.removeEventListener("keydown", handler); document.body.style.overflow = ""; };
   }, [mobileOpen, closeMobile]);
 
+  // Global Cmd+K / Ctrl+K handler
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setCmdOpen((o) => !o);
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
+
   const handleLogout = () => { authStore.getState().logout("manual"); };
 
   return (
@@ -116,8 +188,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
         {/* ─── Top bar ─── */}
         <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-900/80 backdrop-blur">
-          <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+          <div className="px-4 py-2.5 flex items-center justify-between gap-4">
+            {/* Left: hamburger + logo + breadcrumbs */}
+            <div className="flex items-center gap-3 min-w-0">
               <button
                 ref={hamburgerRef}
                 type="button"
@@ -128,16 +201,18 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               >
                 {mobileOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
-              <Link href="/app" className="flex items-center gap-2">
+              <Link href="/app" className="flex items-center gap-2 shrink-0">
                 <span className="h-8 w-8 rounded-md bg-brand-500 flex items-center justify-center text-white font-bold text-sm" aria-hidden="true">LB</span>
-                <div className="hidden sm:flex flex-col">
-                  <span className="text-sm font-semibold tracking-wide">Leasebase</span>
-                  <span className="text-[10px] text-slate-400">Property workspace</span>
-                </div>
+                <span className="hidden lg:block text-sm font-semibold tracking-wide">Leasebase</span>
               </Link>
+              <div className="hidden md:block text-slate-600 select-none" aria-hidden="true">/</div>
+              <div className="hidden md:block">
+                <Breadcrumbs pathname={pathname} />
+              </div>
             </div>
 
-            <div className="hidden md:block flex-1 max-w-xs">
+            {/* Center: global search */}
+            <div className="hidden md:block flex-1 max-w-sm">
               <label className="sr-only" htmlFor="global-search">Search</label>
               <div className="relative">
                 <Search size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500" aria-hidden="true" />
@@ -150,14 +225,24 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            {/* Right: Cmd+K, notifications, user */}
+            <div className="flex items-center gap-2">
               <button
                 type="button"
+                onClick={() => setCmdOpen(true)}
+                className="hidden md:inline-flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs text-slate-400 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                aria-label="Open command palette"
+              >
+                <Command size={14} />
+                <kbd className="font-sans">K</kbd>
+              </button>
+              <Link
+                href="/app/notifications"
                 className="rounded-full p-2 text-slate-300 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 aria-label="Notifications"
               >
                 <Bell size={18} />
-              </button>
+              </Link>
               <div className="flex items-center gap-2">
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
                   {user?.name?.[0]?.toUpperCase() || "?"}
@@ -180,11 +265,34 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </header>
 
         {/* ─── Body ─── */}
-        <div className="flex-1 flex mx-auto w-full max-w-7xl">
-          <nav className="hidden md:block w-56 shrink-0 border-r border-slate-800 px-3 py-4" aria-label="Primary navigation">
-            <SidebarNav pathname={pathname} />
+        <div className="flex-1 flex w-full">
+          {/* Desktop sidebar */}
+          <nav
+            className={`hidden md:flex flex-col shrink-0 border-r border-slate-800 transition-[width] duration-200 ease-in-out ${
+              sidebarCollapsed ? "w-[72px]" : "w-[240px]"
+            }`}
+            aria-label="Primary navigation"
+          >
+            <div className="flex-1 overflow-y-auto px-2 py-4">
+              <SidebarNav pathname={pathname} groups={groups} collapsed={sidebarCollapsed} />
+            </div>
+
+            {/* Collapse toggle */}
+            <div className="border-t border-slate-800 px-2 py-2">
+              <button
+                type="button"
+                onClick={toggleSidebar}
+                className={`flex w-full items-center rounded-lg px-2.5 py-2 text-xs text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+                  sidebarCollapsed ? "justify-center" : "gap-2"
+                }`}
+                aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <><PanelLeftClose size={16} /><span>Collapse</span></>}
+              </button>
+            </div>
           </nav>
 
+          {/* Mobile drawer */}
           {mobileOpen && (
             <>
               <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={closeMobile} aria-hidden="true" />
@@ -195,7 +303,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                     <X size={18} />
                   </button>
                 </div>
-                <SidebarNav pathname={pathname} onItemClick={closeMobile} />
+                <SidebarNav pathname={pathname} groups={groups} collapsed={false} onItemClick={closeMobile} />
               </nav>
             </>
           )}
@@ -212,14 +320,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 </div>
               </div>
             ) : (
-              <>
-                <Breadcrumbs pathname={pathname} />
-                {children}
-              </>
+              children
             )}
           </main>
         </div>
       </div>
+
+      {/* Command palette (Cmd+K / Ctrl+K) */}
+      <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
     </ToastProvider>
   );
 }
