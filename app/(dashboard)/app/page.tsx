@@ -9,13 +9,18 @@ import { AuthCard } from "@/components/auth/AuthCard";
 
 export default function AppDashboardPage() {
   const { user } = authStore();
-  const persona = user?.persona;
+
+  // No user yet — bootstrap or redirect is in progress.
+  // Return nothing and let the layout auth guard handle navigation.
+  if (!user) return null;
+
+  const persona = user.persona;
 
   if (persona === "propertyManager") return <PMDashboard />;
   if (persona === "owner") return <OwnerDashboard />;
   if (persona === "tenant") return <TenantDashboard />;
 
-  // Fail closed: unknown or missing persona shows an error state.
+  // Fail closed: authenticated user whose role cannot be mapped.
   // The wrong-portal guard in useRequireAuth will redirect or logout
   // before this is reached in normal operation.
   return (

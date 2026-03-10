@@ -128,12 +128,26 @@ export function getPortalUrlForRole(role: string | null | undefined): string | n
 }
 
 /**
- * Return the sign-in URL — either the portal selector subdomain or
- * the local `/auth/login` fallback for generic localhost dev.
+ * Return the sign-in URL.
+ *
+ * - Generic localhost → `/auth/login` (same-origin, no subdomains).
+ * - Persona portals (owner / manager / tenant) → `/auth/login`
+ *   (same-origin so that localStorage auth tokens persist after login).
+ * - Everything else (login portal, signup, unknown) → login subdomain.
  */
 export function getSignInUrl(): string {
-  if (typeof window !== "undefined" && isGenericLocalhost(window.location.hostname)) {
-    return "/auth/login";
+  if (typeof window !== "undefined") {
+    // Generic localhost — no subdomain routing.
+    if (isGenericLocalhost(window.location.hostname)) {
+      return "/auth/login";
+    }
+
+    // Persona portals: keep login on the same origin so localStorage
+    // tokens written during login are visible to the dashboard.
+    const ctx = resolvePersonaFromHostname(window.location.hostname);
+    if (ctx === "OWNER" || ctx === "PROPERTY_MANAGER" || ctx === "TENANT") {
+      return "/auth/login";
+    }
   }
   return getPortalOrigin("login");
 }

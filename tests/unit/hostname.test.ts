@@ -3,6 +3,7 @@ import {
   getPortalUrlForRole,
   getPortalOrigin,
   getBaseAppDomain,
+  getSignInUrl,
 } from "@/lib/hostname";
 
 // Default env: leasebase.co
@@ -149,5 +150,76 @@ describe("getPortalUrlForRole", () => {
 
   test("empty string → null (fail closed)", () => {
     expect(getPortalUrlForRole("")).toBe(null);
+  });
+});
+
+describe("getSignInUrl", () => {
+  const originalWindow = globalThis.window;
+
+  afterEach(() => {
+    // Restore real window after each test.
+    Object.defineProperty(globalThis, "window", {
+      value: originalWindow,
+      writable: true,
+    });
+  });
+
+  function setHostname(hostname: string) {
+    Object.defineProperty(globalThis, "window", {
+      value: { location: { hostname } },
+      writable: true,
+    });
+  }
+
+  test("owner portal → same-origin /auth/login", () => {
+    setHostname("owner.leasebase.co");
+    expect(getSignInUrl()).toBe("/auth/login");
+  });
+
+  test("manager portal → same-origin /auth/login", () => {
+    setHostname("manager.leasebase.co");
+    expect(getSignInUrl()).toBe("/auth/login");
+  });
+
+  test("tenant portal → same-origin /auth/login", () => {
+    setHostname("tenant.leasebase.co");
+    expect(getSignInUrl()).toBe("/auth/login");
+  });
+
+  test("login portal → login subdomain URL", () => {
+    setHostname("login.leasebase.co");
+    expect(getSignInUrl()).toBe("https://login.leasebase.co");
+  });
+
+  test("signup portal → login subdomain URL", () => {
+    setHostname("signup.leasebase.co");
+    expect(getSignInUrl()).toBe("https://login.leasebase.co");
+  });
+
+  test("generic localhost → same-origin /auth/login", () => {
+    setHostname("localhost");
+    expect(getSignInUrl()).toBe("/auth/login");
+  });
+
+  test("127.0.0.1 → same-origin /auth/login", () => {
+    setHostname("127.0.0.1");
+    expect(getSignInUrl()).toBe("/auth/login");
+  });
+
+  test("unknown hostname → login subdomain URL", () => {
+    setHostname("example.com");
+    expect(getSignInUrl()).toBe("https://login.leasebase.co");
+  });
+
+  test("dev subdomain portals → same-origin /auth/login", () => {
+    process.env.NEXT_PUBLIC_APP_DOMAIN = "dev.leasebase.co";
+    setHostname("owner.dev.leasebase.co");
+    expect(getSignInUrl()).toBe("/auth/login");
+  });
+
+  test("localhost subdomain portals → same-origin /auth/login", () => {
+    process.env.NEXT_PUBLIC_APP_DOMAIN = "localhost";
+    setHostname("tenant.localhost");
+    expect(getSignInUrl()).toBe("/auth/login");
   });
 });
