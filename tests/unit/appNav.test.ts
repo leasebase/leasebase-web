@@ -24,12 +24,12 @@ describe("filterNavForPersona", () => {
     expect(labels).not.toContain("Tenants");
   });
 
-  test("owner sees Properties but not Units or Tenants", () => {
+  test("owner sees Properties and Tenants but not Units", () => {
     const items = filterNavForPersona("owner");
     const labels = items.map((i) => i.label);
     expect(labels).toContain("Properties");
+    expect(labels).toContain("Tenants");
     expect(labels).not.toContain("Units");
-    expect(labels).not.toContain("Tenants");
   });
 
   test("future items are excluded", () => {

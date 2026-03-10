@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { createInvitation } from "@/services/invitations/invitationApiService";
+import { fetchProperties, fetchUnitsForProperty } from "@/services/properties/propertyService";
+import type { PropertyRow, UnitRow } from "@/services/properties/types";
 
 interface PropertyUnit {
   propertyId: string;
@@ -32,6 +34,33 @@ export function InviteTenantModal({ open, onClose, onSuccess, propertyUnit }: In
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // Property/unit selector state
+  const [properties, setProperties] = useState<PropertyRow[]>([]);
+  const [units, setUnits] = useState<UnitRow[]>([]);
+  const [loadingProperties, setLoadingProperties] = useState(false);
+  const [loadingUnits, setLoadingUnits] = useState(false);
+
+  // Fetch properties when modal opens (only if no pre-selected propertyUnit)
+  useEffect(() => {
+    if (!open || propertyUnit) return;
+    setLoadingProperties(true);
+    fetchProperties(1, 100)
+      .then((res) => setProperties(res.data))
+      .catch(() => {}) // silent — selector will be empty
+      .finally(() => setLoadingProperties(false));
+  }, [open, propertyUnit]);
+
+  // Fetch units when property selection changes
+  useEffect(() => {
+    if (!propertyId || propertyUnit) { setUnits([]); return; }
+    setLoadingUnits(true);
+    setUnitId(""); // reset unit when property changes
+    fetchUnitsForProperty(propertyId, 1, 200)
+      .then((res) => setUnits(res.data))
+      .catch(() => setUnits([]))
+      .finally(() => setLoadingUnits(false));
+  }, [propertyId, propertyUnit]);
+
   function reset() {
     setFirstName("");
     setLastName("");
@@ -41,6 +70,7 @@ export function InviteTenantModal({ open, onClose, onSuccess, propertyUnit }: In
     setUnitId(propertyUnit?.unitId ?? "");
     setError(null);
     setSuccess(false);
+    setUnits([]);
   }
 
   function handleClose() {
@@ -70,6 +100,8 @@ export function InviteTenantModal({ open, onClose, onSuccess, propertyUnit }: In
       setIsSubmitting(false);
     }
   }
+
+  const selectClass = "w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50";
 
   return (
     <Modal open={open} onClose={handleClose} title="Invite Tenant">
@@ -130,21 +162,43 @@ export function InviteTenantModal({ open, onClose, onSuccess, propertyUnit }: In
 
           {!propertyUnit && (
             <>
-              <Input
-                label="Property ID"
-                value={propertyId}
-                onChange={(e) => setPropertyId(e.target.value)}
-                required
-                placeholder="Property UUID"
-                helperText="Enter the property ID. Property/unit selectors coming soon."
-              />
-              <Input
-                label="Unit ID"
-                value={unitId}
-                onChange={(e) => setUnitId(e.target.value)}
-                required
-                placeholder="Unit UUID"
-              />
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-700">Property</label>
+                <select
+                  value={propertyId}
+                  onChange={(e) => setPropertyId(e.target.value)}
+                  required
+                  disabled={loadingProperties}
+                  className={selectClass}
+                >
+                  <option value="">{loadingProperties ? "Loading properties…" : "Select a property"}</option>
+                  {properties.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name} — {p.address_line1}, {p.city}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-700">Unit</label>
+                <select
+                  value={unitId}
+                  onChange={(e) => setUnitId(e.target.value)}
+                  required
+                  disabled={!propertyId || loadingUnits}
+                  className={selectClass}
+                >
+                  <option value="">
+                    {!propertyId ? "Select a property first" : loadingUnits ? "Loading units…" : "Select a unit"}
+                  </option>
+                  {units.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      Unit {u.unit_number}{u.status === "OCCUPIED" ? " (occupied)" : ""}
+                    </option>
+                  ))}
+                </select>
+                {propertyId && !loadingUnits && units.length === 0 && (
+                  <p className="mt-1 text-xs text-slate-400">No units found for this property.</p>
+                )}
+              </div>
             </>
           )}
 
