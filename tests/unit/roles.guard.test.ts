@@ -17,12 +17,12 @@ describe("mapUserRoleToPersona", () => {
     expect(mapUserRoleToPersona("TENANT")).toBe("tenant");
   });
 
-  test("unknown role defaults to tenant", () => {
-    expect(mapUserRoleToPersona("UNKNOWN_ROLE")).toBe("tenant");
+  test("unknown role returns null (fail closed)", () => {
+    expect(mapUserRoleToPersona("UNKNOWN_ROLE")).toBe(null);
   });
 
-  test("null/undefined defaults to tenant", () => {
-    expect(mapUserRoleToPersona(null)).toBe("tenant");
-    expect(mapUserRoleToPersona(undefined)).toBe("tenant");
+  test("null/undefined returns null (fail closed)", () => {
+    expect(mapUserRoleToPersona(null)).toBe(null);
+    expect(mapUserRoleToPersona(undefined)).toBe(null);
   });
 });
