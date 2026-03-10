@@ -152,7 +152,11 @@ export const authStore = create<AuthState>()(
           }
           if (!r.ok) {
             // Surface backend message for login errors (e.g. "Invalid email or password")
-            throw new Error(body?.error?.message || body?.message || "Login failed");
+            const err = new Error(body?.error?.message || body?.message || "Login failed");
+            // Propagate structured code (e.g. "USER_NOT_CONFIRMED") so callers
+            // can branch on it without brittle string matching.
+            if (body?.code) (err as any).code = body.code;
+            throw err;
           }
           return body as { accessToken: string; idToken: string; refreshToken?: string; expiresIn: number };
         });
