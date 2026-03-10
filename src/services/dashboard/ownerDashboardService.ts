@@ -30,8 +30,17 @@ import type {
   SetupStage,
   Sourced,
   DataSource,
+  CashFlowData,
+  CashFlowPropertyBreakdown,
+  MaintenanceOverviewData,
+  LeaseRiskData,
+  LeaseExpirationItem,
+  VacancyReadinessData,
+  PropertyHealthRow,
+  ActivityEvent,
+  DocumentRow,
 } from "./types";
-import { getStubActivityFeed, getStubSetupAlerts } from "./stubs/ownerDashboardStubs";
+import { getStubSetupAlerts } from "./stubs/ownerDashboardStubs";
 
 /* ─── Constants ─── */
 
@@ -86,6 +95,7 @@ interface LeaseRow {
 
 interface PaymentRow {
   id: string;
+  lease_id: string;
   amount: number;
   status: string;
   created_at: string;
@@ -93,6 +103,7 @@ interface PaymentRow {
 
 interface LedgerRow {
   id: string;
+  lease_id: string;
   type: string;
   amount: number;
   status: string;
@@ -101,7 +112,11 @@ interface LedgerRow {
 
 interface WorkOrderRow {
   id: string;
+  unit_id: string;
   status: string;
+  priority: string;
+  description: string;
+  assignee_id: string | null;
   created_at: string;
 }
 
@@ -228,6 +243,15 @@ async function fetchMaintenanceDomain(): Promise<DomainResult<WorkOrderRow[]>> {
     return { data, source: "live", error: null };
   } catch (e: any) {
     return { data: [], source: "unavailable", error: e?.message || "Failed to fetch maintenance" };
+  }
+}
+
+async function fetchDocumentsDomain(): Promise<DomainResult<DocumentRow[]>> {
+  try {
+    const data = await fetchAllPages<DocumentRow>("api/documents");
+    return { data, source: "live", error: null };
+  } catch (e: any) {
+    return { data: [], source: "unavailable", error: e?.message || "Failed to fetch documents" };
   }
 }
 
@@ -431,6 +455,370 @@ export function buildPropertySummaries(
   });
 }
 
+/* ── Cash Flow computation ── */
+
+export function computeCashFlow(
+  propertiesResult: DomainResult<PropertyRow[]>,
+  unitsResult: DomainResult<UnitRow[]>,
+  leasesResult: DomainResult<LeaseRow[]>,
+  paymentsResult: DomainResult<PaymentRow[]>,
+  ledgerResult: DomainResult<LedgerRow[]>,
+): CashFlowData {
+  const ledgSrc = ledgerResult.source;
+  const paySrc = paymentsResult.source;
+  const combinedSrc: DataSource =
+    ledgSrc === "live" && paySrc === "live" ? "live" : "unavailable";
+
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
+  const today = now.toISOString().split("T")[0];
+  const thirtyDaysOut = new Date(now.getTime() + 30 * 86400000).toISOString().split("T")[0];
+
+  // Billed this month: CHARGE ledger entries with due_date in current month
+  const billed = ledgerResult.data
+    .filter((e) => e.type === "CHARGE" && e.due_date >= monthStart.split("T")[0] && e.due_date <= monthEnd.split("T")[0])
+    .reduce((sum, e) => sum + (e.amount || 0), 0);
+
+  // Collected this month
+  const collected = paymentsResult.data
+    .filter((p) => p.status === "SUCCEEDED" && p.created_at >= monthStart)
+    .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+  // Overdue
+  const overdue = ledgerResult.data
+    .filter((e) => e.type === "CHARGE" && e.status === "PENDING" && e.due_date < today)
+    .reduce((sum, e) => sum + (e.amount || 0), 0);
+
+  // Upcoming due (next 30 days)
+  const upcoming = ledgerResult.data
+    .filter((e) => e.type === "CHARGE" && e.status === "PENDING" && e.due_date >= today && e.due_date <= thirtyDaysOut)
+    .reduce((sum, e) => sum + (e.amount || 0), 0);
+
+  // Per-property breakdown
+  // Build unit_id -> property_id map, then lease_id -> property_id via leases
+  const unitToProperty = new Map<string, string>();
+  for (const u of unitsResult.data) {
+    unitToProperty.set(u.id, u.property_id);
+  }
+  const leaseToProperty = new Map<string, string>();
+  for (const l of leasesResult.data) {
+    const pid = unitToProperty.get(l.unit_id);
+    if (pid) leaseToProperty.set(l.id, pid);
+  }
+  const propertyNames = new Map<string, string>();
+  for (const p of propertiesResult.data) {
+    propertyNames.set(p.id, p.name);
+  }
+
+  const propBreakdown = new Map<string, { billed: number; collected: number; overdue: number }>();
+  for (const e of ledgerResult.data) {
+    if (e.type !== "CHARGE") continue;
+    const pid = leaseToProperty.get(e.lease_id ?? "");
+    if (!pid) continue;
+    if (!propBreakdown.has(pid)) propBreakdown.set(pid, { billed: 0, collected: 0, overdue: 0 });
+    const entry = propBreakdown.get(pid)!;
+    if (e.due_date >= monthStart.split("T")[0] && e.due_date <= monthEnd.split("T")[0]) {
+      entry.billed += e.amount;
+    }
+    if (e.status === "PENDING" && e.due_date < today) {
+      entry.overdue += e.amount;
+    }
+  }
+  // Add collected from payments
+  for (const p of paymentsResult.data) {
+    if (p.status !== "SUCCEEDED" || p.created_at < monthStart) continue;
+    const pid = leaseToProperty.get(p.lease_id ?? "");
+    if (!pid || !propBreakdown.has(pid)) continue;
+    propBreakdown.get(pid)!.collected += p.amount;
+  }
+
+  const perProperty: CashFlowPropertyBreakdown[] = Array.from(propBreakdown.entries()).map(
+    ([pid, vals]) => ({
+      propertyId: pid,
+      propertyName: propertyNames.get(pid) ?? "Unknown",
+      ...vals,
+    })
+  );
+
+  return {
+    billedThisMonth: sourced(billed, combinedSrc),
+    collectedThisMonth: sourced(collected, paySrc),
+    overdueAmount: sourced(overdue, ledgSrc),
+    upcomingDue: sourced(upcoming, ledgSrc),
+    perProperty,
+  };
+}
+
+/* ── Maintenance Overview computation ── */
+
+export function computeMaintenanceOverview(
+  maintenanceResult: DomainResult<WorkOrderRow[]>,
+  unitsResult: DomainResult<UnitRow[]>,
+  propertiesResult: DomainResult<PropertyRow[]>,
+): MaintenanceOverviewData {
+  const src = maintenanceResult.source;
+  const workOrders = maintenanceResult.data;
+  const now = Date.now();
+
+  const open = workOrders.filter((w) => w.status === "OPEN").length;
+  const inProgress = workOrders.filter((w) => w.status === "IN_PROGRESS").length;
+  const waiting = workOrders.filter(
+    (w) => w.status === "OPEN" && !w.assignee_id &&
+      (now - new Date(w.created_at).getTime()) > 3 * 86400000
+  ).length;
+  const urgent = workOrders.filter((w) =>
+    (w.status === "OPEN" || w.status === "IN_PROGRESS") && w.priority === "HIGH"
+  ).length;
+
+  // Oldest open request
+  const openOrders = workOrders.filter((w) => w.status === "OPEN" || w.status === "IN_PROGRESS");
+  let oldestDays = 0;
+  for (const w of openOrders) {
+    const age = Math.floor((now - new Date(w.created_at).getTime()) / 86400000);
+    if (age > oldestDays) oldestDays = age;
+  }
+
+  // Most affected property
+  const unitToProperty = new Map<string, string>();
+  for (const u of unitsResult.data) unitToProperty.set(u.id, u.property_id);
+  const propCount = new Map<string, number>();
+  for (const w of openOrders) {
+    const pid = unitToProperty.get(w.unit_id);
+    if (pid) propCount.set(pid, (propCount.get(pid) || 0) + 1);
+  }
+  let mostAffected: { id: string; name: string; count: number } | null = null;
+  for (const [pid, count] of propCount) {
+    if (!mostAffected || count > mostAffected.count) {
+      const pName = propertiesResult.data.find((p) => p.id === pid)?.name ?? "Unknown";
+      mostAffected = { id: pid, name: pName, count };
+    }
+  }
+
+  return {
+    open: sourced(open, src),
+    inProgress: sourced(inProgress, src),
+    waiting: sourced(waiting, src),
+    urgent: sourced(urgent, src),
+    oldestOpenAgeDays: sourced(oldestDays, src),
+    mostAffectedProperty: sourced(mostAffected, src),
+  };
+}
+
+/* ── Lease Risk computation ── */
+
+export function computeLeaseRisk(
+  leasesResult: DomainResult<LeaseRow[]>,
+): LeaseRiskData {
+  const src = leasesResult.source;
+  const leases = leasesResult.data;
+  const now = Date.now();
+  const today = new Date().toISOString().split("T")[0];
+  const thirtyOut = new Date(now + 30 * 86400000).toISOString().split("T")[0];
+  const sixtyOut = new Date(now + 60 * 86400000).toISOString().split("T")[0];
+
+  const active = leases.filter((l) => l.status === "ACTIVE");
+
+  const exp30 = active.filter((l) => l.end_date >= today && l.end_date <= thirtyOut).length;
+  const exp60 = active.filter((l) => l.end_date >= today && l.end_date <= sixtyOut).length;
+
+  // Month-to-month: leases past end_date but still ACTIVE
+  const m2m = active.filter((l) => l.end_date < today).length;
+
+  // Top upcoming expirations (sorted by end_date, first 5)
+  const upcoming = active
+    .filter((l) => l.end_date >= today)
+    .sort((a, b) => a.end_date.localeCompare(b.end_date))
+    .slice(0, 5)
+    .map((l): LeaseExpirationItem => ({
+      leaseId: l.id,
+      unitId: l.unit_id,
+      endDate: l.end_date,
+      daysLeft: Math.ceil((new Date(l.end_date).getTime() - now) / 86400000),
+      rentAmount: l.rent_amount,
+    }));
+
+  return {
+    expiring30: sourced(exp30, src),
+    expiring60: sourced(exp60, src),
+    monthToMonth: sourced(m2m, src),
+    topExpirations: upcoming,
+  };
+}
+
+/* ── Vacancy / Readiness computation ── */
+
+export function computeVacancyReadiness(
+  unitsResult: DomainResult<UnitRow[]>,
+  leasesResult: DomainResult<LeaseRow[]>,
+): VacancyReadinessData {
+  const src: DataSource =
+    unitsResult.source === "live" && leasesResult.source === "live" ? "live" : "unavailable";
+
+  const activeLeaseUnitIds = new Set(
+    leasesResult.data.filter((l) => l.status === "ACTIVE").map((l) => l.unit_id)
+  );
+  const vacant = unitsResult.data.filter((u) => !activeLeaseUnitIds.has(u.id));
+  const readyToLease = vacant.filter((u) => u.rent_amount > 0).length;
+  const missingRent = vacant.filter((u) => u.rent_amount === 0).length;
+
+  return {
+    vacantUnits: sourced(vacant.length, src),
+    readyToLease: sourced(readyToLease, src),
+    missingRentConfig: sourced(missingRent, src),
+    missingSetup: sourced(missingRent, src), // same as missingRent for now
+  };
+}
+
+/* ── Property Health rows ── */
+
+export function buildPropertyHealthRows(
+  propertiesResult: DomainResult<PropertyRow[]>,
+  unitsResult: DomainResult<UnitRow[]>,
+  leasesResult: DomainResult<LeaseRow[]>,
+  paymentsResult: DomainResult<PaymentRow[]>,
+  ledgerResult: DomainResult<LedgerRow[]>,
+  maintenanceResult: DomainResult<WorkOrderRow[]>,
+): PropertyHealthRow[] {
+  if (propertiesResult.source === "unavailable") return [];
+
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const today = now.toISOString().split("T")[0];
+  const sixtyOut = new Date(now.getTime() + 60 * 86400000).toISOString().split("T")[0];
+
+  // Build indexes
+  const unitToProperty = new Map<string, string>();
+  for (const u of unitsResult.data) unitToProperty.set(u.id, u.property_id);
+  const leaseToProperty = new Map<string, string>();
+  for (const l of leasesResult.data) {
+    const pid = unitToProperty.get(l.unit_id);
+    if (pid) leaseToProperty.set(l.id, pid);
+  }
+
+  return propertiesResult.data.map((p) => {
+    const pUnits = unitsResult.data.filter((u) => u.property_id === p.id);
+    const pLeases = leasesResult.data.filter((l) => unitToProperty.get(l.unit_id) === p.id);
+    const activeLeases = pLeases.filter((l) => l.status === "ACTIVE");
+    const activeUnitIds = new Set(activeLeases.map((l) => l.unit_id));
+    const occupied = pUnits.filter((u) => activeUnitIds.has(u.id)).length;
+    const total = pUnits.length;
+    const occupancy = total > 0 ? Math.round((occupied / total) * 100) : 0;
+
+    // Billed (scheduled rent for active leases)
+    const billedCents = activeLeases.reduce((s, l) => s + (l.rent_amount || 0), 0);
+
+    // Collected this month
+    const collectedCents = paymentsResult.data
+      .filter((pay) => pay.status === "SUCCEEDED" && pay.created_at >= monthStart && leaseToProperty.get(pay.lease_id ?? "") === p.id)
+      .reduce((s, pay) => s + (pay.amount || 0), 0);
+
+    // Overdue
+    const overdueCents = ledgerResult.data
+      .filter((e) => e.type === "CHARGE" && e.status === "PENDING" && e.due_date < today && leaseToProperty.get(e.lease_id ?? "") === p.id)
+      .reduce((s, e) => s + (e.amount || 0), 0);
+
+    // Open maintenance
+    const openMaint = maintenanceResult.data
+      .filter((w) => (w.status === "OPEN" || w.status === "IN_PROGRESS") && unitToProperty.get(w.unit_id) === p.id)
+      .length;
+
+    // Expiring leases (60 days)
+    const expiring = activeLeases.filter((l) => l.end_date >= today && l.end_date <= sixtyOut).length;
+
+    // Status
+    let status: PropertyHealthRow["status"] = "healthy";
+    if (overdueCents > 0 || openMaint > 3) status = "critical";
+    else if (occupancy < 80 || expiring > 0 || openMaint > 0) status = "attention";
+
+    return {
+      id: p.id,
+      name: p.name,
+      totalUnits: total,
+      occupancy,
+      collectedCents,
+      billedCents,
+      overdueCents,
+      openMaintenance: openMaint,
+      expiringLeases: expiring,
+      status,
+    };
+  });
+}
+
+/* ── Live Recent Activity (from payments + maintenance + leases) ── */
+
+export function buildRecentActivity(
+  paymentsResult: DomainResult<PaymentRow[]>,
+  maintenanceResult: DomainResult<WorkOrderRow[]>,
+  leasesResult: DomainResult<LeaseRow[]>,
+): { events: ActivityEvent[]; isLive: boolean } {
+  const events: ActivityEvent[] = [];
+  let anyLive = false;
+
+  // Recent payments (last 10 succeeded)
+  if (paymentsResult.source === "live") {
+    anyLive = true;
+    const recent = paymentsResult.data
+      .filter((p) => p.status === "SUCCEEDED")
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))
+      .slice(0, 5);
+    for (const p of recent) {
+      events.push({
+        id: `pay-${p.id}`,
+        type: "PAYMENT_RECEIVED",
+        title: "Payment received",
+        description: `$${(p.amount / 100).toFixed(2)}`,
+        timestamp: p.created_at,
+        link: "/app/payments",
+      });
+    }
+  }
+
+  // Recent maintenance
+  if (maintenanceResult.source === "live") {
+    anyLive = true;
+    const recent = maintenanceResult.data
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))
+      .slice(0, 5);
+    for (const w of recent) {
+      const type = w.status === "RESOLVED" || w.status === "CLOSED"
+        ? "MAINTENANCE_COMPLETED" as const
+        : "MAINTENANCE_CREATED" as const;
+      events.push({
+        id: `maint-${w.id}`,
+        type,
+        title: type === "MAINTENANCE_COMPLETED" ? "Maintenance completed" : "Maintenance request",
+        description: w.description?.slice(0, 60) || "Work order",
+        timestamp: w.created_at,
+        link: `/app/maintenance/${w.id}`,
+      });
+    }
+  }
+
+  // Recent lease changes
+  if (leasesResult.source === "live") {
+    anyLive = true;
+    const recent = leasesResult.data
+      .sort((a, b) => (b.start_date > a.start_date ? 1 : -1))
+      .slice(0, 3);
+    for (const l of recent) {
+      events.push({
+        id: `lease-${l.id}`,
+        type: l.status === "TERMINATED" ? "LEASE_TERMINATED" : "LEASE_RENEWED",
+        title: l.status === "TERMINATED" ? "Lease terminated" : "Lease active",
+        description: `Unit ${l.unit_id} — $${(l.rent_amount / 100).toFixed(2)}/mo`,
+        timestamp: l.start_date,
+        link: "/app/leases",
+      });
+    }
+  }
+
+  // Sort all by timestamp descending, take top 10
+  events.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+  return { events: events.slice(0, 10), isLive: anyLive };
+}
+
 export function computeSetupStage(kpis: DashboardKpis): SetupStage {
   if (kpis.totalProperties.value === 0) return "no-properties";
   if (kpis.totalUnits.value === 0) return "no-units";
@@ -445,20 +833,21 @@ export function computeSetupStage(kpis: DashboardKpis): SetupStage {
 
 export async function fetchOwnerDashboard(): Promise<OwnerDashboardData> {
   // Fetch all domains in parallel (except units which depend on property IDs)
-  const [propertiesResult, leasesResult, paymentsResult, ledgerResult, maintenanceResult] =
+  const [propertiesResult, leasesResult, paymentsResult, ledgerResult, maintenanceResult, documentsResult] =
     await Promise.all([
       fetchPropertiesDomain(),
       fetchLeasesDomain(),
       fetchPaymentsDomain(),
       fetchLedgerDomain(),
       fetchMaintenanceDomain(),
+      fetchDocumentsDomain(),
     ]);
 
   // Fan-out: fetch units for all properties (concurrency-capped)
   const propertyIds = propertiesResult.data.map((p) => p.id);
   const unitsResult = await fetchUnitsDomain(propertyIds);
 
-  // Compute
+  // Compute core KPIs and alerts
   const kpis = computeKpis(
     propertiesResult, unitsResult, leasesResult,
     paymentsResult, ledgerResult, maintenanceResult
@@ -483,12 +872,23 @@ export async function fetchOwnerDashboard(): Promise<OwnerDashboardData> {
         : "unavailable"
     ),
     openWorkOrders: kpis.openMaintenanceRequests,
-    trendAvailable: false, // TODO: Enable when backend provides time-series data
+    trendAvailable: false,
   };
+
+  // New block computations
+  const cashFlow = computeCashFlow(propertiesResult, unitsResult, leasesResult, paymentsResult, ledgerResult);
+  const maintenanceOverview = computeMaintenanceOverview(maintenanceResult, unitsResult, propertiesResult);
+  const leaseRisk = computeLeaseRisk(leasesResult);
+  const vacancyReadiness = computeVacancyReadiness(unitsResult, leasesResult);
+  const propertyHealth = buildPropertyHealthRows(
+    propertiesResult, unitsResult, leasesResult, paymentsResult, ledgerResult, maintenanceResult
+  );
 
   const propertySummaries = buildPropertySummaries(propertiesResult, unitsResult, leasesResult);
   const setupStage = computeSetupStage(kpis);
-  const recentActivity = getStubActivityFeed();
+
+  // Live activity feed from real data
+  const { events: recentActivity } = buildRecentActivity(paymentsResult, maintenanceResult, leasesResult);
 
   const domainErrors: DomainErrors = {
     properties: propertiesResult.error,
@@ -497,7 +897,8 @@ export async function fetchOwnerDashboard(): Promise<OwnerDashboardData> {
     payments: paymentsResult.error,
     ledger: ledgerResult.error,
     maintenance: maintenanceResult.error,
-    activity: null, // stub — no real fetch
+    documents: documentsResult.error,
+    activity: null,
   };
 
   return {
@@ -505,7 +906,13 @@ export async function fetchOwnerDashboard(): Promise<OwnerDashboardData> {
     alerts,
     recentActivity,
     portfolioHealth,
+    cashFlow,
+    maintenanceOverview,
+    leaseRisk,
+    vacancyReadiness,
+    propertyHealth,
     properties: propertySummaries,
+    documentCount: documentsResult.data.length,
     setupStage,
     domainErrors,
   };

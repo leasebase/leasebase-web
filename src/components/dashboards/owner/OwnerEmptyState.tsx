@@ -53,16 +53,16 @@ export function OwnerEmptyState({ stage }: OwnerEmptyStateProps) {
 
   return (
     <div className="mx-auto max-w-md py-12 text-center">
-      <Building2 size={48} strokeWidth={1.5} className="mx-auto mb-4 text-brand-400" />
-      <h2 className="text-xl font-semibold text-slate-100">Welcome to LeaseBase</h2>
-      <p className="mt-1 text-sm text-slate-400">
+      <Building2 size={48} strokeWidth={1.5} className="mx-auto mb-4 text-brand-500" />
+      <h2 className="text-xl font-semibold text-slate-900">Welcome to LeaseBase</h2>
+      <p className="mt-1 text-sm text-slate-500">
         Complete these steps to set up your portfolio and unlock your dashboard.
       </p>
 
       {/* Progress */}
-      <div className="mt-6 flex items-center gap-2 text-xs text-slate-400">
+      <div className="mt-6 flex items-center gap-2 text-xs text-slate-500">
         <span>{doneCount} of {steps.length} complete</span>
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200">
           <div
             className="h-full rounded-full bg-brand-500 transition-all duration-300"
             style={{ width: `${(doneCount / steps.length) * 100}%` }}
@@ -80,13 +80,13 @@ export function OwnerEmptyState({ stage }: OwnerEmptyStateProps) {
                 href={step.href}
                 className={`flex items-center gap-3 rounded-lg border px-4 py-3 text-sm transition-colors ${
                   step.done
-                    ? "border-slate-800 bg-slate-900/40 text-slate-500"
-                    : "border-slate-700 bg-slate-900/70 text-slate-200 hover:border-brand-500/50 hover:bg-slate-800/70"
+                    ? "border-slate-200 bg-slate-50 text-slate-400"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-brand-300 hover:bg-brand-50/30"
                 }`}
               >
                 <IconCmp
                   size={18}
-                  className={step.done ? "text-emerald-500" : "text-brand-400"}
+                  className={step.done ? "text-emerald-500" : "text-brand-500"}
                 />
                 <span className={step.done ? "line-through" : ""}>
                   {step.label}

@@ -36,7 +36,7 @@ export class WidgetErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/70 p-4 text-sm text-slate-400">
+        <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-500">
           <AlertTriangle size={16} className="shrink-0 text-amber-400" />
           <span>{this.props.name} failed to render.</span>
         </div>
