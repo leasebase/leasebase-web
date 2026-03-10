@@ -1,0 +1,633 @@
+/*
+Theme Name: Leasebase Theme
+Theme URI: https://leasebase.ai
+Description: Child theme for Leasebase marketing site with FSE-first customization.
+Author: Leasebase
+Template: twentytwentyfive
+Version: 3.0.0
+Text Domain: leasebase-theme
+*/
+
+/* ============================================================
+   LEASEBASE LANDING PAGE — CUSTOM CSS
+   Clean, fast, professional SaaS landing page styles.
+   Designed for Gutenberg blocks on Twenty Twenty-Five.
+   ============================================================ */
+
+/* --- Reset & Global --- */
+
+:root {
+  --lb-primary: #2563EB;
+  --lb-primary-dark: #1D4ED8;
+  --lb-primary-light: #DBEAFE;
+  --lb-dark: #0F172A;
+  --lb-gray-900: #1E293B;
+  --lb-gray-700: #334155;
+  --lb-gray-500: #64748B;
+  --lb-gray-200: #E2E8F0;
+  --lb-gray-100: #F1F5F9;
+  --lb-gray-50: #F8FAFC;
+  --lb-white: #FFFFFF;
+  --lb-success: #10B981;
+  --lb-radius: 8px;
+  --lb-radius-lg: 12px;
+  --lb-shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --lb-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --lb-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+  --lb-max-width: 1120px;
+  --lb-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body.home {
+  font-family: var(--lb-font);
+  color: var(--lb-dark);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.home .wp-site-blocks {
+  overflow-x: hidden;
+}
+
+/* --- Header / Nav --- */
+
+body.home header.wp-block-template-part .wp-block-group {
+  max-width: var(--lb-max-width);
+  margin: 0 auto;
+}
+
+body.home header .wp-block-site-title a {
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: var(--lb-primary);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+body.home header .has-small-font-size {
+  color: var(--lb-gray-500);
+  font-weight: 400;
+}
+
+/* --- Section shared --- */
+
+.lb-section {
+  max-width: var(--lb-max-width);
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+.lb-section-alt {
+  background: var(--lb-gray-50);
+}
+
+.lb-section-dark {
+  background: var(--lb-gray-900);
+  color: var(--lb-white);
+}
+
+.lb-section h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.lb-section .lb-subtitle {
+  color: var(--lb-gray-500);
+  font-size: 1.125rem;
+  max-width: 640px;
+  margin: 0 auto 48px;
+}
+
+/* --- SECTION 1: Hero --- */
+
+.lb-hero {
+  text-align: center;
+  padding: 100px 24px 80px;
+  max-width: var(--lb-max-width);
+  margin: 0 auto;
+}
+
+.lb-hero h1 {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--lb-dark);
+  margin-bottom: 20px;
+}
+
+.lb-hero .lb-hero-sub {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--lb-gray-500);
+  max-width: 640px;
+  margin: 0 auto 36px;
+  line-height: 1.6;
+}
+
+.lb-hero .wp-block-buttons {
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.lb-hero .wp-block-button__link {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 14px 32px;
+  border-radius: var(--lb-radius);
+  transition: all 0.2s ease;
+}
+
+.lb-hero .wp-block-button:first-child .wp-block-button__link {
+  background: var(--lb-primary);
+  color: var(--lb-white);
+  border: none;
+}
+
+.lb-hero .wp-block-button:first-child .wp-block-button__link:hover {
+  background: var(--lb-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--lb-shadow);
+}
+
+.lb-hero .wp-block-button.is-style-outline .wp-block-button__link {
+  background: transparent;
+  color: var(--lb-primary);
+  border: 2px solid var(--lb-primary);
+}
+
+.lb-hero .wp-block-button.is-style-outline .wp-block-button__link:hover {
+  background: var(--lb-primary-light);
+}
+
+.lb-hero-supporting {
+  font-size: 0.9rem;
+  color: var(--lb-gray-500);
+  margin: 0 auto;
+  max-width: 480px;
+}
+
+/* --- SECTION 2: Product Overview / Features --- */
+
+.lb-features {
+  text-align: center;
+}
+
+.lb-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 32px;
+  max-width: var(--lb-max-width);
+  margin: 0 auto;
+}
+
+.lb-feature-card {
+  background: var(--lb-white);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  padding: 36px 28px;
+  text-align: center;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.lb-feature-card:hover {
+  box-shadow: var(--lb-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.lb-feature-card .lb-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--lb-primary-light);
+  color: var(--lb-primary);
+  border-radius: var(--lb-radius);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.lb-feature-card h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--lb-dark);
+}
+
+.lb-feature-card p {
+  font-size: 0.95rem;
+  color: var(--lb-gray-500);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* --- SECTION 2: Product Screenshot --- */
+
+.lb-screenshot {
+  text-align: center;
+}
+
+.lb-screenshot-frame {
+  max-width: 960px;
+  margin: 40px auto 0;
+}
+
+.lb-screenshot-placeholder {
+  background: var(--lb-gray-100);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--lb-shadow-lg);
+}
+
+.lb-screenshot-chrome {
+  background: var(--lb-gray-200);
+  padding: 12px 16px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.lb-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.15);
+}
+
+.lb-screenshot-body {
+  padding: 80px 40px;
+  color: var(--lb-gray-500);
+  font-size: 1rem;
+}
+
+.lb-screenshot-body p {
+  margin: 0;
+}
+
+.lb-screenshot-hint {
+  font-size: 0.85rem;
+  margin-top: 12px !important;
+  color: var(--lb-gray-500);
+}
+
+/* When real screenshot is added */
+.lb-screenshot-frame img {
+  width: 100%;
+  display: block;
+  border-radius: var(--lb-radius-lg);
+  box-shadow: var(--lb-shadow-lg);
+}
+
+/* --- SECTION 3: How It Works --- */
+
+.lb-steps {
+  text-align: center;
+}
+
+.lb-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 840px;
+  margin: 48px auto 0;
+}
+
+.lb-step {
+  text-align: center;
+}
+
+.lb-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: var(--lb-primary);
+  color: var(--lb-white);
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.lb-step h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--lb-dark);
+  margin-bottom: 8px;
+}
+
+.lb-step p {
+  font-size: 0.95rem;
+  color: var(--lb-gray-500);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* --- SECTION 5: Founder --- */
+
+.lb-founder {
+  text-align: center;
+}
+
+.lb-founder-content {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.lb-founder-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--lb-dark);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.lb-founder-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+}
+
+.lb-founder-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--lb-primary);
+  color: var(--lb-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.lb-founder-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--lb-dark);
+  margin: 0;
+}
+
+.lb-founder-role {
+  font-size: 0.9rem;
+  color: var(--lb-gray-500);
+  margin: 2px 0 0;
+}
+
+/* --- SECTION 7: Final CTA --- */
+
+.lb-final-cta {
+  text-align: center;
+  background: var(--lb-gray-50);
+}
+
+.lb-final-cta h2 {
+  margin-bottom: 28px;
+}
+
+.lb-final-cta .wp-block-button__link {
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 16px 40px;
+  border-radius: var(--lb-radius);
+  background: var(--lb-primary);
+  color: var(--lb-white);
+  transition: all 0.2s ease;
+}
+
+.lb-final-cta .wp-block-button__link:hover {
+  background: var(--lb-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--lb-shadow);
+}
+
+/* --- SECTION 6: Early Access CTA + Form --- */
+
+.lb-cta {
+  text-align: center;
+}
+
+.lb-cta-inner {
+  background: var(--lb-primary);
+  border-radius: var(--lb-radius-lg);
+  padding: 64px 40px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.lb-cta-inner h2 {
+  color: var(--lb-white);
+  margin-bottom: 8px;
+}
+
+.lb-cta-inner .lb-subtitle {
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 36px;
+}
+
+#lb-early-access-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+#lb-early-access-form input,
+#lb-early-access-form select {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  font-family: var(--lb-font);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: var(--lb-radius);
+  background: rgba(255,255,255,0.95);
+  color: var(--lb-dark);
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+#lb-early-access-form input:focus,
+#lb-early-access-form select:focus {
+  border-color: var(--lb-white);
+  background: var(--lb-white);
+}
+
+#lb-early-access-form input::placeholder {
+  color: var(--lb-gray-500);
+}
+
+#lb-early-access-form .lb-form-full {
+  grid-column: 1 / -1;
+}
+
+#lb-early-access-form button[type="submit"] {
+  grid-column: 1 / -1;
+  padding: 16px 32px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: var(--lb-font);
+  color: var(--lb-primary);
+  background: var(--lb-white);
+  border: none;
+  border-radius: var(--lb-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#lb-early-access-form button[type="submit"]:hover {
+  background: var(--lb-gray-100);
+  transform: translateY(-1px);
+  box-shadow: var(--lb-shadow);
+}
+
+#lb-early-access-form button[type="submit"]:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#lb-form-message {
+  grid-column: 1 / -1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: var(--lb-radius);
+  display: none;
+}
+
+#lb-form-message.lb-success {
+  display: block;
+  background: rgba(16, 185, 129, 0.15);
+  color: #065F46;
+}
+
+#lb-form-message.lb-error {
+  display: block;
+  background: rgba(239, 68, 68, 0.15);
+  color: #991B1B;
+}
+
+/* --- SECTION 7: Footer --- */
+
+body.home footer.wp-block-template-part .wp-block-group {
+  max-width: var(--lb-max-width);
+  margin: 0 auto;
+}
+
+.lb-footer {
+  background: var(--lb-gray-900);
+  color: rgba(255,255,255,0.7);
+  padding: 48px 24px 32px;
+}
+
+.lb-footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 40px;
+  max-width: var(--lb-max-width);
+  margin: 0 auto 32px;
+}
+
+.lb-footer-brand h4 {
+  color: var(--lb-white);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.lb-footer-brand p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.lb-footer-links h5 {
+  color: var(--lb-white);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.lb-footer-links a {
+  display: block;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 4px 0;
+  transition: color 0.2s ease;
+}
+
+.lb-footer-links a:hover {
+  color: var(--lb-white);
+}
+
+.lb-footer-bottom {
+  text-align: center;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.4);
+  max-width: var(--lb-max-width);
+  margin: 0 auto;
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 768px) {
+  .lb-hero {
+    padding: 60px 20px 48px;
+  }
+
+  .lb-hero-bullets {
+    grid-template-columns: 1fr;
+  }
+
+  .lb-section {
+    padding: 56px 20px;
+  }
+
+  .lb-features-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .lb-steps-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  #lb-early-access-form {
+    grid-template-columns: 1fr;
+  }
+
+  .lb-cta-inner {
+    padding: 48px 24px;
+  }
+
+  .lb-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lb-hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .lb-section h2 {
+    font-size: 1.5rem;
+  }
+}

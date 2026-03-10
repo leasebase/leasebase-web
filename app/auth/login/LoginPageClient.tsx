@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authStore } from "@/lib/auth/store";
+import { getApiBaseUrl } from "@/lib/apiBase";
 import { getPortalUrlForRole, getSignUpUrl } from "@/lib/hostname";
 import { devLog } from "@/lib/debug";
 import { AuthShell } from "@/components/auth/AuthShell";
@@ -60,10 +61,15 @@ export default function LoginPageClient({
     }
   }, [status, user, next, router]);
 
+  // Track whether the backend returned USER_NOT_CONFIRMED so we can show
+  // contextual actions (confirm email / resend code).
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setLoginError(null);
+    setUnconfirmedEmail(null);
     try {
       await authStore.getState().loginWithPassword(email, password);
       // After login, determine the correct portal based on the user's role.
@@ -75,7 +81,12 @@ export default function LoginPageClient({
       }
       router.replace(next);
     } catch (err: any) {
-      setLoginError(err.message || "Login failed");
+      const msg = err.message || "Login failed";
+      // Detect USER_NOT_CONFIRMED via the structured code from the backend response.
+      if (err.code === "USER_NOT_CONFIRMED") {
+        setUnconfirmedEmail(email);
+      }
+      setLoginError(msg);
     } finally {
       setLoading(false);
     }
@@ -118,8 +129,8 @@ export default function LoginPageClient({
             </p>
           </div>
 
-          {/* Success banner */}
-          {registered && registrationMessage && (
+          {/* Success banner (registration, email confirmed, password reset, etc.) */}
+          {registrationMessage && (
             <div className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-700">
               {decodeURIComponent(registrationMessage)}
             </div>
@@ -128,22 +139,49 @@ export default function LoginPageClient({
           {/* Error banner */}
           {loginError && (
             <div className="rounded-lg border border-danger/30 bg-danger-50/5 px-4 py-3 text-sm text-danger" role="alert">
-              {loginError}
+              <p>{loginError}</p>
+              {unconfirmedEmail && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      router.push(
+                        `/auth/confirm-email?email=${encodeURIComponent(unconfirmedEmail)}`,
+                      )
+                    }
+                    className="text-xs font-medium text-brand-600 hover:text-brand-500 underline"
+                  >
+                    Confirm email
+                  </button>
+                  <span className="text-xs text-danger/50">|</span>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await fetch(
+                          `${getApiBaseUrl()}/api/auth/resend-confirmation`,
+                          {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email: unconfirmedEmail }),
+                          },
+                        );
+                        setLoginError(
+                          "A new confirmation code has been sent to your email.",
+                        );
+                        setUnconfirmedEmail(null);
+                      } catch {
+                        // best-effort
+                      }
+                    }}
+                    className="text-xs font-medium text-brand-600 hover:text-brand-500 underline"
+                  >
+                    Resend confirmation code
+                  </button>
+                </div>
+              )}
             </div>
           )}
-
-          {/* Verify hint */}
-          <p className="text-xs text-slate-400">
-            Just created an account but don&apos;t see a verification screen?{" "}
-            <button
-              type="button"
-              onClick={() => router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`)}
-              className="text-brand-600 hover:text-brand-500 hover:underline transition-colors"
-            >
-              Verify your email or resend the code
-            </button>
-            .
-          </p>
 
           {/* Login form */}
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -155,14 +193,29 @@ export default function LoginPageClient({
               placeholder="you@company.com"
               required
             />
-            <Input
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-            />
+            <div>
+              <Input
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+              <div className="mt-1 text-right">
+                <button
+                  type="button"
+                  onClick={() =>
+                    router.push(
+                      `/auth/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ""}`,
+                    )
+                  }
+                  className="text-xs font-medium text-brand-600 hover:text-brand-500 transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
+            </div>
             <Button
               type="submit"
               loading={loading}

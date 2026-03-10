@@ -150,7 +150,7 @@ function RegisterContent() {
       if (data.userConfirmed) {
         router.push(`/auth/login?registered=true&message=${message}`);
       } else {
-        router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
+        router.push(`/auth/confirm-email?email=${encodeURIComponent(email)}`);
       }
     } catch (err: any) {
       setError(err.message || "Registration failed");
