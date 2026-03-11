@@ -30,13 +30,10 @@ describe("Portal selector page", () => {
     );
   });
 
-  test("renders Property Manager Portal link", () => {
+  test("does NOT render Property Manager Portal link", () => {
     render(<PortalSelectorPage />);
-    const link = screen.getByText("Property Manager Portal");
-    expect(link.closest("a")).toHaveAttribute(
-      "href",
-      expect.stringContaining("manager"),
-    );
+    // PM portal is hidden for MVP — only Owner and Tenant portals are public
+    expect(screen.queryByText("Property Manager Portal")).not.toBeInTheDocument();
   });
 
   test("renders Tenant Portal link", () => {
