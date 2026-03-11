@@ -19,12 +19,13 @@ const portalOptions: PortalOption[] = [
     icon: <Home size={22} />,
     href: getPortalOrigin("owner"),
   },
-  {
-    label: "Property Manager Portal",
-    description: "Manage properties on behalf of owners",
-    icon: <Building2 size={22} />,
-    href: getPortalOrigin("manager"),
-  },
+  // MVP: Property Manager portal hidden from public surface.
+  // {
+  //   label: "Property Manager Portal",
+  //   description: "Manage properties on behalf of owners",
+  //   icon: <Building2 size={22} />,
+  //   href: getPortalOrigin("manager"),
+  // },
   {
     label: "Tenant Portal",
     description: "Pay rent, submit requests, and view your lease",

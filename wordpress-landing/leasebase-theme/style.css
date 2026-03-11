@@ -4,7 +4,7 @@ Theme URI: https://leasebase.ai
 Description: Child theme for Leasebase marketing site with FSE-first customization.
 Author: Leasebase
 Template: twentytwentyfive
-Version: 3.0.0
+Version: 5.0.0
 Text Domain: leasebase-theme
 */
 
@@ -17,23 +17,36 @@ Text Domain: leasebase-theme
 /* --- Reset & Global --- */
 
 :root {
-  --lb-primary: #2563EB;
-  --lb-primary-dark: #1D4ED8;
-  --lb-primary-light: #DBEAFE;
+  /* Brand — Emerald green (from web app design system tokens.css) */
+  --lb-primary: #10b981;
+  --lb-primary-dark: #059669;
+  --lb-primary-light: #d1fae5;
+  --lb-primary-lighter: #ecfdf5;
+  /* Secondary / Info — Blue */
+  --lb-info: #3b82f6;
+  --lb-info-light: #dbeafe;
+  /* Neutrals — Slate */
   --lb-dark: #0F172A;
   --lb-gray-900: #1E293B;
   --lb-gray-700: #334155;
   --lb-gray-500: #64748B;
+  --lb-gray-300: #CBD5E1;
   --lb-gray-200: #E2E8F0;
   --lb-gray-100: #F1F5F9;
   --lb-gray-50: #F8FAFC;
   --lb-white: #FFFFFF;
+  /* Semantic */
   --lb-success: #10B981;
-  --lb-radius: 8px;
-  --lb-radius-lg: 12px;
-  --lb-shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --lb-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-  --lb-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+  --lb-warning: #F59E0B;
+  --lb-danger: #EF4444;
+  /* Shape — aligned with app radius tokens */
+  --lb-radius: 6px;
+  --lb-radius-lg: 8px;
+  /* Shadows — aligned with app shadow tokens */
+  --lb-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --lb-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --lb-shadow-lg: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  /* Layout */
   --lb-max-width: 1120px;
   --lb-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
@@ -56,7 +69,14 @@ body.home header.wp-block-template-part .wp-block-group {
   margin: 0 auto;
 }
 
-body.home header .wp-block-site-title a {
+.lb-header {
+  max-width: var(--lb-max-width);
+  margin: 0 auto;
+  align-items: center;
+}
+
+body.home header .wp-block-site-title a,
+.lb-site-title a {
   font-weight: 700;
   font-size: 1.35rem;
   color: var(--lb-primary);
@@ -67,6 +87,45 @@ body.home header .wp-block-site-title a {
 body.home header .has-small-font-size {
   color: var(--lb-gray-500);
   font-weight: 400;
+}
+
+.lb-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lb-nav-link {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--lb-gray-700);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: var(--lb-radius);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.lb-nav-link:hover {
+  color: var(--lb-primary);
+  background: var(--lb-gray-50);
+}
+
+.lb-nav-btn {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--lb-white);
+  background: var(--lb-primary);
+  text-decoration: none;
+  padding: 8px 20px;
+  border-radius: var(--lb-radius);
+  transition: all 0.2s ease;
+}
+
+.lb-nav-btn:hover {
+  background: var(--lb-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--lb-shadow-sm);
+  color: var(--lb-white);
 }
 
 /* --- Section shared --- */
@@ -153,23 +212,225 @@ body.home header .has-small-font-size {
 }
 
 .lb-hero .wp-block-button.is-style-outline .wp-block-button__link {
-  background: transparent;
-  color: var(--lb-primary);
-  border: 2px solid var(--lb-primary);
+  background: var(--lb-white);
+  color: var(--lb-gray-700);
+  border: 1px solid var(--lb-gray-300);
 }
 
 .lb-hero .wp-block-button.is-style-outline .wp-block-button__link:hover {
-  background: var(--lb-primary-light);
+  background: var(--lb-gray-50);
 }
 
-.lb-hero-supporting {
-  font-size: 0.9rem;
+/* --- Hero Product Visual --- */
+
+.lb-hero-visual {
+  max-width: 880px;
+  margin: 48px auto 0;
+}
+
+.lb-browser-frame {
+  background: var(--lb-white);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--lb-shadow-lg);
+}
+
+.lb-browser-chrome {
+  background: var(--lb-gray-100);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--lb-gray-200);
+}
+
+.lb-browser-chrome .lb-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.12);
+}
+
+.lb-browser-url {
+  margin-left: 12px;
+  font-size: 0.8rem;
   color: var(--lb-gray-500);
-  margin: 0 auto;
-  max-width: 480px;
+  background: var(--lb-white);
+  padding: 4px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--lb-gray-200);
 }
 
-/* --- SECTION 2: Product Overview / Features --- */
+.lb-browser-body {
+  display: flex;
+  min-height: 320px;
+}
+
+.lb-mock-sidebar {
+  width: 180px;
+  background: var(--lb-gray-50);
+  border-right: 1px solid var(--lb-gray-200);
+  padding: 20px 0;
+  flex-shrink: 0;
+}
+
+.lb-mock-nav-item {
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  color: var(--lb-gray-500);
+  cursor: default;
+}
+
+.lb-mock-nav-item.lb-mock-active {
+  color: var(--lb-primary-dark);
+  font-weight: 600;
+  background: var(--lb-primary-lighter);
+  border-right: 3px solid var(--lb-primary);
+}
+
+.lb-mock-main {
+  flex: 1;
+  padding: 28px;
+}
+
+.lb-mock-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.lb-mock-stat {
+  background: var(--lb-gray-50);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius);
+  padding: 16px;
+  text-align: center;
+}
+
+.lb-mock-stat-num {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--lb-dark);
+}
+
+.lb-mock-stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--lb-gray-500);
+  margin-top: 4px;
+}
+
+.lb-mock-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.lb-mock-card {
+  height: 80px;
+  background: var(--lb-gray-50);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius);
+}
+
+/* --- SECTION 2: Problem --- */
+
+.lb-problem {
+  text-align: center;
+}
+
+.lb-problem-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+  max-width: var(--lb-max-width);
+  margin: 0 auto;
+}
+
+.lb-problem-card {
+  background: var(--lb-white);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  padding: 36px 28px;
+  text-align: center;
+  transition: box-shadow 0.2s ease;
+}
+
+.lb-problem-card:hover {
+  box-shadow: var(--lb-shadow);
+}
+
+.lb-problem-card .lb-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: #FEF2F2;
+  color: #DC2626;
+  border-radius: var(--lb-radius);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.lb-problem-card h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--lb-dark);
+}
+
+.lb-problem-card p {
+  font-size: 0.95rem;
+  color: var(--lb-gray-500);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* --- SECTION 3: Platform Overview --- */
+
+.lb-platform {
+  text-align: center;
+}
+
+.lb-platform-highlights {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.lb-platform-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--lb-gray-200);
+  font-size: 1.05rem;
+  color: var(--lb-dark);
+}
+
+.lb-platform-item:last-child {
+  border-bottom: none;
+}
+
+.lb-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #ECFDF5;
+  color: var(--lb-success);
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* --- SECTION 4: Features --- */
 
 .lb-features {
   text-align: center;
@@ -177,8 +438,8 @@ body.home header .has-small-font-size {
 
 .lb-features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
   max-width: var(--lb-max-width);
   margin: 0 auto;
 }
@@ -187,7 +448,7 @@ body.home header .has-small-font-size {
   background: var(--lb-white);
   border: 1px solid var(--lb-gray-200);
   border-radius: var(--lb-radius-lg);
-  padding: 36px 28px;
+  padding: 32px 24px;
   text-align: center;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
@@ -282,7 +543,7 @@ body.home header .has-small-font-size {
   box-shadow: var(--lb-shadow-lg);
 }
 
-/* --- SECTION 3: How It Works --- */
+/* --- SECTION 5: How It Works --- */
 
 .lb-steps {
   text-align: center;
@@ -294,6 +555,11 @@ body.home header .has-small-font-size {
   gap: 40px;
   max-width: 840px;
   margin: 48px auto 0;
+}
+
+.lb-steps-grid.lb-steps-4 {
+  grid-template-columns: repeat(4, 1fr);
+  max-width: var(--lb-max-width);
 }
 
 .lb-step {
@@ -328,7 +594,224 @@ body.home header .has-small-font-size {
   margin: 0;
 }
 
-/* --- SECTION 5: Founder --- */
+/* --- SECTION 6: Dashboard Overview --- */
+
+.lb-dashboard {
+  max-width: 100%;
+  padding: 80px 24px;
+}
+
+.lb-dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+  max-width: var(--lb-max-width);
+  margin: 0 auto;
+}
+
+.lb-dashboard-copy h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  color: var(--lb-dark);
+}
+
+.lb-dashboard-desc {
+  font-size: 1.05rem;
+  color: var(--lb-gray-500);
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+
+.lb-dashboard-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.lb-cap-tag {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--lb-primary-light);
+  color: var(--lb-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 20px;
+}
+
+.lb-dashboard-cta {
+  display: inline-block;
+  padding: 14px 32px;
+  background: var(--lb-primary);
+  color: var(--lb-white);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--lb-radius);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.lb-dashboard-cta:hover {
+  background: var(--lb-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--lb-shadow);
+  color: var(--lb-white);
+}
+
+.lb-dash-panel {
+  background: var(--lb-white);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--lb-shadow-lg);
+}
+
+.lb-dash-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--lb-gray-200);
+}
+
+.lb-dash-panel-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--lb-dark);
+}
+
+.lb-dash-panel-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  background: #ECFDF5;
+  color: var(--lb-success);
+  border-radius: 12px;
+}
+
+.lb-dash-panel-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--lb-gray-200);
+  border-bottom: 1px solid var(--lb-gray-200);
+}
+
+.lb-dash-metric {
+  background: var(--lb-white);
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.lb-dash-metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--lb-dark);
+}
+
+.lb-dash-metric-label {
+  font-size: 0.8rem;
+  color: var(--lb-gray-500);
+  margin-top: 4px;
+}
+
+.lb-dash-panel-rows {
+  padding: 16px 20px;
+}
+
+.lb-dash-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  font-size: 0.9rem;
+  color: var(--lb-gray-700);
+  border-bottom: 1px solid var(--lb-gray-100);
+}
+
+.lb-dash-row:last-child {
+  border-bottom: none;
+}
+
+.lb-dash-row-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.lb-dot-green {
+  background: var(--lb-success);
+}
+
+.lb-dot-blue {
+  background: var(--lb-info);
+}
+
+.lb-dot-amber {
+  background: #F59E0B;
+}
+
+/* --- SECTION 7: Tenant Experience --- */
+
+.lb-tenant-exp {
+  text-align: center;
+}
+
+.lb-tenant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 32px;
+  max-width: var(--lb-max-width);
+  margin: 0 auto;
+}
+
+.lb-tenant-card {
+  background: var(--lb-gray-50);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  padding: 36px 28px;
+  text-align: center;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.lb-tenant-card:hover {
+  box-shadow: var(--lb-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.lb-tenant-card .lb-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--lb-primary-light);
+  color: var(--lb-primary);
+  border-radius: var(--lb-radius);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.lb-tenant-card h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--lb-dark);
+}
+
+.lb-tenant-card p {
+  font-size: 0.95rem;
+  color: var(--lb-gray-500);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* --- Founder (legacy) --- */
 
 .lb-founder {
   text-align: center;
@@ -386,14 +869,22 @@ body.home header .has-small-font-size {
 
 .lb-final-cta {
   text-align: center;
-  background: var(--lb-gray-50);
 }
 
 .lb-final-cta h2 {
-  margin-bottom: 28px;
+  margin-bottom: 12px;
 }
 
-.lb-final-cta .wp-block-button__link {
+.lb-final-cta .lb-subtitle {
+  margin-bottom: 36px;
+}
+
+.lb-final-cta .wp-block-buttons {
+  justify-content: center;
+  gap: 12px;
+}
+
+.lb-final-cta .wp-block-button:first-child .wp-block-button__link {
   font-size: 1.05rem;
   font-weight: 700;
   padding: 16px 40px;
@@ -403,121 +894,28 @@ body.home header .has-small-font-size {
   transition: all 0.2s ease;
 }
 
-.lb-final-cta .wp-block-button__link:hover {
+.lb-final-cta .wp-block-button:first-child .wp-block-button__link:hover {
   background: var(--lb-primary-dark);
   transform: translateY(-1px);
   box-shadow: var(--lb-shadow);
 }
 
-/* --- SECTION 6: Early Access CTA + Form --- */
-
-.lb-cta {
-  text-align: center;
-}
-
-.lb-cta-inner {
-  background: var(--lb-primary);
-  border-radius: var(--lb-radius-lg);
-  padding: 64px 40px;
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-.lb-cta-inner h2 {
-  color: var(--lb-white);
-  margin-bottom: 8px;
-}
-
-.lb-cta-inner .lb-subtitle {
-  color: rgba(255,255,255,0.8);
-  margin-bottom: 36px;
-}
-
-#lb-early-access-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  max-width: 520px;
-  margin: 0 auto;
-}
-
-#lb-early-access-form input,
-#lb-early-access-form select {
-  width: 100%;
-  padding: 14px 16px;
-  font-size: 0.95rem;
-  font-family: var(--lb-font);
-  border: 2px solid rgba(255,255,255,0.3);
-  border-radius: var(--lb-radius);
-  background: rgba(255,255,255,0.95);
-  color: var(--lb-dark);
-  outline: none;
-  transition: border-color 0.2s ease;
-  box-sizing: border-box;
-}
-
-#lb-early-access-form input:focus,
-#lb-early-access-form select:focus {
-  border-color: var(--lb-white);
-  background: var(--lb-white);
-}
-
-#lb-early-access-form input::placeholder {
-  color: var(--lb-gray-500);
-}
-
-#lb-early-access-form .lb-form-full {
-  grid-column: 1 / -1;
-}
-
-#lb-early-access-form button[type="submit"] {
-  grid-column: 1 / -1;
-  padding: 16px 32px;
+.lb-final-cta .wp-block-button.is-style-outline .wp-block-button__link {
   font-size: 1.05rem;
   font-weight: 700;
-  font-family: var(--lb-font);
-  color: var(--lb-primary);
-  background: var(--lb-white);
-  border: none;
+  padding: 16px 40px;
   border-radius: var(--lb-radius);
-  cursor: pointer;
+  background: var(--lb-white);
+  color: var(--lb-gray-700);
+  border: 1px solid var(--lb-gray-300);
   transition: all 0.2s ease;
 }
 
-#lb-early-access-form button[type="submit"]:hover {
-  background: var(--lb-gray-100);
-  transform: translateY(-1px);
-  box-shadow: var(--lb-shadow);
+.lb-final-cta .wp-block-button.is-style-outline .wp-block-button__link:hover {
+  background: var(--lb-gray-50);
 }
 
-#lb-early-access-form button[type="submit"]:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-}
-
-#lb-form-message {
-  grid-column: 1 / -1;
-  font-size: 0.95rem;
-  font-weight: 600;
-  padding: 12px;
-  border-radius: var(--lb-radius);
-  display: none;
-}
-
-#lb-form-message.lb-success {
-  display: block;
-  background: rgba(16, 185, 129, 0.15);
-  color: #065F46;
-}
-
-#lb-form-message.lb-error {
-  display: block;
-  background: rgba(239, 68, 68, 0.15);
-  color: #991B1B;
-}
-
-/* --- SECTION 7: Footer --- */
+/* --- Footer --- */
 
 body.home footer.wp-block-template-part .wp-block-group {
   max-width: var(--lb-max-width);
@@ -532,7 +930,7 @@ body.home footer.wp-block-template-part .wp-block-group {
 
 .lb-footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 40px;
   max-width: var(--lb-max-width);
   margin: 0 auto 32px;
@@ -585,13 +983,28 @@ body.home footer.wp-block-template-part .wp-block-group {
 
 /* --- Responsive --- */
 
+@media (max-width: 1024px) {
+  .lb-features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lb-steps-grid.lb-steps-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lb-dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .lb-mock-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .lb-hero {
     padding: 60px 20px 48px;
-  }
-
-  .lb-hero-bullets {
-    grid-template-columns: 1fr;
   }
 
   .lb-section {
@@ -600,25 +1013,49 @@ body.home footer.wp-block-template-part .wp-block-group {
 
   .lb-features-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
   }
 
-  .lb-steps-grid {
+  .lb-steps-grid,
+  .lb-steps-grid.lb-steps-4 {
     grid-template-columns: 1fr;
     gap: 32px;
   }
 
-  #lb-early-access-form {
+  .lb-problem-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
-  .lb-cta-inner {
-    padding: 48px 24px;
+  .lb-tenant-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .lb-mock-sidebar {
+    display: none;
+  }
+
+  .lb-hero-visual {
+    margin-top: 32px;
+  }
+
+  .lb-mock-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lb-dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
   }
 
   .lb-footer-grid {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+
+  .lb-nav-link {
+    display: none;
   }
 }
 
