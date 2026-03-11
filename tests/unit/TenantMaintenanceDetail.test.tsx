@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { TenantMaintenanceDetail } from "@/app/(dashboard)/app/maintenance/[id]/page";
+import { TenantMaintenanceDetail } from "@/app/(dashboard)/app/maintenance/[id]/_detail-views";
 import type { WorkOrderRow, WorkOrderCommentRow, DomainResult } from "@/services/tenant/types";
 
 /* ── Mocks ── */

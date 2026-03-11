@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ManagerMaintenanceDetail } from "@/app/(dashboard)/app/maintenance/[id]/page";
+import { ManagerMaintenanceDetail } from "@/app/(dashboard)/app/maintenance/[id]/_detail-views";
 import type {
   MaintenanceWorkOrder,
   MaintenanceComment,
