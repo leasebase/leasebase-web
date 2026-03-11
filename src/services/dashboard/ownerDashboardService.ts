@@ -19,6 +19,10 @@
  */
 
 import { apiRequest } from "@/lib/api/client";
+import {
+  fetchMaintenanceStats as fetchStatsApi,
+  type MaintenanceStats,
+} from "@/services/maintenance/maintenanceApiService";
 import type {
   OwnerDashboardData,
   DashboardKpis,
@@ -243,6 +247,17 @@ async function fetchMaintenanceDomain(): Promise<DomainResult<WorkOrderRow[]>> {
     return { data, source: "live", error: null };
   } catch (e: any) {
     return { data: [], source: "unavailable", error: e?.message || "Failed to fetch maintenance" };
+  }
+}
+
+const EMPTY_STATS: MaintenanceStats = { open: 0, in_progress: 0, resolved: 0, closed: 0 };
+
+async function fetchMaintenanceStatsDomain(): Promise<DomainResult<MaintenanceStats>> {
+  try {
+    const res = await fetchStatsApi();
+    return { data: res.data, source: "live", error: null };
+  } catch (e: any) {
+    return { data: EMPTY_STATS, source: "unavailable", error: e?.message || "Failed to fetch stats" };
   }
 }
 
@@ -556,13 +571,22 @@ export function computeMaintenanceOverview(
   maintenanceResult: DomainResult<WorkOrderRow[]>,
   unitsResult: DomainResult<UnitRow[]>,
   propertiesResult: DomainResult<PropertyRow[]>,
+  statsResult?: DomainResult<MaintenanceStats>,
 ): MaintenanceOverviewData {
-  const src = maintenanceResult.source;
   const workOrders = maintenanceResult.data;
   const now = Date.now();
 
-  const open = workOrders.filter((w) => w.status === "OPEN").length;
-  const inProgress = workOrders.filter((w) => w.status === "IN_PROGRESS").length;
+  // Prefer server-aggregated counts from /stats when available;
+  // fall back to client-side counting from the full list.
+  const useStats = statsResult?.source === "live";
+  const src = useStats ? "live" : maintenanceResult.source;
+
+  const open = useStats
+    ? (statsResult!.data.open || 0)
+    : workOrders.filter((w) => w.status === "OPEN").length;
+  const inProgress = useStats
+    ? (statsResult!.data.in_progress || 0)
+    : workOrders.filter((w) => w.status === "IN_PROGRESS").length;
   const waiting = workOrders.filter(
     (w) => w.status === "OPEN" && !w.assignee_id &&
       (now - new Date(w.created_at).getTime()) > 3 * 86400000
@@ -865,8 +889,8 @@ export function computeSetupStage(kpis: DashboardKpis): SetupStage {
  *   Onboarding Checklist | all + documents                                | Derived  | tenant step uses lease proxy
  */
 export async function fetchOwnerDashboard(): Promise<OwnerDashboardData> {
-  // 6 parallel domain fetches (units depend on property IDs, fetched separately below)
-  const [propertiesResult, leasesResult, paymentsResult, ledgerResult, maintenanceResult, documentsResult] =
+  // 7 parallel domain fetches (units depend on property IDs, fetched separately below)
+  const [propertiesResult, leasesResult, paymentsResult, ledgerResult, maintenanceResult, documentsResult, maintenanceStatsResult] =
     await Promise.all([
       fetchPropertiesDomain(),
       fetchLeasesDomain(),
@@ -874,6 +898,7 @@ export async function fetchOwnerDashboard(): Promise<OwnerDashboardData> {
       fetchLedgerDomain(),
       fetchMaintenanceDomain(),
       fetchDocumentsDomain(),
+      fetchMaintenanceStatsDomain(),
     ]);
 
   // Fan-out: fetch units for all properties (concurrency-capped)
@@ -910,7 +935,7 @@ export async function fetchOwnerDashboard(): Promise<OwnerDashboardData> {
 
   // New block computations
   const cashFlow = computeCashFlow(propertiesResult, unitsResult, leasesResult, paymentsResult, ledgerResult);
-  const maintenanceOverview = computeMaintenanceOverview(maintenanceResult, unitsResult, propertiesResult);
+  const maintenanceOverview = computeMaintenanceOverview(maintenanceResult, unitsResult, propertiesResult, maintenanceStatsResult);
   const leaseRisk = computeLeaseRisk(leasesResult);
   const vacancyReadiness = computeVacancyReadiness(unitsResult, leasesResult);
   const propertyHealth = buildPropertyHealthRows(
