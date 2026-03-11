@@ -16,11 +16,6 @@ jest.mock("next/headers", () => ({
   cookies: jest.fn(() => ({ get: jest.fn() })),
 }));
 
-/** Advance past step 1 by selecting a user type. */
-function selectUserType() {
-  fireEvent.click(screen.getByText("Property Manager"));
-}
-
 /** Fill in the non-password fields so only password gates the form. */
 function fillBasicFields() {
   fireEvent.change(screen.getByLabelText("First Name"), { target: { value: "Smoke" } });
@@ -34,9 +29,9 @@ describe("Register page — password validation UX", () => {
     global.fetch = jest.fn();
   });
 
-  test("renders password requirements checklist on step 2", () => {
+  test("renders password requirements checklist", () => {
     render(<RegisterPage />);
-    selectUserType();
+    // Single-step form — requirements visible immediately, no step navigation needed
     expect(screen.getByRole("list", { name: /password requirements/i })).toBeInTheDocument();
     expect(screen.getByText("At least 8 characters")).toBeInTheDocument();
     expect(screen.getByText("One uppercase letter")).toBeInTheDocument();
@@ -47,7 +42,6 @@ describe("Register page — password validation UX", () => {
 
   test("submit button is disabled when password requirements are not met", () => {
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
 
     const btn = screen.getByRole("button", { name: /create account/i });
@@ -61,7 +55,6 @@ describe("Register page — password validation UX", () => {
 
   test("submit button becomes enabled with a valid password + matching confirm", () => {
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
@@ -73,7 +66,6 @@ describe("Register page — password validation UX", () => {
 
   test("does not call API when passwords do not match", () => {
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
@@ -87,7 +79,6 @@ describe("Register page — password validation UX", () => {
 
   test("shows inline mismatch error when confirm password differs", () => {
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
@@ -110,7 +101,6 @@ describe("Register page — password validation UX", () => {
     });
 
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
@@ -137,7 +127,6 @@ describe("Register page — password validation UX", () => {
     });
 
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });

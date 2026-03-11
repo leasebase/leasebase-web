@@ -21,25 +21,24 @@ describe("Register page — tenant removal", () => {
     expect(screen.queryByText("Tenant")).not.toBeInTheDocument();
   });
 
-  test("shows Property Manager option", () => {
+  test("does NOT show Property Manager option", () => {
     render(<RegisterPage />);
-    expect(screen.getByText("Property Manager")).toBeInTheDocument();
+    expect(screen.queryByText("Property Manager")).not.toBeInTheDocument();
   });
 
-  test("shows Landlord / Owner option", () => {
+  test("shows Landlord / Owner as the fixed persona", () => {
     render(<RegisterPage />);
+    // New single-step form: static label, not a selectable button
     expect(screen.getByText("Landlord / Owner")).toBeInTheDocument();
   });
 
-  test("shows exactly 2 user type options", () => {
+  test("shows only Owner persona — no PM, no Tenant selectors", () => {
     render(<RegisterPage />);
-    // Each option is a button with role-selection behavior
-    const pm = screen.getByText("Property Manager");
-    const owner = screen.getByText("Landlord / Owner");
-    expect(pm).toBeInTheDocument();
-    expect(owner).toBeInTheDocument();
-    // Ensure no third option (Tenant) exists
+    // Single-step Owner-only form: PM and Tenant persona options are absent
+    expect(screen.queryByText("Property Manager")).not.toBeInTheDocument();
     expect(screen.queryByText("Tenant")).not.toBeInTheDocument();
     expect(screen.queryByText("Rent a property and manage your lease")).not.toBeInTheDocument();
+    // Owner label is shown as a static identifier, not a picker
+    expect(screen.getByText("Landlord / Owner")).toBeInTheDocument();
   });
 });
