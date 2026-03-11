@@ -2,7 +2,6 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Home, ChevronLeft } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/apiBase";
 import { getSignInUrl, buildSignInRedirect, navigateToSignIn } from "@/lib/hostname";
 import { validatePassword, isPasswordComplexityError } from "@/lib/validation/password";
@@ -12,29 +11,14 @@ import { AuthCard } from "@/components/auth/AuthCard";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
-export type UserType = "PROPERTY_MANAGER" | "OWNER";
+// MVP: only OWNER signup is publicly available.
+// PROPERTY_MANAGER is kept commented-out for future restoration.
+// export type UserType = "PROPERTY_MANAGER" | "OWNER";
+export type UserType = "OWNER";
 
-interface UserTypeOption {
-  value: UserType;
-  label: string;
-  description: string;
-  icon: React.ReactNode;
-}
-
-const userTypeOptions: UserTypeOption[] = [
-  {
-    value: "PROPERTY_MANAGER",
-    label: "Property Manager",
-    description: "Manage properties for multiple owners and landlords",
-    icon: <Building2 size={22} />,
-  },
-  {
-    value: "OWNER",
-    label: "Landlord / Owner",
-    description: "Own and rent out your properties",
-    icon: <Home size={22} />,
-  },
-];
+/** Fixed user type for MVP — no persona selection step. */
+const MVP_USER_TYPE: UserType = "OWNER";
+const MVP_USER_TYPE_LABEL = "Landlord / Owner";
 
 /* ------------------------------------------------------------------ */
 /*  Field-level error state                                            */
@@ -46,8 +30,8 @@ interface FieldErrors {
 
 function RegisterContent() {
   const router = useRouter();
-  const [step, setStep] = useState<1 | 2>(1);
-  const [userType, setUserType] = useState<UserType | null>(null);
+  // MVP: skip persona selection — always Owner.
+  const [userType] = useState<UserType>(MVP_USER_TYPE);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -74,17 +58,6 @@ function RegisterContent() {
     lastName.length > 0 &&
     pwResult.valid &&
     password === confirmPassword;
-
-  const handleUserTypeSelect = (type: UserType) => {
-    setUserType(type);
-    setStep(2);
-  };
-
-  const handleBack = () => {
-    setStep(1);
-    setError(null);
-    setFieldErrors({});
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,75 +133,18 @@ function RegisterContent() {
     }
   };
 
-  // Step 1: User type selection
-  if (step === 1) {
-    return (
-      <AuthShell>
-        <AuthCard className="max-w-lg">
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
-                Create your account
-              </h2>
-              <p className="text-sm text-slate-500">
-                First, tell us how you&apos;ll be using Leasebase.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              {userTypeOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => handleUserTypeSelect(option.value)}
-                  className="w-full flex items-start gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-left transition-all hover:border-brand-500 hover:bg-brand-50/50 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                >
-                  <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
-                    {option.icon}
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-slate-800">{option.label}</h3>
-                    <p className="mt-0.5 text-sm text-slate-500">{option.description}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            <p className="text-center text-sm text-slate-500">
-              Already have an account?{" "}
-              <a
-                href={getSignInUrl()}
-                className="font-medium text-brand-600 hover:text-brand-500 transition-colors"
-              >
-                Sign in
-              </a>
-            </p>
-          </div>
-        </AuthCard>
-      </AuthShell>
-    );
-  }
-
-  // Step 2: Registration form
-  const selectedOption = userTypeOptions.find((o) => o.value === userType);
-
+  // MVP: single-step registration form (Owner only, no persona selection).
   return (
     <AuthShell>
       <AuthCard>
         <div className="space-y-6">
           <div>
-            <button
-              onClick={handleBack}
-              className="mb-4 flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 rounded"
-            >
-              <ChevronLeft size={16} />
-              Back
-            </button>
             <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
               Create your account
             </h2>
             <p className="mt-1 text-sm text-slate-500">
               Signing up as{" "}
-              <span className="font-medium text-brand-600">{selectedOption?.label}</span>
+              <span className="font-medium text-brand-600">{MVP_USER_TYPE_LABEL}</span>
             </p>
           </div>
 

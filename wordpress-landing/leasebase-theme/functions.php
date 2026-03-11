@@ -3,7 +3,8 @@
  * Leasebase Theme — functions.php
  *
  * Child theme of Twenty Twenty-Five.
- * Adds: SEO meta, Inter font, Early Access form handler (REST API + CPT + email).
+ * Adds: SEO meta, Inter font, performance optimizations.
+ * Legacy: Early Access CPT + REST endpoint preserved for existing submission data.
  */
 
 defined('ABSPATH') || exit;
@@ -38,20 +39,7 @@ function leasebase_enqueue_assets() {
         null
     );
 
-    // Early access form handler (only on front page)
-    if (is_front_page()) {
-        wp_enqueue_script(
-            'leasebase-form',
-            get_stylesheet_directory_uri() . '/assets/js/early-access-form.js',
-            [],
-            '1.0.0',
-            true
-        );
-        wp_localize_script('leasebase-form', 'lbForm', [
-            'restUrl' => esc_url_raw(rest_url('leasebase/v1/early-access')),
-            'nonce'   => wp_create_nonce('wp_rest'),
-        ]);
-    }
+    // Note: Early access form JS removed — CTAs now link directly to signup.leasebase.co
 }
 
 /* ============================================================
@@ -64,8 +52,8 @@ function leasebase_seo_meta() {
         return;
     }
 
-    $title = 'LeaseBase — Property Management Software';
-    $desc  = 'Property management platform for landlords and property managers. Manage tenants, rent payments, maintenance, and documents in one place.';
+    $title = 'LeaseBase — The Operating System for Rental Property Owners';
+    $desc  = 'Centralize your properties, leases, tenants, maintenance, and finances in one modern platform. Stop managing rentals through spreadsheets.';
     $url   = home_url('/');
     ?>
     <meta name="description" content="<?php echo esc_attr($desc); ?>">
@@ -90,7 +78,7 @@ function leasebase_seo_meta() {
 add_filter('pre_get_document_title', 'leasebase_document_title');
 function leasebase_document_title($title) {
     if (is_front_page()) {
-        return 'LeaseBase — Property Management Software';
+        return 'LeaseBase — The Operating System for Rental Property Owners';
     }
     return $title;
 }
@@ -153,7 +141,7 @@ function leasebase_register_form_endpoint() {
                 'type'              => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
                 'validate_callback' => function ($val) {
-                    return in_array($val, ['owner', 'property_manager', 'other'], true);
+                    return in_array($val, ['owner', 'other'], true);
                 },
             ],
             'units' => [
@@ -202,7 +190,6 @@ function leasebase_handle_early_access(WP_REST_Request $request) {
     // Role label mapping
     $role_labels = [
         'owner'            => 'Property Owner',
-        'property_manager' => 'Property Manager',
         'other'            => 'Other',
     ];
     $role_label = $role_labels[$role] ?? $role;
@@ -271,7 +258,7 @@ function leasebase_submission_column_data($column, $post_id) {
             echo esc_html(get_post_meta($post_id, '_lb_email', true));
             break;
         case 'lb_role':
-            $role_labels = ['owner' => 'Owner', 'property_manager' => 'Property Manager', 'other' => 'Other'];
+            $role_labels = ['owner' => 'Owner', 'other' => 'Other'];
             $role = get_post_meta($post_id, '_lb_role', true);
             echo esc_html($role_labels[$role] ?? $role);
             break;

@@ -55,8 +55,8 @@ export function AuthValuePanel() {
             <span className="text-brand-400">simplified.</span>
           </h1>
           <p className="max-w-sm text-sm leading-relaxed text-slate-400">
-            The modern platform for landlords, property managers, and tenants to
-            manage leases, payments, and maintenance — all in one place.
+            The modern platform for landlords and tenants to manage leases,
+            payments, and maintenance — all in one place.
           </p>
         </div>
 

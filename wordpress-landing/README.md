@@ -1,8 +1,8 @@
-# LeaseBase — WordPress Landing Page Deployment
+# LeaseBase — WordPress Marketing Site
 
-This directory contains all files needed to transform the leasebase.ai homepage into a high-conversion SaaS landing page.
+Modern, high-conversion SaaS landing page for LeaseBase. Built as a child theme of Twenty Twenty-Five using Gutenberg blocks and Full Site Editing (FSE).
 
-**No new plugins required.** Everything is implemented through the child theme (`leasebase-theme`) and Gutenberg blocks.
+**No plugins required.** Everything is implemented through the child theme (`leasebase-theme`).
 
 ---
 
@@ -11,14 +11,43 @@ This directory contains all files needed to transform the leasebase.ai homepage 
 ```
 wordpress-landing/
 ├── README.md                          ← this file
-├── homepage-content.html              ← Gutenberg block markup for the homepage
+├── homepage-content.html              ← Gutenberg block markup (for WP Page Editor)
 └── leasebase-theme/
-    ├── style.css                      ← Updated child theme styles (v2.0.0)
-    ├── functions.php                  ← SEO meta, form handler, CPT, performance
+    ├── style.css                      ← Child theme styles (v4.0.0)
+    ├── functions.php                  ← SEO meta, fonts, performance
+    ├── templates/
+    │   └── front-page.html            ← FSE homepage template
+    ├── parts/
+    │   ├── header.html                ← Header with Sign Up / Sign In nav
+    │   └── footer.html                ← Footer with product links
     └── assets/
-        └── js/
-            └── early-access-form.js   ← Form AJAX handler
+        └── js/                        ← (empty — no client-side JS needed)
 ```
+
+---
+
+## Homepage Structure
+
+The homepage follows a high-conversion SaaS flow:
+
+1. **Hero** — headline, subheadline, Sign Up + Sign In CTAs
+2. **Problem** — pain of spreadsheets, scattered tools, manual processes
+3. **Platform overview** — LeaseBase as the operating system for rental management
+4. **Feature grid** — 12 feature cards covering the full platform capability
+5. **How it works** — 4-step onboarding flow
+6. **Tenant experience** — portal, maintenance, payments, documents
+7. **Final CTA** — Sign Up + Sign In conversion block
+
+---
+
+## CTA Routing
+
+- **Sign Up** → `https://signup.leasebase.co`
+- **Sign In** → `https://dev.leasebase.co`
+
+Both appear in: header nav, hero, feature section, final CTA, and footer.
+
+The application handles role selection (Owner / Tenant) after sign-in. No role selection on the WordPress site.
 
 ---
 
@@ -26,109 +55,79 @@ wordpress-landing/
 
 ### Step 1: Upload Theme Files
 
-Upload the entire `leasebase-theme/` directory to the WordPress server, replacing the existing child theme.
-
-**Option A — via SFTP / SSH:**
+Upload the entire `leasebase-theme/` directory to the WordPress server.
 
 ```bash
-# Replace with your actual server credentials and path
 scp -r leasebase-theme/ user@server:/var/www/html/wp-content/themes/leasebase-theme/
 ```
 
-**Option B — via WordPress Admin (zip upload):**
+Or upload via **Appearance → Themes → Add New → Upload Theme** (zip the folder first).
 
-1. Zip the `leasebase-theme/` folder
-2. Go to **Appearance → Themes → Add New → Upload Theme**
-3. Upload the zip and activate
-
-**Option C — via File Manager (cPanel/Lightsail):**
-
-1. Navigate to `wp-content/themes/leasebase-theme/`
-2. Upload/replace all files
-
-### Step 2: Update Homepage Content
+### Step 2: Update Homepage Content (if using Page Editor)
 
 1. Go to **WP Admin → Pages → Home** (page ID 5)
-2. Click the **⋮** (three dots) menu in the top-right
-3. Select **Code editor**
-4. **Select all** existing content and **delete** it
-5. Open `homepage-content.html` and copy its entire content
-6. Paste into the code editor
-7. Switch back to **Visual editor** to verify the layout
-8. Click **Update**
+2. Switch to **Code editor** (⋮ menu)
+3. Replace all content with the contents of `homepage-content.html`
+4. Switch back to **Visual editor** to verify
+5. Click **Update**
+
+Note: If using the FSE template (`templates/front-page.html`), this step may not be needed as the template renders directly.
 
 ### Step 3: Verify
 
-After deployment, verify:
-
-- [ ] Homepage loads with the new hero, features, target customer, preview, social proof, CTA, and footer sections
-- [ ] The "Request Early Access" form submits successfully
-- [ ] Form submissions appear in **WP Admin → Early Access** (left sidebar)
-- [ ] Email notification is received at the admin email
-- [ ] Page title shows "LeaseBase — Property Management Software"
-- [ ] View page source shows `<meta name="description" ...>` and Open Graph tags
+- [ ] Homepage loads with hero, problem, platform, features, how-it-works, tenant experience, and final CTA
+- [ ] Header shows LeaseBase brand + Sign In link + Sign Up button
+- [ ] Sign Up buttons link to `https://signup.leasebase.co`
+- [ ] Sign In buttons link to `https://dev.leasebase.co`
+- [ ] Page title: "LeaseBase — The Operating System for Rental Property Owners"
+- [ ] View source shows `<meta name="description" ...>` and Open Graph tags
+- [ ] Footer shows Product, Company, and Connect columns
 - [ ] Mobile responsive layout works correctly
-- [ ] Smooth scroll works when clicking "Request Early Access" or "See the Product" buttons
+- [ ] No "early access", "pilot program", or "Property Manager" language visible
 
 ---
 
-## How to Edit Going Forward
+## How to Edit
 
-### Edit page content
-Go to **Pages → Home** and use the Gutenberg visual editor. Each section is a separate Group block — click to edit text, rearrange, or add new blocks.
+### Page content
+Go to **Pages → Home** (Gutenberg editor) or **Appearance → Editor** (FSE). Each section is a separate Group block.
 
-### Edit styles
-Modify `wp-content/themes/leasebase-theme/style.css`. All custom classes use the `lb-` prefix to avoid conflicts.
+### Styles
+Modify `wp-content/themes/leasebase-theme/style.css`. All custom classes use the `lb-` prefix.
 
-### Edit form behavior
-Modify `wp-content/themes/leasebase-theme/assets/js/early-access-form.js`.
+### Header / Footer
+Edit `parts/header.html` or `parts/footer.html`, or use **Appearance → Editor → Template Parts**.
 
-### View signups
-Go to **WP Admin → Early Access** to see all form submissions with name, email, role, and units.
-
-### Add product screenshots
-Replace the placeholder in Section 4 with an `<img>` tag. The CSS class `lb-preview img` will automatically style it with rounded corners and shadow.
-
-### Update footer links
-Edit the footer HTML block in the homepage content (Section 7), or modify it via **Appearance → Editor → Template Parts → Footer** for site-wide changes.
-
-### Add a Privacy Policy page
-Create a new page at `/privacy-policy/` — the footer already links to it.
+### View legacy signups
+Go to **WP Admin → Early Access** to see historical form submissions.
 
 ---
 
 ## Architecture Notes
 
-### Form Handling
-- **No form plugin needed.** The form uses a custom WP REST API endpoint (`POST /wp-json/leasebase/v1/early-access`).
-- Submissions are stored as a custom post type (`lb_submission`) visible under **Early Access** in the admin sidebar.
-- Email notifications are sent to the WordPress admin email via `wp_mail()`.
-- Rate limiting: max 3 submissions per IP per hour (via transients).
-- Duplicate emails are detected and handled gracefully.
-
 ### SEO
-- Title tag, meta description, canonical URL, Open Graph, and Twitter Card tags are added via `functions.php` — no SEO plugin needed.
-- If you later install Yoast or RankMath, remove the `leasebase_seo_meta()` function and `leasebase_document_title()` filter to avoid duplicate tags.
+- Title, meta description, canonical URL, Open Graph, and Twitter Card tags added via `functions.php`.
+- If you install Yoast or RankMath later, remove the `leasebase_seo_meta()` function to avoid duplicates.
 
 ### Performance
 - Emoji scripts removed (~10KB saved)
 - WordPress version/RSD/shortlink headers removed
 - Inter font loaded with `display=swap`
-- No jQuery dependency — vanilla JS only
+- No jQuery dependency
 - No page builder plugins
-- CSS uses CSS custom properties for efficient theming
+- CSS custom properties for efficient theming
+
+### Legacy: Early Access
+- The CPT (`lb_submission`) and REST endpoint are preserved in `functions.php` for existing submission data.
+- The front-end form and JS handler have been removed. All CTAs now link directly to the product.
 
 ---
 
-## Recommended Next Steps
+## Next Steps
 
-1. **Add real product screenshots** to Section 4
-2. **Replace placeholder testimonials** with real early-user quotes
-3. **Set up transactional email** (e.g., Amazon SES or SMTP plugin) for reliable form notifications
-4. **Add Google Analytics / Plausible** for conversion tracking
-5. **Create Privacy Policy and Terms** pages
-6. **Add a favicon** via Appearance → Customize → Site Identity
-7. **Update social media links** in the footer with real profiles
-8. **Consider adding a blog** for SEO content marketing
-9. **Run Lighthouse audit** after deployment to baseline performance
-10. **Set up a staging environment** for testing future changes
+1. **Add product screenshots** to replace placeholder sections if desired
+2. **Add Google Analytics / Plausible** for conversion tracking
+3. **Create Privacy Policy and Terms** pages (footer already links to them)
+4. **Add a favicon** via Appearance → Customize → Site Identity
+5. **Update social media links** in the footer with real profiles
+6. **Run Lighthouse audit** after deployment to baseline performance
