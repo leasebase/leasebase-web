@@ -1,6 +1,6 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { OwnerMaintenancePage } from "@/app/(dashboard)/app/maintenance/page";
+import { OwnerMaintenancePage } from "@/app/(dashboard)/app/maintenance/_owner-list";
 import type { MaintenanceWorkOrder } from "@/services/maintenance/maintenanceApiService";
 
 /* ── Mocks ── */
