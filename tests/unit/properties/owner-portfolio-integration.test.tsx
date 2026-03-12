@@ -77,13 +77,6 @@ jest.mock("@/services/properties/propertyService", () => ({
   createUnit: (propertyId: string, dto: any) => mockCreateUnit(propertyId, dto),
 }));
 
-// Mock PM services to avoid errors on import
-jest.mock("@/services/pm/pmApiService", () => ({
-  fetchPMProperties: jest.fn(),
-  fetchPMProperty: jest.fn(),
-  fetchPMUnits: jest.fn(),
-}));
-
 // Mock intelligence modules
 jest.mock("@/lib/intelligence/deriveActions", () => ({
   derivePropertyInsights: jest.fn(() => []),

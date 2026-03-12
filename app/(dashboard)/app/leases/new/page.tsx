@@ -12,8 +12,8 @@ export default function CreateLeasePage() {
   const router = useRouter();
   const { user } = authStore();
 
-  // Only owner and PM can create leases
-  if (user?.persona !== "owner" && user?.persona !== "propertyManager") {
+  // Only owner can create leases
+  if (user?.persona !== "owner") {
     return <div className="text-sm text-slate-400">You do not have permission to create leases.</div>;
   }
 

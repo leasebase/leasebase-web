@@ -8,11 +8,6 @@ import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { UserX, UserCheck, FileText, CreditCard, Wrench } from "lucide-react";
-import { authStore } from "@/lib/auth/store";
-import { fetchPMTenant } from "@/services/pm/pmApiService";
-import type { PMTenantDetailRow } from "@/services/pm/pmApiService";
-import { RecommendedActions } from "@/components/ui/RecommendedActions";
-import { deriveTenantDetailInsights } from "@/lib/intelligence/deriveActions";
 import {
   fetchTenant, deactivateTenant, reactivateTenant,
   fetchTenantLeases, fetchTenantPayments, fetchTenantMaintenance,
@@ -29,49 +24,6 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "payments", label: "Payments" },
   { key: "maintenance", label: "Maintenance" },
 ];
-
-/* ── PM Detail (preserved) ── */
-function PMTenantDetail() {
-  const { id } = useParams<{ id: string }>();
-  const [tenant, setTenant] = useState<PMTenantDetailRow | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const res = await fetchPMTenant(id);
-        if (!cancelled) setTenant(res.data);
-      } catch (e: any) { if (!cancelled) setError(e.message); }
-      finally { if (!cancelled) setIsLoading(false); }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, [id]);
-
-  if (isLoading) return <div className="space-y-3"><Skeleton variant="text" className="h-8 w-48" /><Skeleton variant="text" className="h-32 w-full rounded-lg" /></div>;
-  if (error) return <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">{error}</div>;
-  if (!tenant) return null;
-
-  const insights = deriveTenantDetailInsights(tenant);
-
-  return (
-    <>
-      <PageHeader title={tenant.name} description={`${tenant.email} · Unit ${tenant.unit_number} · ${tenant.property_name}`} />
-      <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-400">Lease status:</span>
-          <Badge variant={tenant.lease_status === "ACTIVE" ? "success" : "neutral"}>{tenant.lease_status}</Badge>
-        </div>
-        {tenant.phone && <p className="text-sm text-slate-600">Phone: {tenant.phone}</p>}
-        <p className="text-sm text-slate-600">Rent: ${(tenant.rent_amount / 100).toLocaleString()}/mo</p>
-        <p className="text-sm text-slate-600">Lease: {new Date(tenant.start_date).toLocaleDateString()} — {new Date(tenant.end_date).toLocaleDateString()}</p>
-      </div>
-      <RecommendedActions insights={insights} title="Tenant Insights" className="mt-6" />
-    </>
-  );
-}
 
 /* ── Owner / Admin Detail with Tabs ── */
 function OwnerTenantDetail() {
@@ -273,7 +225,5 @@ function OwnerTenantDetail() {
 }
 
 export default function Page() {
-  const { user } = authStore();
-  if (user?.persona === "propertyManager") return <PMTenantDetail />;
   return <OwnerTenantDetail />;
 }

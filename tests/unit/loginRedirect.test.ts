@@ -6,12 +6,12 @@ describe("Post-login redirect — getPortalUrlForRole (unified /app dashboard)",
     expect(getPortalUrlForRole("OWNER")).toBe("/app");
   });
 
-  test("ORG_ADMIN → /app (all roles route to unified dashboard)", () => {
-    expect(getPortalUrlForRole("ORG_ADMIN")).toBe("/app");
+  test("ORG_ADMIN → null (legacy role, fail closed post Phase 2)", () => {
+    expect(getPortalUrlForRole("ORG_ADMIN")).toBe(null);
   });
 
-  test("PM_STAFF → /app", () => {
-    expect(getPortalUrlForRole("PM_STAFF")).toBe("/app");
+  test("PM_STAFF → null (legacy role, fail closed post Phase 2)", () => {
+    expect(getPortalUrlForRole("PM_STAFF")).toBe(null);
   });
 
   test("TENANT → /app", () => {
@@ -32,8 +32,8 @@ describe("Post-login redirect — getPortalUrlForRole (unified /app dashboard)",
 });
 
 describe("Fail-closed role mapping — mapUserRoleToPersona", () => {
-  test("ORG_ADMIN → propertyManager", () => {
-    expect(mapUserRoleToPersona("ORG_ADMIN")).toBe("propertyManager");
+  test("ORG_ADMIN → null (legacy role removed in Phase 2)", () => {
+    expect(mapUserRoleToPersona("ORG_ADMIN")).toBe(null);
   });
 
   test("OWNER → owner", () => {

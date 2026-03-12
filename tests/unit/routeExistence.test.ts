@@ -33,7 +33,7 @@ function routeExists(urlPath: string): boolean {
   return false;
 }
 
-const ALL_ROLES = ["OWNER", "ORG_ADMIN", "PM_STAFF", "TENANT"];
+const ALL_ROLES = ["OWNER", "TENANT"];
 
 describe("Route existence — getPortalUrlForRole targets must be real pages", () => {
   for (const role of ALL_ROLES) {

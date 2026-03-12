@@ -12,8 +12,6 @@ import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Home } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
-import { fetchPMUnit } from "@/services/pm/pmApiService";
-import type { PMUnitRow } from "@/services/pm/types";
 import { fetchUnit, fetchProperty, updateUnit } from "@/services/properties/propertyService";
 import type { UnitRow, PropertyRow, CreateUnitDTO } from "@/services/properties/types";
 import { UnitForm } from "@/components/properties/UnitForm";
@@ -24,54 +22,6 @@ const STATUS_VARIANTS: Record<string, BadgeVariant> = {
   MAINTENANCE: "warning",
   OFFLINE: "neutral",
 };
-
-/* ── PM Unit Detail (unchanged) ── */
-
-function PMUnitDetail() {
-  const { id } = useParams<{ id: string }>();
-  const [unit, setUnit] = useState<(PMUnitRow & { property_name: string }) | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const res = await fetchPMUnit(id);
-        if (!cancelled) setUnit(res.data);
-      } catch (e: any) { if (!cancelled) setError(e.message); }
-      finally { if (!cancelled) setIsLoading(false); }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, [id]);
-
-  if (isLoading) return <div className="space-y-3"><Skeleton variant="text" className="h-8 w-64" /><Skeleton variant="text" className="h-32 w-full rounded-lg" /></div>;
-  if (error) return <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">{error}</div>;
-  if (!unit) return null;
-
-  return (
-    <>
-      <PageHeader title={`Unit ${unit.unit_number}`} description={unit.property_name} />
-      <div className="mt-6 rounded-lg border border-slate-200 bg-white p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <Badge variant={STATUS_VARIANTS[unit.status] ?? "neutral"}>{unit.status}</Badge>
-          {unit.bedrooms != null && <span className="text-xs text-slate-400">{unit.bedrooms} bed · {unit.bathrooms} bath</span>}
-        </div>
-        <dl className="grid grid-cols-2 gap-3 text-sm">
-          <div><dt className="text-slate-500">Rent</dt><dd className="text-slate-700">${(unit.rent_amount / 100).toLocaleString()}/mo</dd></div>
-          <div><dt className="text-slate-500">Sq Ft</dt><dd className="text-slate-700">{unit.square_feet ?? "—"}</dd></div>
-          <div>
-            <dt className="text-slate-500">Property</dt>
-            <dd className="text-slate-700">
-              <Link href={`/app/properties/${unit.property_id}`} className="text-brand-600 hover:underline">{unit.property_name}</Link>
-            </dd>
-          </div>
-        </dl>
-      </div>
-    </>
-  );
-}
 
 /* ── Owner Unit Detail ── */
 
@@ -195,7 +145,6 @@ function OwnerUnitDetail() {
 
 export default function Page() {
   const { user } = authStore();
-  if (user?.persona === "propertyManager") return <PMUnitDetail />;
   if (user?.persona === "owner") return <OwnerUnitDetail />;
   return (
     <>

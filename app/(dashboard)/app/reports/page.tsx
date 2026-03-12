@@ -11,7 +11,7 @@ export default function Page() {
       <EmptyState
         icon={<BarChart3 size={48} strokeWidth={1.5} />}
         title="Coming soon"
-        description="This section is under development. propertyManager, owner will have access."
+        description="This section is under development."
         className="mt-8"
       />
     </>

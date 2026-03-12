@@ -1,12 +1,12 @@
 import { mapUserRoleToPersona } from "@/lib/auth/roles";
 
 describe("mapUserRoleToPersona", () => {
-  test("ORG_ADMIN maps to propertyManager", () => {
-    expect(mapUserRoleToPersona("ORG_ADMIN")).toBe("propertyManager");
+  test("ORG_ADMIN → null (legacy role removed in Phase 2)", () => {
+    expect(mapUserRoleToPersona("ORG_ADMIN")).toBe(null);
   });
 
-  test("PM_STAFF maps to propertyManager", () => {
-    expect(mapUserRoleToPersona("PM_STAFF")).toBe("propertyManager");
+  test("PM_STAFF → null (legacy role removed in Phase 2)", () => {
+    expect(mapUserRoleToPersona("PM_STAFF")).toBe(null);
   });
 
   test("OWNER maps to owner", () => {

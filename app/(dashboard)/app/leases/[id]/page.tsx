@@ -427,7 +427,7 @@ function LeaseDetailContent() {
 export default function Page() {
   const { user } = authStore();
 
-  if (user?.persona !== "owner" && user?.persona !== "propertyManager") {
+  if (user?.persona !== "owner") {
     return (
       <div className="text-sm text-slate-400">
         Lease detail is not available for your account type.

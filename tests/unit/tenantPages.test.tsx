@@ -3,9 +3,7 @@
  *
  * Validates:
  * - Owner tenant list renders with data
- * - PM tenant list still renders
  * - Tenant detail page renders for owner (with tabs)
- * - Tenant detail page renders for PM
  * - Deactivate/reactivate buttons appear correctly
  */
 
@@ -36,14 +34,6 @@ jest.mock("@/services/tenants/tenantApiService", () => ({
   fetchTenantMaintenance: (...args: unknown[]) => mockFetchTenantMaintenance(...args),
 }));
 
-const mockFetchPMTenants = jest.fn();
-const mockFetchPMTenant = jest.fn();
-
-jest.mock("@/services/pm/pmApiService", () => ({
-  fetchPMTenants: (...args: unknown[]) => mockFetchPMTenants(...args),
-  fetchPMTenant: (...args: unknown[]) => mockFetchPMTenant(...args),
-}));
-
 jest.mock("@/services/invitations/invitationApiService", () => ({
   createInvitation: jest.fn(),
 }));
@@ -72,7 +62,6 @@ jest.mock("next/navigation", () => ({
 /* ── Fixtures ── */
 
 const ownerUser = { persona: "owner", role: "OWNER", name: "Owner" };
-const pmUser = { persona: "propertyManager", role: "PM_STAFF", name: "PM" };
 
 const tenantListData = {
   data: [
@@ -104,21 +93,6 @@ const deactivatedTenantDetail = {
   },
 };
 
-const pmTenantList = {
-  data: [
-    { id: "tp-1", name: "PM Tenant", email: "pm@test.com", phone: null, unit_number: "1A", property_name: "Oak Tower", user_id: "u1", lease_id: "l1" },
-  ],
-  meta: { page: 1, limit: 20, total: 1, hasMore: false },
-};
-
-const pmTenantDetail = {
-  data: {
-    ...pmTenantList.data[0],
-    property_id: "p1", start_date: "2024-01-01", end_date: "2025-12-31",
-    rent_amount: 120000, lease_status: "ACTIVE",
-  },
-};
-
 /* ── Setup ── */
 
 beforeEach(() => {
@@ -130,8 +104,6 @@ beforeEach(() => {
   mockFetchTenantLeases.mockReset().mockResolvedValue({ data: [], meta: {} });
   mockFetchTenantPayments.mockReset().mockResolvedValue({ data: [], meta: {} });
   mockFetchTenantMaintenance.mockReset().mockResolvedValue({ data: [], meta: {} });
-  mockFetchPMTenants.mockReset();
-  mockFetchPMTenant.mockReset();
 });
 
 /* ── Tests: Tenant List Page ── */
@@ -165,17 +137,6 @@ describe("Tenant List Page", () => {
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText(/search by name/i)).toBeInTheDocument();
-    });
-  });
-
-  test("renders PM tenant list (existing behavior)", async () => {
-    mockAuthStore.mockReturnValue({ user: pmUser });
-    mockFetchPMTenants.mockResolvedValue(pmTenantList);
-
-    render(<TenantsPage />);
-
-    await waitFor(() => {
-      expect(screen.getByText("PM Tenant")).toBeInTheDocument();
     });
   });
 
@@ -236,17 +197,6 @@ describe("Tenant Detail Page", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Reactivate")).toBeInTheDocument();
-    });
-  });
-
-  test("renders PM tenant detail (existing behavior)", async () => {
-    mockAuthStore.mockReturnValue({ user: pmUser });
-    mockFetchPMTenant.mockResolvedValue(pmTenantDetail);
-
-    render(<TenantDetailPage />);
-
-    await waitFor(() => {
-      expect(screen.getByText("PM Tenant")).toBeInTheDocument();
     });
   });
 

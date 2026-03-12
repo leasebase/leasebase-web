@@ -6,7 +6,7 @@ The Maintenance domain covers the full lifecycle of work orders (maintenance req
 
 ## Service Responsibilities
 
-### maintenance-service (backend — `../leasebase/services/api`)
+### maintenance-service (backend)
 
 - CRUD operations on work orders scoped to the caller's organization (via JWT `organizationId`).
 - Status transitions: `OPEN → IN_PROGRESS → RESOLVED → CLOSED`.
