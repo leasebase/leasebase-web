@@ -56,6 +56,26 @@ docker buildx build \
   --file "${REPO_ROOT}/Dockerfile" \
   "${REPO_ROOT}"
 
+# ── Post-build domain validation ─────────────────────────────────────────────
+# Fail fast if the built JS bundle still references the old domain.
+# NEXT_PUBLIC_* env vars are baked at build time; a stale GitHub Actions
+# variable would silently produce a broken client bundle.
+BLOCKED_DOMAINS=("api.dev.leasebase.co" "api.leasebase.co")
+echo "▸ Checking built bundle for stale domain references..."
+STALE_FOUND=0
+for domain in "${BLOCKED_DOMAINS[@]}"; do
+  if docker run --rm "${IMAGE_SHA}" sh -c "grep -r '${domain}' /app/.next/static/ 2>/dev/null" | head -3; then
+    echo "ERROR: Built JS bundle contains blocked domain '${domain}'" >&2
+    echo "       Check the NEXT_PUBLIC_API_BASE_URL GitHub Actions variable." >&2
+    STALE_FOUND=1
+  fi
+done
+if [[ "$STALE_FOUND" -eq 1 ]]; then
+  echo "::error::Domain validation failed — stale API domain baked into client bundle."
+  exit 1
+fi
+echo "✓ No stale domain references found in built bundle."
+
 # ── Trivy scan ───────────────────────────────────────────────────────────────
 echo "▸ Scanning image with Trivy..."
 trivy image \
