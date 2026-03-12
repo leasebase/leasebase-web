@@ -23,21 +23,21 @@ describe("getBaseAppDomain", () => {
   });
 });
 
-describe("getPortalUrlForRole — same-origin paths", () => {
-  test("OWNER → /owner", () => {
-    expect(getPortalUrlForRole("OWNER")).toBe("/owner");
+describe("getPortalUrlForRole — unified /app dashboard", () => {
+  test("OWNER → /app", () => {
+    expect(getPortalUrlForRole("OWNER")).toBe("/app");
   });
 
-  test("ORG_ADMIN → /owner", () => {
-    expect(getPortalUrlForRole("ORG_ADMIN")).toBe("/owner");
+  test("ORG_ADMIN → /app", () => {
+    expect(getPortalUrlForRole("ORG_ADMIN")).toBe("/app");
   });
 
-  test("PM_STAFF → /owner", () => {
-    expect(getPortalUrlForRole("PM_STAFF")).toBe("/owner");
+  test("PM_STAFF → /app", () => {
+    expect(getPortalUrlForRole("PM_STAFF")).toBe("/app");
   });
 
-  test("TENANT → /tenant", () => {
-    expect(getPortalUrlForRole("TENANT")).toBe("/tenant");
+  test("TENANT → /app", () => {
+    expect(getPortalUrlForRole("TENANT")).toBe("/app");
   });
 
   test("unknown role → null (fail closed)", () => {
@@ -56,12 +56,12 @@ describe("getPortalUrlForRole — same-origin paths", () => {
     expect(getPortalUrlForRole("")).toBe(null);
   });
 
-  test("case-insensitive: owner → /owner", () => {
-    expect(getPortalUrlForRole("owner")).toBe("/owner");
+  test("case-insensitive: owner → /app", () => {
+    expect(getPortalUrlForRole("owner")).toBe("/app");
   });
 
-  test("case-insensitive: tenant → /tenant", () => {
-    expect(getPortalUrlForRole("tenant")).toBe("/tenant");
+  test("case-insensitive: tenant → /app", () => {
+    expect(getPortalUrlForRole("tenant")).toBe("/app");
   });
 });
 
@@ -93,8 +93,8 @@ describe("buildSignInRedirect", () => {
   });
 
   test("multiple params → combined query string", () => {
-    expect(buildSignInRedirect({ message: "Password reset", next: "/owner" })).toBe(
-      "/auth/login?message=Password+reset&next=%2Fowner",
+    expect(buildSignInRedirect({ message: "Password reset", next: "/app" })).toBe(
+      "/auth/login?message=Password+reset&next=%2Fapp",
     );
   });
 });

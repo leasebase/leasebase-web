@@ -40,5 +40,5 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   // Match root plus auth/app/invite paths — skip static assets and API routes.
-  matcher: ["/", "/auth/:path*", "/app/:path*", "/invite/:path*", "/owner/:path*", "/tenant/:path*"],
+  matcher: ["/", "/auth/:path*", "/app/:path*", "/invite/:path*"],
 };
