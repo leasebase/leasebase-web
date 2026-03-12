@@ -11,9 +11,7 @@ import { AuthCard } from "@/components/auth/AuthCard";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
-// MVP: only OWNER signup is publicly available.
-// PROPERTY_MANAGER is kept commented-out for future restoration.
-// export type UserType = "PROPERTY_MANAGER" | "OWNER";
+// Only OWNER signup is publicly available.
 export type UserType = "OWNER";
 
 /** Fixed user type for MVP — no persona selection step. */

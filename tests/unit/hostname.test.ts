@@ -28,12 +28,12 @@ describe("getPortalUrlForRole — unified /app dashboard", () => {
     expect(getPortalUrlForRole("OWNER")).toBe("/app");
   });
 
-  test("ORG_ADMIN → /app", () => {
-    expect(getPortalUrlForRole("ORG_ADMIN")).toBe("/app");
+  test("ORG_ADMIN → null (legacy role, fail closed)", () => {
+    expect(getPortalUrlForRole("ORG_ADMIN")).toBe(null);
   });
 
-  test("PM_STAFF → /app", () => {
-    expect(getPortalUrlForRole("PM_STAFF")).toBe("/app");
+  test("PM_STAFF → null (legacy role, fail closed)", () => {
+    expect(getPortalUrlForRole("PM_STAFF")).toBe(null);
   });
 
   test("TENANT → /app", () => {

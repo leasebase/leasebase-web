@@ -13,7 +13,7 @@ import { TenantMaintenanceDetail, ManagerMaintenanceDetail } from "./_detail-vie
 export default function Page() {
   const { user } = authStore();
   if (user?.persona === "tenant") return <TenantMaintenanceDetail />;
-  if (user?.persona === "propertyManager" || user?.persona === "owner") return <ManagerMaintenanceDetail />;
+  if (user?.persona === "owner") return <ManagerMaintenanceDetail />;
   return (
     <>
       <PageHeader title="Work Order" description="View work order details." />

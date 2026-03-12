@@ -146,8 +146,8 @@ export function TenantMaintenanceDetail() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   Manager detail — owner + PM shared (status change, assignment, comments)
-   Uses org-wide /api/maintenance endpoints (authorized for OWNER & PM_STAFF)
+   Manager detail — owner (status change, assignment, comments)
+   Uses org-wide /api/maintenance endpoints (authorized for OWNER)
    ═══════════════════════════════════════════════════════════════════════ */
 
 const ALL_STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"] as const;

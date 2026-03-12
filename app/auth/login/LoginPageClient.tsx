@@ -31,7 +31,7 @@ export default function LoginPageClient({
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [devEmail, setDevEmail] = useState("");
-  const [devRole, setDevRole] = useState("ORG_ADMIN");
+  const [devRole, setDevRole] = useState("OWNER");
   const [devOrgId, setDevOrgId] = useState("dev-org-1");
 
   const devBypassEnabled =
@@ -91,7 +91,7 @@ export default function LoginPageClient({
     setLoading(true);
     setLoginError(null);
     try {
-      const emailToUse = devEmail || email || "pm@example.com";
+      const emailToUse = devEmail || email || "owner@example.com";
       await authStore.getState().loginDevBypass({
         email: emailToUse,
         role: devRole,
@@ -253,7 +253,7 @@ export default function LoginPageClient({
                   type="email"
                   value={devEmail}
                   onChange={(e) => setDevEmail(e.target.value)}
-                  placeholder="pm@example.com"
+                  placeholder="owner@example.com"
                 />
                 <Input
                   label="Dev org ID"
@@ -269,8 +269,6 @@ export default function LoginPageClient({
                   value={devRole}
                   onChange={(e) => setDevRole(e.target.value)}
                 >
-                  <option value="ORG_ADMIN">Property Manager (ORG_ADMIN)</option>
-                  <option value="PM_STAFF">Property Manager Staff (PM_STAFF)</option>
                   <option value="OWNER">Owner</option>
                   <option value="TENANT">Tenant</option>
                 </Select>

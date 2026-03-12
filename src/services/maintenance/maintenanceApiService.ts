@@ -2,7 +2,7 @@
  * Maintenance API Service — Owner / Admin endpoints.
  *
  * Calls the maintenance-service via BFF at /api/maintenance.
- * These endpoints require ORG_ADMIN, PM_STAFF, or OWNER role.
+ * These endpoints require OWNER role (PM roles being removed — see ADR-001).
  * Server scopes by organizationId from JWT — client never passes orgId.
  */
 
@@ -61,12 +61,12 @@ export interface MaintenanceStats {
 
 /* ── API functions ── */
 
-/** Fetch aggregated status counts. Requires ORG_ADMIN | PM_STAFF | OWNER. */
+/** Fetch aggregated status counts. Requires OWNER. */
 export async function fetchMaintenanceStats(): Promise<{ data: MaintenanceStats }> {
   return apiRequest<{ data: MaintenanceStats }>({ path: "api/maintenance/stats" });
 }
 
-/** Fetch work orders with optional filters. Requires ORG_ADMIN | PM_STAFF | OWNER. */
+/** Fetch work orders with optional filters. Requires OWNER. */
 export async function fetchMaintenanceList(
   filters: MaintenanceListFilters = {},
 ): Promise<PaginatedResponse<MaintenanceWorkOrder>> {
@@ -111,7 +111,7 @@ export async function postMaintenanceComment(
   });
 }
 
-/** Update the status of a work order. Requires ORG_ADMIN | PM_STAFF | OWNER. */
+/** Update the status of a work order. Requires OWNER. */
 export async function updateMaintenanceStatus(
   id: string,
   status: string,
@@ -124,7 +124,7 @@ export async function updateMaintenanceStatus(
   });
 }
 
-/** Assign a work order. Requires ORG_ADMIN | PM_STAFF | OWNER. */
+/** Assign a work order. Requires OWNER. */
 export async function assignMaintenanceWorkOrder(
   id: string,
   assigneeId: string,

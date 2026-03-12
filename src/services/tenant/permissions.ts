@@ -42,7 +42,7 @@ export const TENANT_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/tenants",
     service: "tenant-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
     notes: "Cannot list all tenants.",
   },
@@ -56,7 +56,7 @@ export const TENANT_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "PUT /api/tenants/:id",
     service: "tenant-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
     notes: "Admin-only full update.",
   },
@@ -65,7 +65,7 @@ export const TENANT_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/leases",
     service: "lease-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
     notes: "Data isolation phase: requireRole guard added. TENANT gets 403.",
   },
@@ -81,7 +81,7 @@ export const TENANT_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/payments",
     service: "payments-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
     notes: "Data isolation phase: requireRole guard added. TENANT gets 403. Use GET /api/payments/mine instead.",
   },
@@ -109,14 +109,14 @@ export const TENANT_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "POST /api/payments",
     service: "payments-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
-    notes: "Data isolation phase: requireRole guard added. TENANT/OWNER get 403.",
+    notes: "OWNER-only. Tenants cannot record payments directly.",
   },
   {
     endpoint: "GET /api/payments/ledger",
     service: "payments-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
     notes: "Cannot view ledger entries.",
   },
@@ -125,7 +125,7 @@ export const TENANT_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/maintenance",
     service: "maintenance-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
     notes: "Data isolation phase: requireRole guard added. TENANT gets 403. Use GET /api/maintenance/mine instead.",
   },
@@ -163,13 +163,13 @@ export const TENANT_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "PUT /api/maintenance/:id",
     service: "maintenance-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
   },
   {
     endpoint: "PATCH /api/maintenance/:id/status",
     service: "maintenance-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
   },
 
@@ -177,7 +177,7 @@ export const TENANT_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/documents",
     service: "document-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
     notes: "Org-wide documents list. Tenant uses GET /api/documents/mine instead.",
   },
@@ -191,19 +191,19 @@ export const TENANT_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/documents/:id",
     service: "document-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
   },
   {
     endpoint: "GET /api/documents/:id/download",
     service: "document-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
   },
   {
     endpoint: "POST /api/documents/upload",
     service: "document-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF"],
+    allowedRoles: ["OWNER"],
     tenantAllowed: false,
   },
 

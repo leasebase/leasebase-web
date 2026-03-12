@@ -35,8 +35,6 @@ export function getPortalUrlForRole(role: string | null | undefined): string | n
 
   switch (normalized) {
     case "OWNER":
-    case "ORG_ADMIN":
-    case "PM_STAFF":
     case "TENANT":
       return "/app";
     default:

@@ -12,7 +12,7 @@ import { LeasesTable } from "@/components/leases/LeasesTable";
 import { LeasesEmptyState } from "@/components/leases/LeasesEmptyState";
 import { LeasesSkeleton } from "@/components/leases/LeasesSkeleton";
 
-/* ── Owner / PM Leases Page ── */
+/* ── Owner Leases Page ── */
 
 function LeasesListPage() {
   const [leases, setLeases] = useState<LeaseRow[]>([]);
@@ -81,7 +81,7 @@ export default function Page() {
   const { user } = authStore();
 
   // Owner-focused only. Tenant lease view is out of scope.
-  if (user?.persona !== "owner" && user?.persona !== "propertyManager") {
+  if (user?.persona !== "owner") {
     return (
       <>
         <PageHeader title="Leases" description="View and manage lease agreements." />

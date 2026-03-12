@@ -1,9 +1,11 @@
-export type Persona = "propertyManager" | "owner" | "tenant" | "agent" | "vendor";
+/**
+ * Supported personas — Owner and Tenant only.
+ * Property Manager, Agent, and Vendor have been removed from the product model.
+ */
+export type Persona = "owner" | "tenant";
 
 // Backend roles as strings; we don't import the enum to avoid coupling.
 export type BackendUserRole =
-  | "ORG_ADMIN"
-  | "PM_STAFF"
   | "OWNER"
   | "TENANT"
   | (string & {});
@@ -17,9 +19,6 @@ export type BackendUserRole =
 export function mapUserRoleToPersona(role: BackendUserRole | null | undefined): Persona | null {
   const normalized = (role || "").toUpperCase();
 
-  if (normalized === "ORG_ADMIN" || normalized === "PM_STAFF") {
-    return "propertyManager";
-  }
   if (normalized === "OWNER") {
     return "owner";
   }
