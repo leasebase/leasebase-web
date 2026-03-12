@@ -10,6 +10,22 @@
 defined('ABSPATH') || exit;
 
 /* ============================================================
+   AUTH URL CONFIGURATION — TEMPORARY DEV ENVIRONMENT
+   ============================================================
+   When PROD goes live, update these two URLs and redeploy:
+     LEASEBASE_SIGNIN_URL → https://signin.leasebase.ai
+     LEASEBASE_SIGNUP_URL → https://signup.leasebase.ai
+   Also update the matching URLs in:
+     - parts/header.html
+     - parts/footer.html
+     - templates/front-page.html
+     - homepage-content.html
+     - README.md (CTA Routing section)
+   ============================================================ */
+define('LEASEBASE_SIGNIN_URL', 'https://signin.dev.leasebase.ai');
+define('LEASEBASE_SIGNUP_URL', 'https://signup.dev.leasebase.ai');
+
+/* ============================================================
    1. ENQUEUE STYLES & SCRIPTS
    ============================================================ */
 
@@ -39,7 +55,8 @@ function leasebase_enqueue_assets() {
         null
     );
 
-    // Note: Early access form JS removed — CTAs now link directly to signup.leasebase.co
+    // Note: Early access form JS removed — CTAs now link directly to signup.
+    // Auth URLs configured via LEASEBASE_SIGNIN_URL / LEASEBASE_SIGNUP_URL constants above.
 }
 
 /* ============================================================

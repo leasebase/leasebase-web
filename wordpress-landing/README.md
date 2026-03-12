@@ -42,10 +42,13 @@ The homepage follows a high-conversion SaaS flow:
 
 ## CTA Routing
 
-- **Sign Up** → `https://signup.leasebase.co`
-- **Sign In** → `https://dev.leasebase.co`
+> **Temporary DEV links** — update to production URLs when PROD goes live.
+> Auth URL constants are defined in `leasebase-theme/functions.php` at the top of the file.
 
-Both appear in: header nav, hero, feature section, final CTA, and footer.
+- **Sign Up** → `https://signup.dev.leasebase.ai`
+- **Sign In** → `https://signin.dev.leasebase.ai`
+
+Both appear in: header nav, hero, feature section, dashboard CTA, final CTA, and footer.
 
 The application handles role selection (Owner / Tenant) after sign-in. No role selection on the WordPress site.
 
@@ -77,8 +80,8 @@ Note: If using the FSE template (`templates/front-page.html`), this step may not
 
 - [ ] Homepage loads with hero, problem, platform, features, how-it-works, tenant experience, and final CTA
 - [ ] Header shows LeaseBase brand + Sign In link + Sign Up button
-- [ ] Sign Up buttons link to `https://signup.leasebase.co`
-- [ ] Sign In buttons link to `https://dev.leasebase.co`
+- [ ] Sign Up buttons link to `https://signup.dev.leasebase.ai`
+- [ ] Sign In buttons link to `https://signin.dev.leasebase.ai`
 - [ ] Page title: "LeaseBase — The Operating System for Rental Property Owners"
 - [ ] View source shows `<meta name="description" ...>` and Open Graph tags
 - [ ] Footer shows Product, Company, and Connect columns
