@@ -10,6 +10,7 @@
 
 import {
   getAccessToken,
+  getIdToken,
   hasAccessToken,
   isAccessTokenFresh,
   clearAuthTokens,
@@ -55,13 +56,22 @@ describe("token helpers", () => {
   });
 
   test("setTokens + getAccessToken round-trips", () => {
-    setTokens({ accessToken: "tok123", expiresIn: 3600 });
+    setTokens({ accessToken: "tok123", idToken: "id-tok123", expiresIn: 3600 });
     expect(getAccessToken()).toBe("tok123");
     expect(hasAccessToken()).toBe(true);
   });
 
+  test("setTokens + getIdToken round-trips", () => {
+    setTokens({ accessToken: "tok", idToken: "id-tok-456", expiresIn: 3600 });
+    expect(getIdToken()).toBe("id-tok-456");
+  });
+
+  test("getIdToken returns undefined when store is empty", () => {
+    expect(getIdToken()).toBeUndefined();
+  });
+
   test("isAccessTokenFresh returns true for non-expired token", () => {
-    setTokens({ accessToken: "tok", expiresIn: 3600 });
+    setTokens({ accessToken: "tok", idToken: "id-tok", expiresIn: 3600 });
     expect(isAccessTokenFresh()).toBe(true);
   });
 
@@ -74,9 +84,10 @@ describe("token helpers", () => {
   });
 
   test("clearAuthTokens removes all tokens", () => {
-    setTokens({ accessToken: "tok", expiresIn: 3600 });
+    setTokens({ accessToken: "tok", idToken: "id-tok", expiresIn: 3600 });
     clearAuthTokens();
     expect(getAccessToken()).toBeUndefined();
+    expect(getIdToken()).toBeUndefined();
     expect(authStore.getState().status).toBe("unauthenticated");
   });
 });
@@ -90,6 +101,7 @@ describe("loadMe", () => {
     authStore.setState({
       mode: "cognito",
       accessToken: "stale-token",
+      idToken: "stale-id-token",
       expiresAt: Date.now() + 60_000,
       status: "initializing",
     });
@@ -111,6 +123,7 @@ describe("loadMe", () => {
     authStore.setState({
       mode: "cognito",
       accessToken: "bad-token",
+      idToken: "bad-id-token",
       expiresAt: Date.now() + 60_000,
       status: "initializing",
     });
@@ -129,6 +142,7 @@ describe("loadMe", () => {
     authStore.setState({
       mode: "cognito",
       accessToken: "good-token",
+      idToken: "good-id-token",
       expiresAt: Date.now() + 60_000,
       status: "initializing",
     });
@@ -152,10 +166,41 @@ describe("loadMe", () => {
     expect(authStore.getState().user?.email).toBe("a@b.co");
   });
 
+  test("loadMe sends ID token (not access token) as Bearer", async () => {
+    authStore.setState({
+      mode: "cognito",
+      accessToken: "access-tok-should-not-be-sent",
+      idToken: "id-tok-should-be-sent",
+      expiresAt: Date.now() + 60_000,
+      status: "initializing",
+    });
+
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 200,
+      ok: true,
+      text: async () =>
+        JSON.stringify({
+          id: "u1",
+          orgId: "o1",
+          email: "a@b.co",
+          name: "Alice",
+          role: "OWNER",
+        }),
+    });
+
+    await authStore.getState().loadMe("bootstrap");
+
+    // Verify the ID token was sent, not the access token
+    const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
+    const headers = fetchCall[1]?.headers as Headers;
+    expect(headers.get("Authorization")).toBe("Bearer id-tok-should-be-sent");
+  });
+
   test("loadMe('bootstrap') with network error does not throw", async () => {
     authStore.setState({
       mode: "cognito",
       accessToken: "tok",
+      idToken: "id-tok",
       expiresAt: Date.now() + 60_000,
       status: "initializing",
     });
@@ -208,6 +253,7 @@ describe("bootstrapSession", () => {
     authStore.setState({
       mode: "cognito",
       accessToken: "good-token",
+      idToken: "good-id-token",
       expiresAt: Date.now() + 60_000,
     });
 
@@ -234,6 +280,7 @@ describe("bootstrapSession", () => {
     authStore.setState({
       mode: "cognito",
       accessToken: "stale-token",
+      idToken: "stale-id-token",
       expiresAt: Date.now() + 60_000,
       user: { id: "u1", orgId: "o1", email: "a@b.co", name: "Alice", role: "OWNER", persona: null },
     });
@@ -257,6 +304,7 @@ describe("bootstrapSession", () => {
     authStore.setState({
       mode: "cognito",
       accessToken: "token",
+      idToken: "id-token",
       expiresAt: Date.now() + 60_000,
       user: { id: "u1", orgId: "o1", email: "a@b.co", name: "Alice", role: "OWNER", persona: null },
     });
@@ -289,6 +337,7 @@ describe("bootstrapSession", () => {
     authStore.setState({
       mode: "cognito",
       accessToken: "token",
+      idToken: "id-token",
       expiresAt: Date.now() + 60_000,
     });
 
@@ -309,6 +358,7 @@ describe("bootstrapSession", () => {
     authStore.setState({
       mode: "cognito",
       accessToken: "token",
+      idToken: "id-token",
       expiresAt: Date.now() + 60_000,
     });
 
@@ -324,6 +374,7 @@ describe("bootstrapSession", () => {
     authStore.setState({
       mode: "cognito",
       accessToken: "token",
+      idToken: "id-token",
       expiresAt: Date.now() + 60_000,
     });
 

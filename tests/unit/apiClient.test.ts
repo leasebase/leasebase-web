@@ -19,7 +19,8 @@ jest.mock("@/lib/apiBase", () => ({
 beforeEach(() => {
   authStore.setState({
     mode: "cognito",
-    accessToken: "test-token",
+    accessToken: "test-access-token",
+    idToken: "test-id-token",
     expiresAt: Date.now() + 60_000,
     status: "authenticated",
     user: {
@@ -91,7 +92,8 @@ describe("apiRequest 403 handling", () => {
     // Auth state should remain intact
     const state = authStore.getState();
     expect(state.status).toBe("authenticated");
-    expect(state.accessToken).toBe("test-token");
+    expect(state.accessToken).toBe("test-access-token");
+    expect(state.idToken).toBe("test-id-token");
     expect(state.user?.email).toBe("a@b.co");
   });
 });
@@ -151,7 +153,7 @@ describe("apiRequest generic errors", () => {
 /* ------------------------------------------------------------------ */
 
 describe("apiRequest auth headers", () => {
-  test("attaches Bearer token for cognito mode", async () => {
+  test("attaches ID token (not access token) as Bearer for cognito mode", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       status: 200,
       ok: true,
@@ -162,7 +164,9 @@ describe("apiRequest auth headers", () => {
 
     const [, options] = (global.fetch as jest.Mock).mock.calls[0];
     const headers = options.headers as Headers;
-    expect(headers.get("Authorization")).toBe("Bearer test-token");
+    // Must use the ID token — it carries custom:role required by requireAuth.
+    // Access tokens lack custom attributes in Cognito.
+    expect(headers.get("Authorization")).toBe("Bearer test-id-token");
   });
 
   test("anonymous request skips auth headers", async () => {

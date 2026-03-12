@@ -1,6 +1,6 @@
 import { getApiBaseUrl } from "@/lib/apiBase";
 import { authStore } from "@/lib/auth/store";
-import { getAccessToken } from "@/lib/auth/tokens";
+import { getIdToken } from "@/lib/auth/tokens";
 
 export interface ApiRequestOptions extends RequestInit {
   /** Relative API path like "api/auth/me" or "/api/auth/me". */
@@ -12,7 +12,10 @@ export interface ApiRequestOptions extends RequestInit {
 /**
  * Centralized API client for authenticated requests.
  *
- * - Automatically attaches the bearer token (or dev-bypass headers).
+ * - Automatically attaches the Cognito **ID token** as the bearer token
+ *   (or dev-bypass headers).  The ID token is used because it carries
+ *   `custom:role`, which the backend `requireAuth` middleware requires.
+ *   Cognito access tokens do not carry custom attributes.
  * - On 401, clears auth state and throws.
  * - Does NOT force a redirect — callers decide how to react.
  *
@@ -33,7 +36,7 @@ export async function apiRequest<T = any>({ path, anonymous, ...init }: ApiReque
 
   if (!anonymous) {
     const state = authStore.getState();
-    const token = getAccessToken();
+    const token = getIdToken();
 
     if (state.mode === "cognito" && token) {
       headers.set("Authorization", `Bearer ${token}`);
