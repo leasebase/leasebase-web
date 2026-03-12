@@ -123,13 +123,23 @@ export const authStore = create<AuthState>()(
             }
 
             // Token looks fresh — validate with /me.
-            // If user is already hydrated from localStorage, optimistically mark
-            // authenticated then verify in the background.
-            set({ status: user ? "authenticated" : "initializing" });
+            // Always go through "initializing" so callers (e.g. login page)
+            // don't prematurely redirect before /me confirms the session.
+            set({ status: "initializing" });
             await get().loadMe("bootstrap");
           } catch {
             // bootstrapSession must never throw.
             devLog("auth", "bootstrap: unexpected error, treating as unauthenticated");
+            set({
+              status: "unauthenticated",
+              mode: null,
+              user: undefined,
+              accessToken: undefined,
+              idToken: undefined,
+              refreshToken: undefined,
+              expiresAt: undefined,
+              devBypass: undefined,
+            });
           }
         })();
 
