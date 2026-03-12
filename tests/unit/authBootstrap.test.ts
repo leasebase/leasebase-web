@@ -24,7 +24,10 @@ jest.mock("@/lib/apiBase", () => ({
 
 // Reset store between tests
 beforeEach(() => {
-  // Fully reset the zustand store to idle + empty.
+  // Logout resets the module-level bootstrapPromise sentinel so each
+  // test can call bootstrapSession() independently.
+  authStore.getState().logout();
+  // Then reset to idle (logout sets unauthenticated).
   authStore.setState({
     mode: null,
     accessToken: undefined,
@@ -163,6 +166,194 @@ describe("loadMe", () => {
     await authStore.getState().loadMe("bootstrap");
 
     expect(authStore.getState().status).toBe("unauthenticated");
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/*  loginWithPassword                                                  */
+/* ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ */
+/*  bootstrapSession                                                    */
+/* ------------------------------------------------------------------ */
+
+describe("bootstrapSession", () => {
+  test("no token → unauthenticated immediately, no /me call", async () => {
+    // No tokens in store (default idle state)
+    global.fetch = jest.fn();
+
+    await authStore.getState().bootstrapSession();
+
+    expect(authStore.getState().status).toBe("unauthenticated");
+    // /me should never have been called
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  test("expired token → unauthenticated immediately, no /me call", async () => {
+    authStore.setState({
+      mode: "cognito",
+      accessToken: "expired-token",
+      expiresAt: Date.now() - 10_000,
+    });
+    global.fetch = jest.fn();
+
+    await authStore.getState().bootstrapSession();
+
+    expect(authStore.getState().status).toBe("unauthenticated");
+    expect(authStore.getState().accessToken).toBeUndefined();
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  test("fresh token + /me 200 → authenticated", async () => {
+    authStore.setState({
+      mode: "cognito",
+      accessToken: "good-token",
+      expiresAt: Date.now() + 60_000,
+    });
+
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 200,
+      ok: true,
+      text: async () =>
+        JSON.stringify({
+          id: "u1",
+          orgId: "o1",
+          email: "a@b.co",
+          name: "Alice",
+          role: "OWNER",
+        }),
+    });
+
+    await authStore.getState().bootstrapSession();
+
+    expect(authStore.getState().status).toBe("authenticated");
+    expect(authStore.getState().user?.email).toBe("a@b.co");
+  });
+
+  test("fresh token + /me 401 → unauthenticated silently (no throw)", async () => {
+    authStore.setState({
+      mode: "cognito",
+      accessToken: "stale-token",
+      expiresAt: Date.now() + 60_000,
+      user: { id: "u1", orgId: "o1", email: "a@b.co", name: "Alice", role: "OWNER", persona: null },
+    });
+
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 401,
+      ok: false,
+      text: async () => JSON.stringify({ error: { message: "Invalid token" } }),
+    });
+
+    // Must not throw — the login page depends on this
+    await authStore.getState().bootstrapSession();
+
+    expect(authStore.getState().status).toBe("unauthenticated");
+    expect(authStore.getState().accessToken).toBeUndefined();
+    expect(authStore.getState().user).toBeUndefined();
+  });
+
+  test("does NOT set optimistic 'authenticated' before /me validates", async () => {
+    // Simulate rehydrated state with cached user
+    authStore.setState({
+      mode: "cognito",
+      accessToken: "token",
+      expiresAt: Date.now() + 60_000,
+      user: { id: "u1", orgId: "o1", email: "a@b.co", name: "Alice", role: "OWNER", persona: null },
+    });
+
+    // Track status changes
+    const statusChanges: string[] = [];
+    const unsub = authStore.subscribe((state) => {
+      statusChanges.push(state.status);
+    });
+
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 200,
+      ok: true,
+      text: async () =>
+        JSON.stringify({ id: "u1", orgId: "o1", email: "a@b.co", name: "Alice", role: "OWNER" }),
+    });
+
+    await authStore.getState().bootstrapSession();
+    unsub();
+
+    // Status must transition through "initializing" before reaching "authenticated".
+    // Before the fix, it would jump straight to "authenticated" (optimistic).
+    const initIdx = statusChanges.indexOf("initializing");
+    const authIdx = statusChanges.indexOf("authenticated");
+    expect(initIdx).toBeGreaterThanOrEqual(0);
+    expect(authIdx).toBeGreaterThan(initIdx);
+  });
+
+  test("catch block sets unauthenticated on unexpected error", async () => {
+    authStore.setState({
+      mode: "cognito",
+      accessToken: "token",
+      expiresAt: Date.now() + 60_000,
+    });
+
+    // Make rehydrate throw to trigger the outer catch
+    const originalRehydrate = authStore.persist.rehydrate;
+    authStore.persist.rehydrate = () => { throw new Error("rehydrate failed"); };
+
+    // Should NOT throw
+    await authStore.getState().bootstrapSession();
+
+    expect(authStore.getState().status).toBe("unauthenticated");
+
+    // Restore
+    authStore.persist.rehydrate = originalRehydrate;
+  });
+
+  test("/me network error during bootstrap → unauthenticated, no throw", async () => {
+    authStore.setState({
+      mode: "cognito",
+      accessToken: "token",
+      expiresAt: Date.now() + 60_000,
+    });
+
+    global.fetch = jest.fn().mockRejectedValue(new Error("Network failure"));
+
+    // Should NOT throw
+    await authStore.getState().bootstrapSession();
+
+    expect(authStore.getState().status).toBe("unauthenticated");
+  });
+
+  test("/me 500 during bootstrap → unauthenticated, no throw", async () => {
+    authStore.setState({
+      mode: "cognito",
+      accessToken: "token",
+      expiresAt: Date.now() + 60_000,
+    });
+
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 500,
+      ok: false,
+      text: async () => JSON.stringify({ message: "Internal Server Error" }),
+    });
+
+    await authStore.getState().bootstrapSession();
+
+    expect(authStore.getState().status).toBe("unauthenticated");
+  });
+
+  test("devBypass bootstrap + /me 401 → unauthenticated silently", async () => {
+    authStore.setState({
+      mode: "devBypass",
+      devBypass: { email: "dev@test.com", role: "OWNER", orgId: "org1" },
+    });
+
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 401,
+      ok: false,
+      text: async () => JSON.stringify({ error: { message: "Unauthorized" } }),
+    });
+
+    await authStore.getState().bootstrapSession();
+
+    expect(authStore.getState().status).toBe("unauthenticated");
+    expect(authStore.getState().devBypass).toBeUndefined();
   });
 });
 
