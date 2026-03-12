@@ -86,7 +86,10 @@ describe("groupNavForPersona", () => {
   test("system group is not present (Settings moved to header)", () => {
     for (const persona of ["owner", "tenant"] as const) {
       const groups = groupNavForPersona(persona);
-      expect(groups.find((g) => g.key === "system")).toBeUndefined();
+      // Cast to string[] because "system" was removed from NavGroupKey;
+      // this asserts the old key never appears at runtime either.
+      const keys = groups.map((g) => g.key as string);
+      expect(keys).not.toContain("system");
     }
   });
 
