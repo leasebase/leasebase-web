@@ -1,4 +1,4 @@
-import { filterNavForPersona, appNavItems } from "@/lib/appNav";
+import { filterNavForPersona, groupNavForPersona, appNavItems } from "@/lib/appNav";
 
 describe("filterNavForPersona", () => {
   test("returns empty array for null persona", () => {
@@ -9,38 +9,93 @@ describe("filterNavForPersona", () => {
     expect(filterNavForPersona(undefined)).toEqual([]);
   });
 
-  test("PM sees properties, units, tenants", () => {
-    const items = filterNavForPersona("propertyManager");
-    const labels = items.map((i) => i.label);
-    expect(labels).toContain("Properties");
-    expect(labels).toContain("Units");
-    expect(labels).toContain("Tenants");
-  });
-
-  test("tenant does not see Units or Tenants", () => {
-    const items = filterNavForPersona("tenant");
-    const labels = items.map((i) => i.label);
-    expect(labels).not.toContain("Units");
-    expect(labels).not.toContain("Tenants");
-  });
-
-  test("owner sees Properties and Tenants but not Units", () => {
+  test("owner sees core product sections", () => {
     const items = filterNavForPersona("owner");
     const labels = items.map((i) => i.label);
+    expect(labels).toContain("Dashboard");
     expect(labels).toContain("Properties");
     expect(labels).toContain("Tenants");
-    expect(labels).not.toContain("Units");
+    expect(labels).toContain("Leases");
+    expect(labels).toContain("Maintenance");
+    expect(labels).toContain("Documents");
+    expect(labels).toContain("Payments");
+    expect(labels).toContain("Reports");
+  });
+
+  test("tenant does not see owner-only sections", () => {
+    const items = filterNavForPersona("tenant");
+    const labels = items.map((i) => i.label);
+    expect(labels).not.toContain("Properties");
+    expect(labels).not.toContain("Tenants");
+    expect(labels).not.toContain("Payments");
+    expect(labels).not.toContain("Reports");
+  });
+
+  test("tenant sees their own sections", () => {
+    const items = filterNavForPersona("tenant");
+    const labels = items.map((i) => i.label);
+    expect(labels).toContain("Dashboard");
+    expect(labels).toContain("Leases");
+    expect(labels).toContain("Maintenance");
+    expect(labels).toContain("Documents");
+  });
+
+  test("Notifications is NOT in the left nav (belongs in header)", () => {
+    for (const persona of ["owner", "tenant"] as const) {
+      const labels = filterNavForPersona(persona).map((i) => i.label);
+      expect(labels).not.toContain("Notifications");
+    }
+  });
+
+  test("Messages is NOT in the left nav (belongs in header)", () => {
+    for (const persona of ["owner", "tenant"] as const) {
+      const labels = filterNavForPersona(persona).map((i) => i.label);
+      expect(labels).not.toContain("Messages");
+    }
+  });
+
+  test("Settings is NOT in the left nav (belongs in user dropdown)", () => {
+    for (const persona of ["owner", "tenant"] as const) {
+      const labels = filterNavForPersona(persona).map((i) => i.label);
+      expect(labels).not.toContain("Settings");
+    }
   });
 
   test("future items are excluded", () => {
-    const items = filterNavForPersona("propertyManager");
-    const future = items.filter((i) => i.isFuture);
-    expect(future).toHaveLength(0);
+    for (const persona of ["owner", "tenant"] as const) {
+      const items = filterNavForPersona(persona);
+      expect(items.filter((i) => i.isFuture)).toHaveLength(0);
+    }
   });
 
   test("all nav items have a path starting with /app", () => {
     for (const item of appNavItems) {
       expect(item.path).toMatch(/^\/app/);
+    }
+  });
+});
+
+describe("groupNavForPersona", () => {
+  test("owner has no empty groups", () => {
+    const groups = groupNavForPersona("owner");
+    for (const group of groups) {
+      expect(group.items.length).toBeGreaterThan(0);
+    }
+  });
+
+  test("system group is not present (Settings moved to header)", () => {
+    for (const persona of ["owner", "tenant"] as const) {
+      const groups = groupNavForPersona(persona);
+      expect(groups.find((g) => g.key === "system")).toBeUndefined();
+    }
+  });
+
+  test("overview group contains only Dashboard", () => {
+    for (const persona of ["owner", "tenant"] as const) {
+      const groups = groupNavForPersona(persona);
+      const overview = groups.find((g) => g.key === "overview");
+      expect(overview).toBeDefined();
+      expect(overview!.items.map((i) => i.label)).toEqual(["Dashboard"]);
     }
   });
 });

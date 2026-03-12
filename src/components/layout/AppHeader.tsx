@@ -1,67 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Menu,
   X,
   Bell,
+  MessageSquare,
   Search,
   LogOut,
-  ChevronRight,
   Command,
-  User,
   Settings,
-  CreditCard,
 } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { Avatar } from "@/components/ui/Avatar";
 import { DropdownMenu, type DropdownMenuItem } from "@/components/ui/DropdownMenu";
 import { useAppShell } from "./AppShell";
-
-/* ─── Breadcrumbs ─── */
-
-function HeaderBreadcrumbs({ pathname }: { pathname: string }) {
-  const segments = pathname
-    .replace(/^\/app\/?/, "")
-    .split("/")
-    .filter(Boolean);
-
-  return (
-    <nav aria-label="Breadcrumb" className="text-xs text-slate-500">
-      <ol className="flex items-center gap-1">
-        <li>
-          <Link href="/app" className="transition-colors hover:text-slate-900">
-            Home
-          </Link>
-        </li>
-        {segments.map((seg, i) => {
-          const href = `/app/${segments.slice(0, i + 1).join("/")}`;
-          const label =
-            seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, " ");
-          const isLast = i === segments.length - 1;
-          return (
-            <li key={href} className="flex items-center gap-1">
-              <ChevronRight size={12} aria-hidden="true" />
-              {isLast ? (
-                <span className="text-slate-800" aria-current="page">
-                  {label}
-                </span>
-              ) : (
-                <Link
-                  href={href}
-                  className="transition-colors hover:text-slate-900"
-                >
-                  {label}
-                </Link>
-              )}
-            </li>
-          );
-        })}
-      </ol>
-    </nav>
-  );
-}
 
 /* ─── AppHeader ─── */
 
@@ -70,7 +24,7 @@ export interface AppHeaderProps {
 }
 
 export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
-  const pathname = usePathname();
+  const router = useRouter();
   const { user } = authStore();
   const { mobileOpen, setMobileOpen, hamburgerRef } = useAppShell();
 
@@ -80,28 +34,10 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
 
   const userMenuItems: DropdownMenuItem[] = [
     {
-      id: "profile",
-      label: "Profile",
-      icon: <User size={14} />,
-      onClick: () => {
-        /* TODO: navigate to profile */
-      },
-    },
-    {
-      id: "workspace-settings",
-      label: "Workspace settings",
+      id: "settings",
+      label: "Settings",
       icon: <Settings size={14} />,
-      onClick: () => {
-        /* TODO: navigate to settings */
-      },
-    },
-    {
-      id: "billing",
-      label: "Billing",
-      icon: <CreditCard size={14} />,
-      onClick: () => {
-        /* TODO: navigate to billing */
-      },
+      onClick: () => router.push("/app/settings"),
     },
     {
       id: "sign-out",
@@ -115,25 +51,21 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-surface/80 backdrop-blur">
       <div className="flex items-center justify-between gap-4 px-4 py-2.5">
-        {/* Left: hamburger + breadcrumbs */}
-        <div className="flex min-w-0 items-center gap-3">
+        {/* Left: hamburger — mobile only, hidden on desktop */}
+        <div className="flex items-center md:hidden">
           <button
             ref={hamburgerRef}
             type="button"
-            className="rounded p-1.5 text-slate-600 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500 md:hidden"
+            className="rounded p-1.5 text-slate-600 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-
-          <div className="hidden min-w-0 items-center gap-2 md:flex">
-            <HeaderBreadcrumbs pathname={pathname} />
-          </div>
         </div>
 
-        {/* Center: global search */}
+        {/* Center: global search — hidden on xs, shown md+ */}
         <div className="hidden flex-1 max-w-sm md:block">
           <label className="sr-only" htmlFor="global-search">
             Search
@@ -153,7 +85,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
           </div>
         </div>
 
-        {/* Right: Cmd+K, notifications, user dropdown */}
+        {/* Right: Cmd+K, messages, notifications, user dropdown */}
         <div className="flex items-center gap-2">
           {onOpenCommandPalette && (
             <button
@@ -166,6 +98,14 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
               <kbd className="font-sans">K</kbd>
             </button>
           )}
+
+          <Link
+            href="/app/messages"
+            className="rounded-full p-2 text-slate-500 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
+            aria-label="Messages"
+          >
+            <MessageSquare size={18} />
+          </Link>
 
           <Link
             href="/app/notifications"
