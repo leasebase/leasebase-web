@@ -22,7 +22,7 @@ const nextConfig = {
     ];
   },
   // No rewrites / API proxy.  All browser-side API calls use the explicit
-  // NEXT_PUBLIC_API_BASE_URL (e.g. https://api.dev.leasebase.co) so there
+  // NEXT_PUBLIC_API_BASE_URL (e.g. https://api.dev.leasebase.ai) so there
   // is no hidden same-origin proxying to debug.
 };
 

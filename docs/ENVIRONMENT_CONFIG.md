@@ -7,8 +7,8 @@ This document describes the environment variables required by the `leasebase-web
 - `NEXT_PUBLIC_API_BASE_URL`  
   Base URL for the Leasebase API (from the `../leasebase` backend). Example:
   - Local: `http://localhost:4000`
-  - Staging: `https://api.staging.leasebase.com`
-  - Prod: `https://api.leasebase.com`
+  - Dev: `https://api.dev.leasebase.ai`
+  - Prod: `https://api.leasebase.ai`
 
 - `NEXT_PUBLIC_COGNITO_REGION`  
   AWS region of the Cognito User Pool (e.g. `us-west-2`).

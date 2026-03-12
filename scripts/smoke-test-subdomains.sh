@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 #
-# Smoke test: verify all portal subdomains resolve, return valid TLS,
-# and serve the expected Next.js pages.
+# Smoke test: verify domain resolution, TLS, vanity redirects, and health.
 #
 # Usage:
-#   ./scripts/smoke-test-subdomains.sh              # defaults to leasebase.co
-#   ./scripts/smoke-test-subdomains.sh example.com  # custom root domain
+#   ./scripts/smoke-test-subdomains.sh                    # defaults to leasebase.ai
+#   ./scripts/smoke-test-subdomains.sh leasebase.ai dev   # explicit root + env prefix
 #
 set -euo pipefail
 
-ROOT_DOMAIN="${1:-leasebase.co}"
-SUBDOMAINS=("signup" "login" "owner" "manager" "tenant")
-BASE_URL="https://dev.${ROOT_DOMAIN}"
+ROOT_DOMAIN="${1:-leasebase.ai}"
+ENV_PREFIX="${2:-dev}"
+BASE_URL="https://app.${ENV_PREFIX}.${ROOT_DOMAIN}"
+VANITY_DOMAINS=("signin.${ENV_PREFIX}.${ROOT_DOMAIN}" "signup.${ENV_PREFIX}.${ROOT_DOMAIN}")
 
 PASS=0
 FAIL=0
@@ -61,44 +61,43 @@ check_tls() {
   fi
 }
 
-# ─── Main domain ──────────────────────────────────────────────────────────────
-bold "=== Main domain: dev.${ROOT_DOMAIN} ==="
-check_dns "dev.${ROOT_DOMAIN}"
-check "Homepage" "$BASE_URL"
+# ─── Main domain ─────────────────────────────────────────────────────────────────────────────
+bold "=== Main domain: app.${ENV_PREFIX}.${ROOT_DOMAIN} ==="
+check_dns "app.${ENV_PREFIX}.${ROOT_DOMAIN}"
+check "Homepage" "$BASE_URL" "307"
 check "Health check" "$BASE_URL/healthz"
 echo
 
-# ─── Portal subdomains ───────────────────────────────────────────────────────
-for sub in "${SUBDOMAINS[@]}"; do
-  fqdn="${sub}.${ROOT_DOMAIN}"
-  bold "=== Subdomain: ${fqdn} ==="
+# ─── Vanity redirect subdomains ─────────────────────────────────────────────────────────────
+for fqdn in "${VANITY_DOMAINS[@]}"; do
+  bold "=== Vanity redirect: ${fqdn} ==="
   check_dns "$fqdn"
   check_tls "$fqdn"
-  # Portal subdomains serve the persona page; Next.js may return 200 or 307
-  check "${sub} page" "https://${fqdn}" "200"
+  # Vanity domains should 302 redirect to app.* via ALB listener rules
+  check "${fqdn} redirect" "https://${fqdn}" "302"
   echo
 done
 
-# ─── API endpoint ─────────────────────────────────────────────────────────────
-bold "=== API: api.dev.${ROOT_DOMAIN} ==="
-check_dns "api.dev.${ROOT_DOMAIN}"
-check "API health" "https://api.dev.${ROOT_DOMAIN}/health" "200"
+# ─── API endpoint ───────────────────────────────────────────────────────────────────────────
+bold "=== API: api.${ENV_PREFIX}.${ROOT_DOMAIN} ==="
+check_dns "api.${ENV_PREFIX}.${ROOT_DOMAIN}"
+check "API health" "https://api.${ENV_PREFIX}.${ROOT_DOMAIN}/health" "200"
 echo
 
-# ─── CORS preflight spot-check ────────────────────────────────────────────────
-bold "=== CORS preflight (signup → API) ==="
+# ─── CORS preflight spot-check ──────────────────────────────────────────────────────────────
+bold "=== CORS preflight (app → API) ==="
 cors_status=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 \
   -X OPTIONS \
-  -H "Origin: https://signup.${ROOT_DOMAIN}" \
+  -H "Origin: ${BASE_URL}" \
   -H "Access-Control-Request-Method: POST" \
   -H "Access-Control-Request-Headers: content-type,authorization" \
-  "https://api.dev.${ROOT_DOMAIN}/health" 2>/dev/null || echo "000")
+  "https://api.${ENV_PREFIX}.${ROOT_DOMAIN}/health" 2>/dev/null || echo "000")
 cors_allow=$(curl -s -D - -o /dev/null --max-time 10 \
   -X OPTIONS \
-  -H "Origin: https://signup.${ROOT_DOMAIN}" \
+  -H "Origin: ${BASE_URL}" \
   -H "Access-Control-Request-Method: POST" \
   -H "Access-Control-Request-Headers: content-type,authorization" \
-  "https://api.dev.${ROOT_DOMAIN}/health" 2>/dev/null | grep -i 'access-control-allow-origin' || echo "")
+  "https://api.${ENV_PREFIX}.${ROOT_DOMAIN}/health" 2>/dev/null | grep -i 'access-control-allow-origin' || echo "")
 
 if [[ -n "$cors_allow" ]]; then
   green "  ✓ CORS preflight returned: $cors_allow"

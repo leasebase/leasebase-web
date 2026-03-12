@@ -1,112 +1,27 @@
 /**
- * Hostname detection and portal URL utilities.
+ * Hostname and URL utilities for the leasebase.ai domain model.
  *
- * Single source of truth for all subdomain ↔ persona mapping logic.
- * Used by middleware, login redirect, wrong-portal guard, and UI links.
+ * Post-migration, all auth and dashboard pages are served from a single origin
+ * (app.dev.leasebase.ai in DEV, app.leasebase.ai in PROD). Persona subdomains
+ * are eliminated — role routing is purely path-based (/owner, /tenant).
+ *
+ * Vanity subdomains (signin.*, signup.*) are handled by ALB 302 redirects
+ * and never reach this code.
  */
-
-export type HostnameContext =
-  | "SIGNUP"
-  | "PORTAL_SELECTOR"
-  | "OWNER"
-  | "PROPERTY_MANAGER"
-  | "TENANT";
-
-/** Portal identifiers for URL generation. */
-export type PortalId = "signup" | "login" | "owner" | "manager" | "tenant";
-
-// Subdomain prefix → context mapping
-const SUBDOMAIN_MAP: Record<string, HostnameContext> = {
-  signup: "SIGNUP",
-  login: "PORTAL_SELECTOR",
-  owner: "OWNER",
-  manager: "PROPERTY_MANAGER",
-  tenant: "TENANT",
-};
-
-// Context → subdomain prefix (reverse of SUBDOMAIN_MAP for portal contexts)
-const CONTEXT_TO_SUBDOMAIN: Partial<Record<HostnameContext, string>> = {
-  SIGNUP: "signup",
-  PORTAL_SELECTOR: "login",
-  OWNER: "owner",
-  PROPERTY_MANAGER: "manager",
-  TENANT: "tenant",
-};
 
 /**
  * Return the base app domain from the environment.
- * Default: "leasebase.co". For local subdomain testing: "localhost".
+ * Default: "leasebase.ai".
  */
 export function getBaseAppDomain(): string {
   if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_APP_DOMAIN) {
     return process.env.NEXT_PUBLIC_APP_DOMAIN;
   }
-  return "leasebase.co";
+  return "leasebase.ai";
 }
 
 /**
- * Determine whether a hostname is a generic local dev hostname
- * (no subdomain routing should be enforced).
- */
-function isGenericLocalhost(hostname: string): boolean {
-  const bare = hostname.replace(/:\d+$/, "");
-  return bare === "localhost" || bare === "127.0.0.1";
-}
-
-/**
- * Resolve the persona context from a hostname.
- *
- * Returns `null` for generic localhost (no subdomain enforcement) or
- * unrecognised hostnames. Uses the NEXT_PUBLIC_APP_DOMAIN env var to
- * support both production (`leasebase.co`) and local subdomain testing
- * (`localhost`).
- */
-export function resolvePersonaFromHostname(
-  hostname: string,
-): HostnameContext | null {
-  // Strip port if present
-  const bare = hostname.replace(/:\d+$/, "");
-
-  // Generic localhost without subdomain — no gating
-  if (isGenericLocalhost(hostname)) {
-    return null;
-  }
-
-  const baseDomain = getBaseAppDomain();
-
-  // Hostname must end with the base domain
-  if (!bare.endsWith(baseDomain)) {
-    return null;
-  }
-
-  // Extract subdomain prefix: "signup.leasebase.co" → "signup"
-  const prefix = bare.slice(0, bare.length - baseDomain.length).replace(/\.$/, "");
-
-  if (!prefix) {
-    return null;
-  }
-
-  return SUBDOMAIN_MAP[prefix] ?? null;
-}
-
-/**
- * Build the full origin URL for a given portal.
- *
- * Examples:
- *   getPortalOrigin("owner")   → "https://owner.leasebase.co"
- *   getPortalOrigin("signup")  → "https://signup.leasebase.co"
- *   (localhost)                → "http://signup.localhost:3000"
- */
-export function getPortalOrigin(portal: PortalId): string {
-  const baseDomain = getBaseAppDomain();
-  const isLocalhost = baseDomain === "localhost";
-  const protocol = isLocalhost ? "http" : "https";
-  const port = isLocalhost ? ":3000" : "";
-  return `${protocol}://${portal}.${baseDomain}${port}`;
-}
-
-/**
- * Map a backend role string to the correct portal URL (with /app path).
+ * Map a backend role string to the correct same-origin dashboard path.
  *
  * Returns `null` if the role is unknown — callers must handle this as a
  * fail-closed condition (do NOT default to tenant).
@@ -116,95 +31,53 @@ export function getPortalUrlForRole(role: string | null | undefined): string | n
 
   switch (normalized) {
     case "OWNER":
-      return `${getPortalOrigin("owner")}/app`;
+      return "/owner";
     case "ORG_ADMIN":
     case "PM_STAFF":
-      return `${getPortalOrigin("manager")}/app`;
+      return "/owner"; // PM users route to owner dashboard
     case "TENANT":
-      return `${getPortalOrigin("tenant")}/app`;
+      return "/tenant";
     default:
       return null;
   }
 }
 
 /**
- * Return the sign-in URL.
- *
- * - Generic localhost → `/auth/login` (same-origin, no subdomains).
- * - Persona portals (owner / manager / tenant) → `/auth/login`
- *   (same-origin so that localStorage auth tokens persist after login).
- * - Everything else (login portal, signup, unknown) → login subdomain.
+ * Return the sign-in URL — always same-origin.
  */
 export function getSignInUrl(): string {
-  if (typeof window !== "undefined") {
-    // Generic localhost — no subdomain routing.
-    if (isGenericLocalhost(window.location.hostname)) {
-      return "/auth/login";
-    }
-
-    // Persona portals: keep login on the same origin so localStorage
-    // tokens written during login are visible to the dashboard.
-    const ctx = resolvePersonaFromHostname(window.location.hostname);
-    if (ctx === "OWNER" || ctx === "PROPERTY_MANAGER" || ctx === "TENANT") {
-      return "/auth/login";
-    }
-  }
-  return getPortalOrigin("login");
+  return "/auth/login";
 }
 
 /**
- * Build a full sign-in page URL with optional query parameters.
+ * Build a sign-in page URL with optional query parameters.
  *
- * Unlike `getSignInUrl()` (which may return just the portal origin for
- * the login subdomain), this always targets the `/auth/login` path so
- * that success messages ("Email confirmed", "Password reset") are shown.
- *
- * Same-origin result: `/auth/login?message=...`
- * Cross-origin result: `https://login.leasebase.co/auth/login?message=...`
+ * Always same-origin: `/auth/login?message=...`
  */
 export function buildSignInRedirect(params?: Record<string, string>): string {
-  const base = getSignInUrl();
   const qs =
     params && Object.keys(params).length > 0
       ? `?${new URLSearchParams(params).toString()}`
       : "";
-
-  if (base.startsWith("http")) {
-    // Cross-origin: base is a portal origin (e.g. https://login.leasebase.co).
-    // Append the login page path.
-    return `${base}/auth/login${qs}`;
-  }
-  // Same-origin: base is already "/auth/login".
-  return `${base}${qs}`;
+  return `/auth/login${qs}`;
 }
 
 /**
  * Navigate the browser to the sign-in page.
- *
- * Uses `window.location.href` for cross-origin redirects and
- * `router.push`/`router.replace` for same-origin navigation.
- *
- * @param url - The target URL (from `buildSignInRedirect` or `getSignInUrl`).
- * @param router - Next.js router instance (only needed for same-origin).
+ * Always same-origin, so always uses router.push.
  */
 export function navigateToSignIn(
   url: string,
   router?: { push: (url: string) => void },
 ): void {
-  if (url.startsWith("http")) {
-    window.location.href = url;
-  } else if (router) {
+  if (router) {
     router.push(url);
   }
 }
 
 /**
- * Return the signup URL — either the signup subdomain or the local
- * `/auth/register` fallback for generic localhost dev.
+ * Return the signup URL — always same-origin.
  */
 export function getSignUpUrl(): string {
-  if (typeof window !== "undefined" && isGenericLocalhost(window.location.hostname)) {
-    return "/auth/register";
-  }
-  return getPortalOrigin("signup");
+  return "/auth/register";
 }

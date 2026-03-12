@@ -9,7 +9,7 @@
 #     bash scripts/smoke-test-invitations.sh
 #
 #   # With manually-provided token (deployed environments):
-#   API_BASE=https://api.dev.leasebase.co \
+#   API_BASE=https://api.dev.leasebase.ai \
 #   AUTH_EMAIL=pm@example.com AUTH_PASSWORD=Password1! \
 #   INVITE_TOKEN=<token-from-email-or-logs> \
 #     bash scripts/smoke-test-invitations.sh
@@ -21,7 +21,7 @@
 #
 # Optional:
 #   INVITE_TOKEN   — Pre-existing invitation token (skips create-invitation step)
-#   TENANT_EMAIL   — Email for the invited tenant (default: smoke-tenant-<ts>@test.leasebase.co)
+#   TENANT_EMAIL   — Email for the invited tenant (default: smoke-tenant-<ts>@test.leasebase.ai)
 #   PROPERTY_ID    — Property ID to use for the invitation
 #   UNIT_ID        — Unit ID to use for the invitation
 #   TENANT_PASSWORD — Password for the new tenant (default: SmokeTest1!)
@@ -49,7 +49,7 @@ FAILURES=0
 
 TENANT_PASSWORD="${TENANT_PASSWORD:-SmokeTest1!}"
 TIMESTAMP=$(date +%s)
-TENANT_EMAIL="${TENANT_EMAIL:-smoke-tenant-${TIMESTAMP}@test.leasebase.co}"
+TENANT_EMAIL="${TENANT_EMAIL:-smoke-tenant-${TIMESTAMP}@test.leasebase.ai}"
 
 echo "═══════════════════════════════════════════════════════"
 echo "  LeaseBase Invitation Flow — Smoke Test"

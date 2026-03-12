@@ -1,56 +1,21 @@
-import { render, screen } from "@testing-library/react";
 import PortalSelectorPage from "@/app/portal/page";
 
-jest.mock("@/lib/apiBase", () => ({
-  getApiBaseUrl: () => "http://localhost:4000",
-}));
-
+const mockRedirect = jest.fn();
 jest.mock("next/navigation", () => ({
-  useRouter: () => ({ replace: jest.fn(), push: jest.fn() }),
-  useSearchParams: () => new URLSearchParams(),
-}));
-
-jest.mock("next/headers", () => ({
-  headers: jest.fn(() => new Map()),
-  cookies: jest.fn(() => ({ get: jest.fn() })),
+  redirect: (...args: unknown[]) => {
+    mockRedirect(...args);
+    // redirect() in Next.js throws NEXT_REDIRECT internally
+    throw new Error("NEXT_REDIRECT");
+  },
 }));
 
 describe("Portal selector page", () => {
-  test("renders the title", () => {
-    render(<PortalSelectorPage />);
-    expect(screen.getByText("Sign in to LeaseBase")).toBeInTheDocument();
+  beforeEach(() => {
+    mockRedirect.mockClear();
   });
 
-  test("renders Owner / Landlord Portal link", () => {
-    render(<PortalSelectorPage />);
-    const link = screen.getByText("Owner / Landlord Portal");
-    expect(link.closest("a")).toHaveAttribute(
-      "href",
-      expect.stringContaining("owner"),
-    );
-  });
-
-  test("does NOT render Property Manager Portal link", () => {
-    render(<PortalSelectorPage />);
-    // PM portal is hidden for MVP — only Owner and Tenant portals are public
-    expect(screen.queryByText("Property Manager Portal")).not.toBeInTheDocument();
-  });
-
-  test("renders Tenant Portal link", () => {
-    render(<PortalSelectorPage />);
-    const link = screen.getByText("Tenant Portal");
-    expect(link.closest("a")).toHaveAttribute(
-      "href",
-      expect.stringContaining("tenant"),
-    );
-  });
-
-  test("renders Sign up link", () => {
-    render(<PortalSelectorPage />);
-    const link = screen.getByText("Sign up");
-    expect(link.closest("a")).toHaveAttribute(
-      "href",
-      expect.stringContaining("signup"),
-    );
+  test("redirects to /auth/login", () => {
+    expect(() => PortalSelectorPage()).toThrow("NEXT_REDIRECT");
+    expect(mockRedirect).toHaveBeenCalledWith("/auth/login");
   });
 });

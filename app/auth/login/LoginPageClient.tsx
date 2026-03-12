@@ -46,18 +46,13 @@ export default function LoginPageClient({
   }, []);
 
   // If already authenticated (or becomes authenticated after bootstrap), redirect
-  // to the correct persona portal.
+  // to the correct role-based dashboard path.
   useEffect(() => {
     devLog("login", "auth status =", status, "user =", user?.email ?? "(none)");
     if (status === "authenticated" && user) {
       const portalUrl = getPortalUrlForRole(user.role);
-      if (portalUrl && typeof window !== "undefined" && !window.location.href.startsWith(portalUrl.replace(/\/app$/, ""))) {
-        devLog("login", "cross-domain redirect to", portalUrl);
-        window.location.href = portalUrl;
-        return;
-      }
-      devLog("login", "already on correct portal, redirecting to", next);
-      router.replace(next);
+      devLog("login", "redirecting to", portalUrl || next);
+      router.replace(portalUrl || next);
     }
   }, [status, user, next, router]);
 
@@ -72,14 +67,10 @@ export default function LoginPageClient({
     setUnconfirmedEmail(null);
     try {
       await authStore.getState().loginWithPassword(email, password);
-      // After login, determine the correct portal based on the user's role.
+      // After login, determine the correct dashboard based on the user's role.
       const loggedInUser = authStore.getState().user;
       const portalUrl = loggedInUser ? getPortalUrlForRole(loggedInUser.role) : null;
-      if (portalUrl && typeof window !== "undefined" && !window.location.href.startsWith(portalUrl.replace(/\/app$/, ""))) {
-        window.location.href = portalUrl;
-        return;
-      }
-      router.replace(next);
+      router.replace(portalUrl || next);
     } catch (err: any) {
       const msg = err.message || "Login failed";
       // Detect USER_NOT_CONFIRMED via the structured code from the backend response.

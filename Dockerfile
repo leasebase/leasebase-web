@@ -17,7 +17,7 @@ RUN npm ci
 COPY . .
 
 # NEXT_PUBLIC_API_BASE_URL is baked into the client JS bundle at build time.
-# Set via --build-arg in CI (e.g. https://api.dev.leasebase.co for dev).
+# Set via --build-arg in CI (e.g. https://api.dev.leasebase.ai for dev).
 # Locally it defaults to empty; .env.local supplies http://localhost:4000.
 ARG NEXT_PUBLIC_API_BASE_URL=
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
