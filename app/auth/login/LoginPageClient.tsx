@@ -59,12 +59,15 @@ export default function LoginPageClient({
   // Track whether the backend returned USER_NOT_CONFIRMED so we can show
   // contextual actions (confirm email / resend code).
   const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
+  // Track whether the backend returned a password-reset-required state.
+  const [needsPasswordReset, setNeedsPasswordReset] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setLoginError(null);
     setUnconfirmedEmail(null);
+    setNeedsPasswordReset(false);
     try {
       await authStore.getState().loginWithPassword(email, password);
       // After login, determine the correct dashboard based on the user's role.
@@ -76,6 +79,9 @@ export default function LoginPageClient({
       // Detect USER_NOT_CONFIRMED via the structured code from the backend response.
       if (err.code === "USER_NOT_CONFIRMED") {
         setUnconfirmedEmail(email);
+      }
+      if (err.code === "NEW_PASSWORD_REQUIRED" || err.code === "PASSWORD_RESET_REQUIRED") {
+        setNeedsPasswordReset(true);
       }
       setLoginError(msg);
     } finally {
@@ -168,6 +174,21 @@ export default function LoginPageClient({
                     className="text-xs font-medium text-brand-600 hover:text-brand-500 underline"
                   >
                     Resend confirmation code
+                  </button>
+                </div>
+              )}
+              {needsPasswordReset && (
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      router.push(
+                        `/auth/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ""}`,
+                      )
+                    }
+                    className="text-xs font-medium text-brand-600 hover:text-brand-500 underline"
+                  >
+                    Reset password now
                   </button>
                 </div>
               )}
