@@ -209,9 +209,9 @@ export const authStore = create<AuthState>()(
           const response = await fetch(`${base}/api/auth/me`, {
             headers: (() => {
               const headers = new Headers();
-              const { mode, accessToken, devBypass } = get();
-              if (mode === "cognito" && accessToken) {
-                headers.set("Authorization", `Bearer ${accessToken}`);
+              const { mode, idToken, devBypass } = get();
+              if (mode === "cognito" && idToken) {
+                headers.set("Authorization", `Bearer ${idToken}`);
               }
               if (mode === "devBypass" && devBypass) {
                 headers.set("x-dev-user-email", devBypass.email);

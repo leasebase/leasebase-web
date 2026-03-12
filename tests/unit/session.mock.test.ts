@@ -8,8 +8,7 @@ describe("auth persona mapping", () => {
     expect(mapUserRoleToPersona("TENANT")).toBe("tenant");
   });
 
-  test("legacy roles return null (fail closed, removed in Phase 2)", () => {
-    expect(mapUserRoleToPersona("ORG_ADMIN")).toBe(null);
-    expect(mapUserRoleToPersona("PM_STAFF")).toBe(null);
+  test("unknown roles return null (fail closed)", () => {
+    expect(mapUserRoleToPersona("UNKNOWN_ROLE")).toBe(null);
   });
 });
