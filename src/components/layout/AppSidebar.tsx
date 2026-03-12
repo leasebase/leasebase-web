@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { groupNavForPersona, type NavGroup } from "@/lib/appNav";
-import { Avatar } from "@/components/ui/Avatar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useAppShell } from "./AppShell";
 import { SidebarNavItem } from "./SidebarNavItem";
@@ -111,38 +110,8 @@ export function AppSidebar() {
           />
         </div>
 
-        {/* Footer: user info + collapse toggle */}
-        <div className="space-y-1 border-t border-slate-200 px-2 py-2">
-          {/* User mini-profile */}
-          {user && (
-            <div
-              className={`flex items-center rounded-lg px-2 py-1.5 ${
-                sidebarCollapsed ? "justify-center" : "gap-2.5"
-              }`}
-            >
-              {sidebarCollapsed ? (
-                <Tooltip content={user.name || user.email || "User"}>
-                  <Avatar name={user.name || user.email} size="xs" />
-                </Tooltip>
-              ) : (
-                <>
-                  <Avatar name={user.name || user.email} size="xs" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium text-slate-700">
-                      {user.name || user.email}
-                    </p>
-                    <p className="truncate text-[10px] capitalize text-slate-500">
-                      {user.persona
-                        ?.replace(/([A-Z])/g, " $1")
-                        .trim() || ""}
-                    </p>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Collapse toggle */}
+        {/* Footer: collapse toggle */}
+        <div className="border-t border-slate-200 px-2 py-2">
           <button
             type="button"
             onClick={toggleSidebar}
