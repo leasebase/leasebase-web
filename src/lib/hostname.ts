@@ -3,7 +3,8 @@
  *
  * Post-migration, all auth and dashboard pages are served from a single origin
  * (app.dev.leasebase.ai in DEV, app.leasebase.ai in PROD). Persona subdomains
- * are eliminated — role routing is purely path-based (/owner, /tenant).
+ * are eliminated — the unified dashboard at /app renders role-specific content
+ * via user.persona.
  *
  * Vanity subdomains (signin.*, signup.*) are handled by ALB 302 redirects
  * and never reach this code.
@@ -23,6 +24,9 @@ export function getBaseAppDomain(): string {
 /**
  * Map a backend role string to the correct same-origin dashboard path.
  *
+ * All valid roles route to the unified `/app` dashboard, which renders
+ * role-specific content via `user.persona`.
+ *
  * Returns `null` if the role is unknown — callers must handle this as a
  * fail-closed condition (do NOT default to tenant).
  */
@@ -31,12 +35,10 @@ export function getPortalUrlForRole(role: string | null | undefined): string | n
 
   switch (normalized) {
     case "OWNER":
-      return "/owner";
     case "ORG_ADMIN":
     case "PM_STAFF":
-      return "/owner"; // PM users route to owner dashboard
     case "TENANT":
-      return "/tenant";
+      return "/app";
     default:
       return null;
   }
