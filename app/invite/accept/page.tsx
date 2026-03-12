@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 import { validatePassword } from "@/lib/validation/password";
-import { getPortalOrigin } from "@/lib/hostname";
 import {
   fetchInvitationByToken,
   acceptInvitation,
@@ -73,7 +72,7 @@ function AcceptInviteContent() {
     }
   }
 
-  const tenantLoginUrl = `${getPortalOrigin("tenant")}/auth/login`;
+  const tenantLoginUrl = "/auth/login";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">

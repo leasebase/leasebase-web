@@ -1,25 +1,21 @@
 import { getPortalUrlForRole } from "@/lib/hostname";
 import { mapUserRoleToPersona } from "@/lib/auth/roles";
 
-beforeEach(() => {
-  delete process.env.NEXT_PUBLIC_APP_DOMAIN;
-});
-
-describe("Post-login redirect — getPortalUrlForRole", () => {
-  test("OWNER redirects to owner portal", () => {
-    expect(getPortalUrlForRole("OWNER")).toBe("https://owner.leasebase.co/app");
+describe("Post-login redirect — getPortalUrlForRole (same-origin paths)", () => {
+  test("OWNER → /owner", () => {
+    expect(getPortalUrlForRole("OWNER")).toBe("/owner");
   });
 
-  test("ORG_ADMIN redirects to manager portal", () => {
-    expect(getPortalUrlForRole("ORG_ADMIN")).toBe("https://manager.leasebase.co/app");
+  test("ORG_ADMIN → /owner (PM users route to owner dashboard)", () => {
+    expect(getPortalUrlForRole("ORG_ADMIN")).toBe("/owner");
   });
 
-  test("PM_STAFF redirects to manager portal", () => {
-    expect(getPortalUrlForRole("PM_STAFF")).toBe("https://manager.leasebase.co/app");
+  test("PM_STAFF → /owner", () => {
+    expect(getPortalUrlForRole("PM_STAFF")).toBe("/owner");
   });
 
-  test("TENANT redirects to tenant portal", () => {
-    expect(getPortalUrlForRole("TENANT")).toBe("https://tenant.leasebase.co/app");
+  test("TENANT → /tenant", () => {
+    expect(getPortalUrlForRole("TENANT")).toBe("/tenant");
   });
 
   test("unknown role returns null (fail closed)", () => {
