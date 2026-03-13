@@ -191,14 +191,16 @@ export const TENANT_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/documents/:id",
     service: "document-service",
-    allowedRoles: ["OWNER"],
-    tenantAllowed: false,
+    allowedRoles: ["*"],
+    tenantAllowed: true,
+    notes: "TENANT ownership check via tenant_profiles.lease_id. Returns 404 for unowned docs.",
   },
   {
     endpoint: "GET /api/documents/:id/download",
     service: "document-service",
-    allowedRoles: ["OWNER"],
-    tenantAllowed: false,
+    allowedRoles: ["*"],
+    tenantAllowed: true,
+    notes: "TENANT ownership check via tenant_profiles.lease_id. Returns 404 for unowned docs.",
   },
   {
     endpoint: "POST /api/documents/upload",
