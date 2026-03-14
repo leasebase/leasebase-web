@@ -153,7 +153,7 @@ describe("apiRequest generic errors", () => {
 /* ------------------------------------------------------------------ */
 
 describe("apiRequest auth headers", () => {
-  test("attaches ID token (not access token) as Bearer for cognito mode", async () => {
+  test("attaches access token as Bearer for cognito mode", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       status: 200,
       ok: true,
@@ -164,9 +164,9 @@ describe("apiRequest auth headers", () => {
 
     const [, options] = (global.fetch as jest.Mock).mock.calls[0];
     const headers = options.headers as Headers;
-    // Must use the ID token — it carries custom:role required by requireAuth.
-    // Access tokens lack custom attributes in Cognito.
-    expect(headers.get("Authorization")).toBe("Bearer test-id-token");
+    // Access token carries custom:role via the Pre-Token Generation V2 Lambda.
+    // Standard OAuth pattern: use access token for API auth.
+    expect(headers.get("Authorization")).toBe("Bearer test-access-token");
   });
 
   test("anonymous request skips auth headers", async () => {
