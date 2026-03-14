@@ -10,13 +10,13 @@ Auth: Cognito JWT Bearer token (except webhook endpoints, which use Stripe signa
 
 Create a Stripe Connect Account Link for owner onboarding. Returns a URL that redirects the owner to Stripe's hosted onboarding.
 
-**Auth:** `ORG_ADMIN` or `OWNER`
+**Auth:** `OWNER`
 
 **Request:**
 ```json
 {
-  "return_url": "https://app.leasebase.co/settings/payments",
-  "refresh_url": "https://app.leasebase.co/settings/payments?refresh=true"
+  "return_url": "https://app.dev.leasebase.ai/settings/payments",
+  "refresh_url": "https://app.dev.leasebase.ai/settings/payments?refresh=true"
 }
 ```
 
@@ -43,7 +43,7 @@ Create a Stripe Connect Account Link for owner onboarding. Returns a URL that re
 
 Retrieve the Stripe Connect onboarding and capability status for the current org.
 
-**Auth:** `ORG_ADMIN`, `OWNER`, `PM_STAFF`
+**Auth:** `OWNER`
 
 **Response (200):**
 ```json
@@ -83,7 +83,7 @@ Retrieve the Stripe Connect onboarding and capability status for the current org
 
 Generate a login link to the Stripe Express Dashboard for the connected account.
 
-**Auth:** `ORG_ADMIN`, `OWNER`
+**Auth:** `OWNER`
 
 **Response (200):**
 ```json
@@ -111,8 +111,8 @@ Create a Stripe Checkout Session for a tenant to pay a specific obligation or am
 {
   "obligation_id": "obl_uuid",
   "payment_method_types": ["us_bank_account", "card"],
-  "success_url": "https://app.leasebase.co/payments/success?session_id={CHECKOUT_SESSION_ID}",
-  "cancel_url": "https://app.leasebase.co/payments/cancel"
+  "success_url": "https://app.dev.leasebase.ai/payments/success?session_id={CHECKOUT_SESSION_ID}",
+  "cancel_url": "https://app.dev.leasebase.ai/payments/cancel"
 }
 ```
 

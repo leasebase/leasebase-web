@@ -1,77 +1,81 @@
 # Authentication
 
-Leasebase Web uses AWS Cognito for authentication, with an optional dev-only mock auth flow.
+**Last updated:** 2026-03-14 (alignment audit)
 
-## Cognito Hosted UI
+Leasebase Web uses AWS Cognito for authentication. The backend microservices enforce authorization via JWT verification and RBAC guards.
 
-The preferred auth flow is Cognito Hosted UI with the Authorization Code (OIDC) flow.
+## Auth Flow
 
-Key env vars:
+### Registration (Owner — self-service)
 
-- `NEXT_PUBLIC_COGNITO_USER_POOL_ID`
-- `NEXT_PUBLIC_COGNITO_CLIENT_ID`
-- `NEXT_PUBLIC_COGNITO_DOMAIN`
+1. User visits `/auth/register` and submits email + password + name.
+2. Frontend calls `POST /api/auth/register` (BFF → auth-service).
+3. Auth-service creates user in Cognito with `custom:role=OWNER`, bootstraps Org + User + Subscription in DB.
+4. User confirms email via code, then logs in.
 
-Flow:
+Only `OWNER` can self-register. Tenants are invited by an owner (see below).
 
-1. User visits `/auth/login` and clicks **Continue with Cognito**.
-2. The app builds an authorize URL for the Cognito Hosted UI and redirects the browser.
-3. After login, Cognito redirects back to `/auth/callback` with `code` and `state`.
-4. The callback page should call a backend endpoint to exchange the code for tokens and
-   establish a secure session (implemented in the backend repo). This frontend assumes the
-   backend sets HttpOnly cookies as part of that flow.
+### Registration (Tenant — via invitation)
 
-## User types and registration
+1. Owner creates invitation via `POST /api/tenants/invitations`.
+2. Tenant clicks invite link, visits `/invite/:token`, submits password.
+3. Tenant-service calls auth-service internally to create Cognito user with `custom:role=TENANT`.
+4. DB records (User, tenant_profile, lease) are created transactionally.
 
-During registration, users select one of three user types:
+### Login
 
-- `PROPERTY_MANAGER` – Manages properties for multiple owners/landlords. Creates an organization.
-- `OWNER` – Landlord who owns and rents out properties.
-- `TENANT` – Rents a property and manages their lease.
+1. User visits `/auth/login`, enters email + password.
+2. Frontend calls `POST /api/auth/login` (BFF → auth-service).
+3. Auth-service authenticates via Cognito `USER_PASSWORD_AUTH`.
+4. Returns `{ accessToken, idToken, refreshToken, expiresIn }`.
+5. Frontend stores the **ID token** and sends it as `Authorization: Bearer <idToken>` on API requests.
 
-The `userType` is sent to the backend during registration and determines the user's initial role and
-permissions.
+### Authenticated Requests
 
-## Role-based access
+1. Frontend sends `Authorization: Bearer <idToken>` to BFF.
+2. BFF proxies to the appropriate backend service (no auth logic at BFF level).
+3. Backend service runs `requireAuth` middleware (from `@leasebase/service-common`):
+   - Verifies JWT signature via Cognito JWKS
+   - Extracts `custom:role` claim → FAIL-CLOSED if missing (401)
+   - Enriches from DB (orgId, name) as fail-open fallback
+   - Attaches `{ userId, orgId, role, email }` to `req.user`
+4. Optional `requireRole(UserRole.OWNER)` guard checks role.
+5. All DB queries scoped by `organization_id` from `req.user.orgId`.
 
-Roles are represented as:
+## Roles
 
-- `ORG_ADMIN`, `PM_STAFF`, `OWNER` – may access `/pm/*`.
-- `TENANT` – may access `/tenant/*`.
+Only two roles exist in the system:
 
-The middleware in `middleware.ts`:
+- `OWNER` — Property owner / landlord. Full CRUD within their organization.
+- `TENANT` — Renter. Scoped access to own profile, lease, payments, and maintenance.
 
-- Reads `lb_role` from cookies.
-- Redirects unauthenticated users hitting `/pm/*` or `/tenant/*` to `/auth/login` with `next`.
-- Redirects users with an insufficient role to `/auth/access-denied`.
+The `UserRole` enum in `@leasebase/service-common` enforces this. Legacy roles (`ORG_ADMIN`, `PM_STAFF`, `PROPERTY_MANAGER`) have been removed.
 
-## DEV-only mock auth
+## ID Token as Bearer (temporary)
 
-For local development without Cognito, a mock auth mode is available when **both**:
+Cognito access tokens do **not** carry custom attributes (`custom:role`). The system currently uses ID tokens as Bearer tokens so that `custom:role` is available for fail-closed auth.
 
-- `DEV_ONLY_MOCK_AUTH=true` (server-side) and/or
-- `NEXT_PUBLIC_DEV_ONLY_MOCK_AUTH=true` (client-side).
+This is a temporary measure. A planned Pre-Token Generation Lambda will inject custom claims into access tokens, at which point the frontend will switch back to access tokens (standard OAuth pattern). See `docs/security/auth-authority-decision.md`.
 
-When enabled:
+## Middleware
 
-- `/auth/login` shows a **Dev-only mock login** form where you can choose:
-  - `role` (ORG_ADMIN, PM_STAFF, OWNER, TENANT)
-  - `orgId`
-  - `userEmail`
-- On submit, it calls `/api/dev-login`, which:
-  - Validates the payload.
-  - Creates an encoded mock session and sets `lb_role` and `lb_session` HttpOnly cookies.
-- Middleware and API calls then treat this like a real session, and all guarded routes work.
+The Next.js middleware (`middleware.ts`) handles:
 
-**Important:**
+- Old-domain redirects: `*.leasebase.co` → `app.{env}.leasebase.ai` (301)
+- Root path `/` → redirect to `/auth/login` (307)
+- Pass-through for all other paths
 
-- Mock auth must never be enabled in production.
-- Real authentication and authorization enforcement belong in the backend; the frontend only
-  handles routing and basic UX around login/logout.
+There is no cookie-based role checking or `/pm/*` routing in the middleware.
+
+## Key Environment Variables
+
+- `NEXT_PUBLIC_API_BASE_URL` — Backend API base URL
+- `NEXT_PUBLIC_COGNITO_USER_POOL_ID` — Cognito User Pool ID
+- `NEXT_PUBLIC_COGNITO_CLIENT_ID` — Cognito app client ID
+- `NEXT_PUBLIC_COGNITO_DOMAIN` — Cognito Hosted UI domain
+- `DEV_ONLY_MOCK_AUTH` — Dev-only flag (must be `false` in production)
 
 ## Logout
 
-- `/auth/logout`:
-  - Calls `/api/logout` to clear `lb_role` and `lb_session` cookies.
-  - If Cognito is configured, redirects to Cognito logout with a return URL to `/`.
-  - Otherwise, redirects directly back to `/`.
+- `/auth/logout` clears tokens and redirects to `/`.
+- If Cognito Hosted UI is configured, redirects through Cognito logout first.
