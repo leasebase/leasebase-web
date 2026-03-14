@@ -32,14 +32,13 @@ export function getAccessToken(): string | undefined {
 /**
  * Return the current Cognito ID token, or `undefined` if absent.
  *
- * The ID token carries custom attributes (`custom:role`, `custom:orgId`) that
- * are required by the backend `requireAuth` middleware.  Cognito access tokens
- * do NOT carry custom attributes, so the ID token is used as the Bearer token
- * for authenticated API requests.
+ * The ID token carries custom attributes (`custom:role`, `custom:orgId`)
+ * natively from Cognito.  Since the Pre-Token Generation V2 Lambda now
+ * injects `custom:role` into access tokens, the access token is used as
+ * the Bearer token for API requests (standard OAuth pattern).
  *
- * When the Pre-Token Generation Lambda is deployed (future), the access token
- * will carry these claims and this function will no longer be needed for API
- * auth — at that point the app should switch back to `getAccessToken()`.
+ * This function is retained for cases where ID-token-specific claims are
+ * needed (e.g. `email`, `cognito:username`).
  */
 export function getIdToken(): string | undefined {
   return authStore.getState().idToken;
