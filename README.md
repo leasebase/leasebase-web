@@ -46,14 +46,16 @@ A full local environment (API + web + DB) uses two repos side by side:
 - Backend/API: v2 microservices + `../leasebase-schema-dev` (schema only, transitional)
 - Web frontend: `./` (this repo)
 
-### 1. Run the backend API locally (from `../leasebase`)
+### 1. Run the backend API locally
 
-Refer to the backend repo docs for the authoritative commands. A typical flow is:
+For local development, `leasebase-schema-dev` provides a NestJS dev API on port 4000 (transitional). In production, the v2 microservices are the canonical runtime.
+
+Refer to `../leasebase-schema-dev/README.md` for authoritative commands. A typical flow is:
 
 1. Install dependencies.
 2. Start or provision the database.
 3. Run migrations and seeds.
-4. Start the API server (commonly on `http://localhost:4000`, but always check the backend docs).
+4. Start the API server (commonly on `http://localhost:4000`).
 
 ### 2. Run the web frontend (this repo)
 
