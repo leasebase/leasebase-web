@@ -13,6 +13,7 @@ import {
   postMaintenanceComment,
   updateMaintenanceStatus,
   assignMaintenanceWorkOrder,
+  cancelMaintenanceWorkOrder,
   type MaintenanceWorkOrder,
   type MaintenanceComment,
 } from "@/services/maintenance/maintenanceApiService";
@@ -20,15 +21,33 @@ import {
   fetchMaintenanceDetail,
   fetchMaintenanceComments,
   addMaintenanceComment,
+  cancelMaintenanceRequest,
 } from "@/services/tenant/adapters/maintenanceAdapter";
 import type { WorkOrderRow, WorkOrderCommentRow } from "@/services/tenant/types";
 
 const STATUS_VARIANTS: Record<string, "success" | "warning" | "danger" | "info" | "neutral"> = {
-  OPEN: "warning", IN_PROGRESS: "info", RESOLVED: "success", CLOSED: "neutral",
+  SUBMITTED: "warning", IN_REVIEW: "info", SCHEDULED: "info",
+  IN_PROGRESS: "info", COMPLETED: "success", CLOSED: "neutral", CANCELLED: "neutral",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  SUBMITTED: "Submitted", IN_REVIEW: "In Review", SCHEDULED: "Scheduled",
+  IN_PROGRESS: "In Progress", COMPLETED: "Completed", CLOSED: "Closed", CANCELLED: "Cancelled",
 };
 
 const PRIORITY_VARIANTS: Record<string, "danger" | "warning" | "neutral"> = {
-  HIGH: "danger", MEDIUM: "warning", LOW: "neutral",
+  URGENT: "danger", HIGH: "danger", MEDIUM: "warning", LOW: "neutral",
+};
+
+const CANCELLABLE_STATUSES = ["SUBMITTED", "IN_REVIEW"];
+
+/** Owner status transitions — server-enforced. */
+const OWNER_TRANSITIONS: Record<string, string[]> = {
+  SUBMITTED: ["IN_REVIEW", "CLOSED"],
+  IN_REVIEW: ["SCHEDULED", "IN_PROGRESS", "CLOSED"],
+  SCHEDULED: ["IN_PROGRESS", "CLOSED"],
+  IN_PROGRESS: ["COMPLETED", "CLOSED"],
+  COMPLETED: ["CLOSED"],
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -43,6 +62,7 @@ export function TenantMaintenanceDetail() {
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,6 +96,17 @@ export function TenantMaintenanceDetail() {
     finally { setSubmitting(false); }
   }
 
+  async function handleCancel() {
+    if (!confirm("Are you sure you want to cancel this request?")) return;
+    setCancelling(true);
+    try {
+      const updated = await cancelMaintenanceRequest(id);
+      setItem(updated);
+    } catch (err: any) {
+      setError(err?.message || "Failed to cancel");
+    } finally { setCancelling(false); }
+  }
+
   if (isLoading) {
     return (
       <div className="space-y-3" aria-label="Loading work order">
@@ -93,19 +124,26 @@ export function TenantMaintenanceDetail() {
       <div className="mt-6 space-y-6">
         {/* Detail card */}
         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-3">
+          {item.title && <p className="text-sm font-semibold text-slate-900">{item.title}</p>}
           <p className="text-sm text-slate-900" data-testid="wo-description">{item.description}</p>
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant={STATUS_VARIANTS[item.status] || "neutral"}>
-              {item.status.replace("_", " ")}
+              {STATUS_LABELS[item.status] || item.status}
             </Badge>
             <Badge variant={PRIORITY_VARIANTS[item.priority] || "neutral"}>
               {item.priority}
             </Badge>
             <span className="text-xs text-slate-500">{item.category}</span>
+            {item.request_number && <span className="text-xs text-slate-400">{item.request_number}</span>}
           </div>
           <p className="text-xs text-slate-500">
-            Submitted {new Date(item.created_at).toLocaleDateString()}
+            Submitted {new Date(item.submitted_at || item.created_at).toLocaleDateString()}
           </p>
+          {CANCELLABLE_STATUSES.includes(item.status) && (
+            <Button variant="danger" size="sm" loading={cancelling} onClick={handleCancel}>
+              Cancel Request
+            </Button>
+          )}
         </div>
 
         {/* Comments section */}
@@ -150,7 +188,7 @@ export function TenantMaintenanceDetail() {
    Uses org-wide /api/maintenance endpoints (authorized for OWNER)
    ═══════════════════════════════════════════════════════════════════════ */
 
-const ALL_STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"] as const;
+const ALL_STATUSES = ["SUBMITTED", "IN_REVIEW", "SCHEDULED", "IN_PROGRESS", "COMPLETED", "CLOSED", "CANCELLED"] as const;
 
 export function ManagerMaintenanceDetail() {
   const { id } = useParams<{ id: string }>();
@@ -180,7 +218,7 @@ export function ManagerMaintenanceDetail() {
       ]);
       setItem(detailRes.data);
       setComments(commentsRes.data);
-      setAssigneeInput(detailRes.data.assigneeId || "");
+      setAssigneeInput(detailRes.data.assignee_id || "");
     } catch (e: any) {
       setError(e?.message || "Failed to load work order");
     } finally {
@@ -212,7 +250,7 @@ export function ManagerMaintenanceDetail() {
 
   async function handleAssign() {
     const trimmed = assigneeInput.trim();
-    if (!trimmed || trimmed === item?.assigneeId) return;
+    if (!trimmed || trimmed === item?.assignee_id) return;
     setAssigning(true);
     try {
       const res = await assignMaintenanceWorkOrder(id, trimmed);
@@ -238,37 +276,47 @@ export function ManagerMaintenanceDetail() {
       <div className="mt-6 space-y-6">
         {/* Detail card */}
         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-3">
+          {item.title && <p className="text-sm font-semibold text-slate-900">{item.title}</p>}
           <p className="text-sm text-slate-900" data-testid="wo-description">{item.description}</p>
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant={STATUS_VARIANTS[item.status] || "neutral"}>
-              {item.status.replace("_", " ")}
+              {STATUS_LABELS[item.status] || item.status}
             </Badge>
             <Badge variant={PRIORITY_VARIANTS[item.priority] || "neutral"}>
               {item.priority}
             </Badge>
             <span className="text-xs text-slate-500">{item.category}</span>
+            {item.request_number && <span className="text-xs text-slate-400">{item.request_number}</span>}
           </div>
           <p className="text-xs text-slate-500">
-            Submitted {new Date(item.createdAt).toLocaleDateString()}
+            Submitted {new Date(item.submitted_at || item.created_at).toLocaleDateString()}
           </p>
+          {item.scheduled_date && (
+            <p className="text-xs text-slate-500">Scheduled: {new Date(item.scheduled_date).toLocaleDateString()}</p>
+          )}
+          {item.assignee_name && (
+            <p className="text-xs text-slate-500">Assigned to: {item.assignee_name}</p>
+          )}
 
-          {/* Status controls */}
-          <div className="pt-2">
-            <p className="text-xs font-medium text-slate-600 mb-2">Change status</p>
-            <div className="flex gap-2 flex-wrap" role="group" aria-label="Status controls">
-              {ALL_STATUSES.filter((s) => s !== item.status).map((s) => (
-                <Button
-                  key={s}
-                  variant="secondary"
-                  size="sm"
-                  loading={statusUpdating === s}
-                  onClick={() => handleStatusChange(s)}
-                >
-                  {s.replace("_", " ")}
-                </Button>
-              ))}
+          {/* Status controls — only show valid transitions */}
+          {OWNER_TRANSITIONS[item.status] && (
+            <div className="pt-2">
+              <p className="text-xs font-medium text-slate-600 mb-2">Change status</p>
+              <div className="flex gap-2 flex-wrap" role="group" aria-label="Status controls">
+                {(OWNER_TRANSITIONS[item.status] || []).map((s) => (
+                  <Button
+                    key={s}
+                    variant="secondary"
+                    size="sm"
+                    loading={statusUpdating === s}
+                    onClick={() => handleStatusChange(s)}
+                  >
+                    {STATUS_LABELS[s] || s}
+                  </Button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Assignment controls */}
           <div className="pt-2">
@@ -293,8 +341,8 @@ export function ManagerMaintenanceDetail() {
                 Assign
               </Button>
             </div>
-            {item.assigneeId && (
-              <p className="text-xs text-slate-500 mt-1">Currently assigned: {item.assigneeId}</p>
+            {item.assignee_id && (
+              <p className="text-xs text-slate-500 mt-1">Currently assigned: {item.assignee_id}</p>
             )}
           </div>
         </div>
@@ -310,7 +358,7 @@ export function ManagerMaintenanceDetail() {
                 <div key={c.id} className="border-l-2 border-slate-200 pl-3">
                   <p className="text-sm text-slate-700">{c.comment}</p>
                   <p className="text-xs text-slate-500 mt-1">
-                    {c.authorName} · {new Date(c.createdAt).toLocaleString()}
+                    {c.author_name} · {new Date(c.created_at).toLocaleString()}
                   </p>
                 </div>
               ))}

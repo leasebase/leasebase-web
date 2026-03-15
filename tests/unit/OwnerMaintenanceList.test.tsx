@@ -24,33 +24,55 @@ jest.mock("next/link", () => {
 const workOrders: MaintenanceWorkOrder[] = [
   {
     id: "wo-1",
-    organizationId: "org-1",
-    unitId: "unit-1",
-    createdByUserId: "u-1",
-    tenantUserId: "u-1",
-    assigneeId: null,
+    organization_id: "org-1",
+    unit_id: "unit-1",
+    property_id: "prop-1",
+    created_by_user_id: "u-1",
+    tenant_user_id: "u-1",
+    assignee_id: null,
+    title: null,
     category: "Plumbing",
     priority: "HIGH",
-    status: "OPEN",
+    status: "SUBMITTED",
     description: "Kitchen faucet leaking",
-    propertyId: "prop-1",
-    createdAt: "2026-03-10T12:00:00Z",
-    updatedAt: "2026-03-10T12:00:00Z",
+    entry_permission: "WITH_NOTICE",
+    contact_preference: "EMAIL",
+    availability_notes: null,
+    request_number: "MR-20260310-0001",
+    assignee_name: null,
+    scheduled_date: null,
+    submitted_at: "2026-03-10T12:00:00Z",
+    completed_at: null,
+    closed_at: null,
+    cancelled_at: null,
+    created_at: "2026-03-10T12:00:00Z",
+    updated_at: "2026-03-10T12:00:00Z",
   },
   {
     id: "wo-2",
-    organizationId: "org-1",
-    unitId: "unit-2",
-    createdByUserId: "u-2",
-    tenantUserId: "u-2",
-    assigneeId: "u-pm-1",
+    organization_id: "org-1",
+    unit_id: "unit-2",
+    property_id: "prop-1",
+    created_by_user_id: "u-2",
+    tenant_user_id: "u-2",
+    assignee_id: "u-pm-1",
+    title: null,
     category: "HVAC",
     priority: "MEDIUM",
     status: "IN_PROGRESS",
     description: "AC not cooling properly",
-    propertyId: "prop-1",
-    createdAt: "2026-03-09T10:00:00Z",
-    updatedAt: "2026-03-10T08:00:00Z",
+    entry_permission: "WITH_NOTICE",
+    contact_preference: "EMAIL",
+    availability_notes: null,
+    request_number: "MR-20260309-0002",
+    assignee_name: null,
+    scheduled_date: null,
+    submitted_at: "2026-03-09T10:00:00Z",
+    completed_at: null,
+    closed_at: null,
+    cancelled_at: null,
+    created_at: "2026-03-09T10:00:00Z",
+    updated_at: "2026-03-10T08:00:00Z",
   },
 ];
 
@@ -83,9 +105,9 @@ describe("OwnerMaintenancePage", () => {
     });
     expect(screen.getByText("AC not cooling properly")).toBeInTheDocument();
 
-    // Status badges
-    expect(screen.getByText("OPEN")).toBeInTheDocument();
-    expect(screen.getByText("IN PROGRESS")).toBeInTheDocument();
+    // Status badges ("Submitted" may appear in badge + filter option)
+    expect(screen.getAllByText(/Submitted/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("In Progress").length).toBeGreaterThanOrEqual(1);
 
     // Priority badges
     expect(screen.getByText("HIGH")).toBeInTheDocument();
@@ -135,7 +157,7 @@ describe("OwnerMaintenancePage", () => {
 
     // Apply status filter → returns empty
     mockFetchMaintenanceList.mockResolvedValue(paginatedResponse([]));
-    await user.selectOptions(screen.getByLabelText("Filter by status"), "RESOLVED");
+    await user.selectOptions(screen.getByLabelText("Filter by status"), "COMPLETED");
 
     await waitFor(() => {
       expect(screen.getByText("No work orders match the current filters.")).toBeInTheDocument();
@@ -176,11 +198,11 @@ describe("OwnerMaintenancePage", () => {
     mockFetchMaintenanceList.mockClear();
     mockFetchMaintenanceList.mockResolvedValue(paginatedResponse([workOrders[0]]));
 
-    await user.selectOptions(screen.getByLabelText("Filter by status"), "OPEN");
+    await user.selectOptions(screen.getByLabelText("Filter by status"), "SUBMITTED");
 
     await waitFor(() => {
       expect(mockFetchMaintenanceList).toHaveBeenCalledWith(
-        expect.objectContaining({ status: "OPEN" }),
+        expect.objectContaining({ status: "SUBMITTED" }),
       );
     });
   });
@@ -236,9 +258,9 @@ describe("OwnerMaintenancePage", () => {
       expect(screen.getByText("Kitchen faucet leaking")).toBeInTheDocument();
     });
 
-    expect(screen.queryByRole("button", { name: /IN PROGRESS/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /RESOLVED/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /CLOSED/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /In Review/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Completed/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Closed/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /assign/i })).not.toBeInTheDocument();
   });
 

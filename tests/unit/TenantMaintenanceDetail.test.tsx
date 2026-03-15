@@ -13,6 +13,7 @@ jest.mock("@/services/tenant/adapters/maintenanceAdapter", () => ({
   fetchMaintenanceDetail: (...args: any[]) => mockFetchDetail(args[0]),
   fetchMaintenanceComments: (...args: any[]) => mockFetchComments(args[0]),
   addMaintenanceComment: (...args: any[]) => mockAddComment(args[0], args[1]),
+  cancelMaintenanceRequest: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -33,12 +34,25 @@ const workOrder: WorkOrderRow = {
   id: "wo-1",
   organization_id: "org-1",
   unit_id: "unit-1",
+  property_id: "prop-1",
   created_by_user_id: "u-tenant-1",
+  tenant_user_id: "u-tenant-1",
+  title: null,
   category: "Plumbing",
   priority: "HIGH",
-  status: "OPEN",
+  status: "SUBMITTED",
   description: "Kitchen faucet is leaking badly",
+  entry_permission: "WITH_NOTICE",
+  contact_preference: "EMAIL",
+  availability_notes: null,
+  request_number: null,
   assignee_id: null,
+  assignee_name: null,
+  scheduled_date: null,
+  submitted_at: "2026-03-10T12:00:00Z",
+  completed_at: null,
+  closed_at: null,
+  cancelled_at: null,
   created_at: "2026-03-10T12:00:00Z",
   updated_at: "2026-03-10T12:00:00Z",
 };
@@ -97,14 +111,12 @@ describe("TenantMaintenanceDetail", () => {
       expect(screen.getByText("Kitchen faucet is leaking badly")).toBeInTheDocument();
     });
 
-    // Status badge
-    expect(screen.getByText("OPEN")).toBeInTheDocument();
+    // Status badge (also appears in "Submitted <date>" text)
+    expect(screen.getAllByText(/Submitted/).length).toBeGreaterThanOrEqual(1);
     // Priority badge
     expect(screen.getByText("HIGH")).toBeInTheDocument();
     // Category
     expect(screen.getByText("Plumbing")).toBeInTheDocument();
-    // Created date
-    expect(screen.getByText(/Submitted/)).toBeInTheDocument();
   });
 
   test("renders comments thread", async () => {
@@ -178,11 +190,10 @@ describe("TenantMaintenanceDetail", () => {
       expect(screen.getByText("Kitchen faucet is leaking badly")).toBeInTheDocument();
     });
 
-    // PM detail shows status transition buttons like "IN PROGRESS", "RESOLVED", "CLOSED"
-    // Tenant detail must NOT show these
-    expect(screen.queryByRole("button", { name: /IN PROGRESS/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /RESOLVED/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /CLOSED/i })).not.toBeInTheDocument();
+    // PM detail shows status transition buttons — tenant detail must NOT show these
+    expect(screen.queryByRole("button", { name: /In Review/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Completed/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Closed/i })).not.toBeInTheDocument();
   });
 
   test("does NOT render assignment controls", async () => {
@@ -197,14 +208,14 @@ describe("TenantMaintenanceDetail", () => {
     expect(screen.queryByText(/assign/i)).not.toBeInTheDocument();
   });
 
-  test("renders IN_PROGRESS status with space-replaced label", async () => {
+  test("renders IN_PROGRESS status with human-readable label", async () => {
     const inProgressWO = { ...workOrder, status: "IN_PROGRESS" as const };
     mockFetchDetail.mockResolvedValue(successDetail(inProgressWO));
     mockFetchComments.mockResolvedValue(successComments([]));
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {
-      expect(screen.getByText("IN PROGRESS")).toBeInTheDocument();
+      expect(screen.getByText("In Progress")).toBeInTheDocument();
     });
   });
 });

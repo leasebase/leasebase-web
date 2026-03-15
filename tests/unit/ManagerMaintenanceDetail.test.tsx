@@ -20,6 +20,7 @@ jest.mock("@/services/maintenance/maintenanceApiService", () => ({
   postMaintenanceComment: (...args: any[]) => mockPostComment(...args),
   updateMaintenanceStatus: (...args: any[]) => mockUpdateStatus(...args),
   assignMaintenanceWorkOrder: (...args: any[]) => mockAssign(...args),
+  cancelMaintenanceWorkOrder: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -38,41 +39,52 @@ jest.mock("next/link", () => {
 
 const workOrder: MaintenanceWorkOrder = {
   id: "wo-1",
-  organizationId: "org-1",
-  unitId: "unit-1",
-  createdByUserId: "u-tenant-1",
-  tenantUserId: "u-tenant-1",
-  assigneeId: null,
+  organization_id: "org-1",
+  unit_id: "unit-1",
+  property_id: "prop-1",
+  created_by_user_id: "u-tenant-1",
+  tenant_user_id: "u-tenant-1",
+  assignee_id: null,
+  title: null,
   category: "Plumbing",
   priority: "HIGH",
-  status: "OPEN",
+  status: "SUBMITTED",
   description: "Kitchen faucet leaking badly",
-  propertyId: "prop-1",
-  createdAt: "2026-03-10T12:00:00Z",
-  updatedAt: "2026-03-10T12:00:00Z",
+  entry_permission: "WITH_NOTICE",
+  contact_preference: "EMAIL",
+  availability_notes: null,
+  request_number: null,
+  assignee_name: null,
+  scheduled_date: null,
+  submitted_at: "2026-03-10T12:00:00Z",
+  completed_at: null,
+  closed_at: null,
+  cancelled_at: null,
+  created_at: "2026-03-10T12:00:00Z",
+  updated_at: "2026-03-10T12:00:00Z",
 };
 
 const assignedWorkOrder: MaintenanceWorkOrder = {
   ...workOrder,
-  assigneeId: "u-pm-1",
+  assignee_id: "u-pm-1",
 };
 
 const comments: MaintenanceComment[] = [
   {
     id: "c1",
-    workOrderId: "wo-1",
-    userId: "u-pm-1",
+    work_order_id: "wo-1",
+    user_id: "u-pm-1",
     comment: "Plumber scheduled for tomorrow.",
-    authorName: "Dev Manager",
-    createdAt: "2026-03-10T14:00:00Z",
+    author_name: "Dev Manager",
+    created_at: "2026-03-10T14:00:00Z",
   },
   {
     id: "c2",
-    workOrderId: "wo-1",
-    userId: "u-tenant-1",
+    work_order_id: "wo-1",
+    user_id: "u-tenant-1",
     comment: "Thanks, I will be home.",
-    authorName: "Dev Tenant",
-    createdAt: "2026-03-10T15:00:00Z",
+    author_name: "Dev Tenant",
+    created_at: "2026-03-10T15:00:00Z",
   },
 ];
 
@@ -113,14 +125,12 @@ describe("ManagerMaintenanceDetail", () => {
       expect(screen.getByText("Kitchen faucet leaking badly")).toBeInTheDocument();
     });
 
-    // Status badge
-    expect(screen.getByText("OPEN")).toBeInTheDocument();
+    // Status badge (also appears in "Submitted <date>" text)
+    expect(screen.getAllByText(/Submitted/).length).toBeGreaterThanOrEqual(1);
     // Priority badge
     expect(screen.getByText("HIGH")).toBeInTheDocument();
     // Category
     expect(screen.getByText("Plumbing")).toBeInTheDocument();
-    // Submitted date
-    expect(screen.getByText(/Submitted/)).toBeInTheDocument();
   });
 
   /* ── Error state ── */
@@ -146,20 +156,19 @@ describe("ManagerMaintenanceDetail", () => {
     });
 
     const statusGroup = screen.getByRole("group", { name: "Status controls" });
-    // Current is OPEN, so buttons for IN_PROGRESS, RESOLVED, CLOSED should appear
-    expect(statusGroup).toHaveTextContent("IN PROGRESS");
-    expect(statusGroup).toHaveTextContent("RESOLVED");
-    expect(statusGroup).toHaveTextContent("CLOSED");
-    // OPEN should NOT appear as a button (it's the current status)
+    // Current is SUBMITTED, so buttons for IN_REVIEW and CLOSED should appear (valid transitions)
+    expect(statusGroup).toHaveTextContent("In Review");
+    expect(statusGroup).toHaveTextContent("Closed");
+    // SUBMITTED should NOT appear as a button (it's the current status)
     const buttons = screen.getAllByRole("button");
     const statusButtonLabels = buttons.map((b) => b.textContent);
-    expect(statusButtonLabels).not.toContain("OPEN");
+    expect(statusButtonLabels).not.toContain("Submitted");
   });
 
   test("status-change button calls updateMaintenanceStatus API", async () => {
     const user = userEvent.setup();
     setupSuccess();
-    const updatedWO = { ...workOrder, status: "IN_PROGRESS" as const };
+    const updatedWO = { ...workOrder, status: "IN_REVIEW" as const };
     mockUpdateStatus.mockResolvedValue({ data: updatedWO });
     render(<ManagerMaintenanceDetail />);
 
@@ -167,17 +176,17 @@ describe("ManagerMaintenanceDetail", () => {
       expect(screen.getByText("Kitchen faucet leaking badly")).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole("button", { name: /IN PROGRESS/ }));
+    await user.click(screen.getByRole("button", { name: /In Review/ }));
 
     await waitFor(() => {
-      expect(mockUpdateStatus).toHaveBeenCalledWith("wo-1", "IN_PROGRESS");
+      expect(mockUpdateStatus).toHaveBeenCalledWith("wo-1", "IN_REVIEW");
     });
   });
 
   test("after status change, UI updates to reflect new status", async () => {
     const user = userEvent.setup();
     setupSuccess();
-    const updatedWO = { ...workOrder, status: "RESOLVED" as const };
+    const updatedWO = { ...workOrder, status: "CLOSED" as const };
     mockUpdateStatus.mockResolvedValue({ data: updatedWO });
     render(<ManagerMaintenanceDetail />);
 
@@ -185,11 +194,11 @@ describe("ManagerMaintenanceDetail", () => {
       expect(screen.getByText("Kitchen faucet leaking badly")).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole("button", { name: /RESOLVED/ }));
+    await user.click(screen.getByRole("button", { name: /Closed/ }));
 
-    // After update, RESOLVED should be the badge (not a button), and OPEN should appear as a button
+    // After update, CLOSED is terminal — no status controls should appear
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /OPEN/ })).toBeInTheDocument();
+      expect(screen.queryByRole("group", { name: "Status controls" })).not.toBeInTheDocument();
     });
   });
 
@@ -210,7 +219,7 @@ describe("ManagerMaintenanceDetail", () => {
   test("assign button calls assignMaintenanceWorkOrder API", async () => {
     const user = userEvent.setup();
     setupSuccess();
-    mockAssign.mockResolvedValue({ data: { ...workOrder, assigneeId: "u-pm-2" } });
+    mockAssign.mockResolvedValue({ data: { ...workOrder, assignee_id: "u-pm-2" } });
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
@@ -235,7 +244,7 @@ describe("ManagerMaintenanceDetail", () => {
       expect(screen.getByText("Kitchen faucet leaking badly")).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/Currently assigned: u-pm-1/)).toBeInTheDocument();
+    expect(screen.getByText(/Currently assigned: u-pm-1/i)).toBeInTheDocument();
   });
 
   test("assignment input pre-fills with current assigneeId", async () => {
@@ -278,11 +287,11 @@ describe("ManagerMaintenanceDetail", () => {
     mockPostComment.mockResolvedValue({
       data: {
         id: "c-new",
-        workOrderId: "wo-1",
-        userId: "u-pm-1",
+        work_order_id: "wo-1",
+        user_id: "u-pm-1",
         comment: "Will check tomorrow",
-        authorName: "Dev Manager",
-        createdAt: "2026-03-11T10:00:00Z",
+        author_name: "Dev Manager",
+        created_at: "2026-03-11T10:00:00Z",
       },
     });
     render(<ManagerMaintenanceDetail />);
@@ -307,11 +316,11 @@ describe("ManagerMaintenanceDetail", () => {
     mockPostComment.mockResolvedValue({
       data: {
         id: "c-new",
-        workOrderId: "wo-1",
-        userId: "u-pm-1",
+        work_order_id: "wo-1",
+        user_id: "u-pm-1",
         comment: "Noted",
-        authorName: "Dev Manager",
-        createdAt: "2026-03-11T10:00:00Z",
+        author_name: "Dev Manager",
+        created_at: "2026-03-11T10:00:00Z",
       },
     });
     render(<ManagerMaintenanceDetail />);

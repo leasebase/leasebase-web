@@ -1,6 +1,6 @@
 # LeaseBase Authentication & Authorization Flow
 
-**Last updated:** 2026-03-12 (after Phase 2 identity stabilization)
+**Last updated:** 2026-03-15 (Option B: auth-service owns all User writes)
 
 ## Overview
 
@@ -30,17 +30,26 @@ Browser → auth-service POST /auth/register
 
 ```
 Browser → tenant-service POST /invitations/accept (public, no auth)
+  → SELECT ... FOR UPDATE (lock invitation row, status must be PENDING)
   → tenant-service → auth-service POST /internal/auth/create-tenant
-    → Cognito: create user (email, password)
-    → Cognito: set custom attributes (custom:role=TENANT, custom:orgId, custom:orgType)
-    → Return: cognitoSub
-  → DB (transaction):
-    → INSERT INTO "User" (role='TENANT')
-    → INSERT INTO leases
-    → INSERT INTO tenant_profiles
-    → UPDATE units SET status='OCCUPIED'
+    → Cognito: create user (email, password, custom:role=TENANT)
+    → DB: INSERT INTO "User" (role='TENANT', organizationId)
+    → Return: { cognitoSub, userId }
+  → DB (transaction, same connection holding row lock):
+    → UPDATE invitation SET status='ACCEPTED'
+    → INSERT INTO lease_service.leases
+    → INSERT INTO "TenantProfile"
+    → UPDATE property_service.units SET status='OCCUPIED'
+    → COMMIT
+  → On domain provisioning failure:
+    → ROLLBACK
+    → auth-service POST /internal/auth/delete-tenant (compensating cleanup)
   → Return: success
 ```
+
+**Service ownership boundaries:**
+- auth-service owns: Cognito identity + `public."User"` row (sole writer)
+- tenant-service owns: `public."TenantProfile"`, `lease_service.leases`, `property_service.units` status, `tenant_service.tenant_invitations`
 
 ### 3. Login
 
@@ -99,10 +108,16 @@ All v2 services use guards from `@leasebase/service-common`:
 ## Identity Table
 
 All v2 services read from the canonical `"User"` (Prisma-managed, PascalCase) table.
+**Only `auth_user` (auth-service) may INSERT into `public."User"`.**
 
 Key `"User"` columns used in queries:
 - `id`, `email`, `name`, `role`, `status` (lowercase, no quoting needed)
 - `"organizationId"`, `"cognitoSub"`, `"createdAt"`, `"updatedAt"` (camelCase, must be quoted in raw SQL)
+
+DB grants:
+- `auth_user`: SELECT, INSERT on `public."User"`, `public."Organization"`, `public."Subscription"`
+- All other service roles: SELECT only on `public."User"`
+- `tenant_user`: INSERT on `public."TenantProfile"`, `lease_service.leases`; UPDATE on `property_service.units`
 
 ## Pre-Deployment Steps
 

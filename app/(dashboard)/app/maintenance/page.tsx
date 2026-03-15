@@ -20,15 +20,27 @@ import {
 import { OwnerMaintenancePage } from "./_owner-list";
 
 const STATUS_VARIANTS: Record<string, "success" | "warning" | "danger" | "info" | "neutral"> = {
-  OPEN: "warning",
+  SUBMITTED: "warning",
+  IN_REVIEW: "info",
+  SCHEDULED: "info",
   IN_PROGRESS: "info",
-  WAITING: "neutral",
-  RESOLVED: "success",
   COMPLETED: "success",
   CLOSED: "neutral",
+  CANCELLED: "neutral",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  SUBMITTED: "Submitted",
+  IN_REVIEW: "In Review",
+  SCHEDULED: "Scheduled",
+  IN_PROGRESS: "In Progress",
+  COMPLETED: "Completed",
+  CLOSED: "Closed",
+  CANCELLED: "Cancelled",
 };
 
 const PRIORITY_VARIANTS: Record<string, "danger" | "warning" | "neutral"> = {
+  URGENT: "danger",
   HIGH: "danger",
   MEDIUM: "warning",
   LOW: "neutral",
@@ -124,7 +136,7 @@ function TenantMaintenancePage() {
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <Badge variant={PRIORITY_VARIANTS[wo.priority] || "neutral"}>{wo.priority}</Badge>
-                    <Badge variant={STATUS_VARIANTS[wo.status] || "neutral"}>{wo.status.replace("_", " ")}</Badge>
+                    <Badge variant={STATUS_VARIANTS[wo.status] || "neutral"}>{STATUS_LABELS[wo.status] || wo.status}</Badge>
                   </div>
                 </div>
               </Link>
