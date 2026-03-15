@@ -250,7 +250,7 @@ async function fetchMaintenanceDomain(): Promise<DomainResult<WorkOrderRow[]>> {
   }
 }
 
-const EMPTY_STATS: MaintenanceStats = { open: 0, in_progress: 0, resolved: 0, closed: 0 };
+const EMPTY_STATS: MaintenanceStats = { submitted: 0, in_review: 0, scheduled: 0, in_progress: 0, completed: 0, closed: 0, cancelled: 0 };
 
 async function fetchMaintenanceStatsDomain(): Promise<DomainResult<MaintenanceStats>> {
   try {
@@ -341,9 +341,10 @@ export function computeKpis(
     .reduce((sum, e) => sum + (e.amount || 0), 0);
   const overdueAmount = sourced(overdue, ledgSrc);
 
-  // Open maintenance
+  // Active maintenance (not closed/completed/cancelled)
+  const activeStatuses = ["SUBMITTED", "IN_REVIEW", "SCHEDULED", "IN_PROGRESS"];
   const openCount = workOrders.filter(
-    (w) => w.status === "OPEN" || w.status === "IN_PROGRESS"
+    (w) => activeStatuses.includes(w.status)
   ).length;
   const openMaintenanceRequests = sourced(openCount, maintSrc);
 
@@ -410,7 +411,7 @@ export function computeAlerts(
     const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const agingCount = maintenanceResult.data.filter(
       (w) =>
-        (w.status === "OPEN" || w.status === "IN_PROGRESS") &&
+        (["SUBMITTED", "IN_REVIEW", "SCHEDULED", "IN_PROGRESS"] as string[]).includes(w.status) &&
         w.created_at < sevenDaysAgo
     ).length;
     if (agingCount > 0) {
@@ -581,22 +582,23 @@ export function computeMaintenanceOverview(
   const useStats = statsResult?.source === "live";
   const src = useStats ? "live" : maintenanceResult.source;
 
+  const activeStatuses = ["SUBMITTED", "IN_REVIEW", "SCHEDULED", "IN_PROGRESS"];
   const open = useStats
-    ? (statsResult!.data.open || 0)
-    : workOrders.filter((w) => w.status === "OPEN").length;
+    ? (statsResult!.data.submitted || 0)
+    : workOrders.filter((w) => w.status === "SUBMITTED").length;
   const inProgress = useStats
     ? (statsResult!.data.in_progress || 0)
     : workOrders.filter((w) => w.status === "IN_PROGRESS").length;
   const waiting = workOrders.filter(
-    (w) => w.status === "OPEN" && !w.assignee_id &&
+    (w) => w.status === "SUBMITTED" && !w.assignee_id &&
       (now - new Date(w.created_at).getTime()) > 3 * 86400000
   ).length;
   const urgent = workOrders.filter((w) =>
-    (w.status === "OPEN" || w.status === "IN_PROGRESS") && w.priority === "HIGH"
+    activeStatuses.includes(w.status) && w.priority === "HIGH"
   ).length;
 
   // Oldest open request
-  const openOrders = workOrders.filter((w) => w.status === "OPEN" || w.status === "IN_PROGRESS");
+  const openOrders = workOrders.filter((w) => activeStatuses.includes(w.status));
   let oldestDays = 0;
   for (const w of openOrders) {
     const age = Math.floor((now - new Date(w.created_at).getTime()) / 86400000);

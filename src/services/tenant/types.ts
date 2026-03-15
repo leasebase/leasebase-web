@@ -63,14 +63,30 @@ export interface WorkOrderRow {
   id: string;
   organization_id: string;
   unit_id: string;
+  property_id: string | null;
   created_by_user_id: string;
+  tenant_user_id: string | null;
+  title: string | null;
   category: string;
-  priority: "LOW" | "MEDIUM" | "HIGH";
-  status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+  status: "SUBMITTED" | "IN_REVIEW" | "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CLOSED" | "CANCELLED";
   description: string;
+  entry_permission: string | null;
+  contact_preference: string | null;
+  availability_notes: string | null;
+  request_number: string | null;
   assignee_id: string | null;
+  assignee_name: string | null;
+  scheduled_date: string | null;
+  submitted_at: string | null;
+  completed_at: string | null;
+  closed_at: string | null;
+  cancelled_at: string | null;
   created_at: string;
   updated_at: string;
+  /* Enriched via JOIN */
+  unit_number?: string;
+  property_name?: string;
 }
 
 export interface WorkOrderCommentRow {

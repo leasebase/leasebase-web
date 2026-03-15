@@ -124,9 +124,9 @@ describe("MaintenanceOverviewCard", () => {
 
 describe("computeMaintenanceOverview with stats", () => {
   const workOrders = [
-    { id: "wo1", unit_id: "u1", status: "OPEN", priority: "HIGH", description: "Leak", assignee_id: null, created_at: new Date(Date.now() - 5 * 86400000).toISOString() },
+    { id: "wo1", unit_id: "u1", status: "SUBMITTED", priority: "HIGH", description: "Leak", assignee_id: null, created_at: new Date(Date.now() - 5 * 86400000).toISOString() },
     { id: "wo2", unit_id: "u1", status: "IN_PROGRESS", priority: "MEDIUM", description: "Paint", assignee_id: "pm1", created_at: new Date().toISOString() },
-    { id: "wo3", unit_id: "u2", status: "OPEN", priority: "LOW", description: "Bulb", assignee_id: null, created_at: new Date().toISOString() },
+    { id: "wo3", unit_id: "u2", status: "SUBMITTED", priority: "LOW", description: "Bulb", assignee_id: null, created_at: new Date().toISOString() },
   ];
   const units = [
     { id: "u1", property_id: "p1", status: "ACTIVE", rent_amount: 100000 },
@@ -139,10 +139,13 @@ describe("computeMaintenanceOverview with stats", () => {
 
   test("uses stats endpoint counts when stats are live", () => {
     const statsData: MaintenanceStats = {
-      open: 10,
+      submitted: 10,
+      in_review: 0,
+      scheduled: 0,
       in_progress: 7,
-      resolved: 3,
+      completed: 3,
       closed: 1,
+      cancelled: 0,
     };
 
     const result = computeMaintenanceOverview(
@@ -153,7 +156,7 @@ describe("computeMaintenanceOverview with stats", () => {
     );
 
     // open/inProgress come from stats, not client-side counting
-    expect(result.open.value).toBe(10);
+    expect(result.open.value).toBe(10); // submitted
     expect(result.open.source).toBe("live");
     expect(result.inProgress.value).toBe(7);
     expect(result.inProgress.source).toBe("live");
@@ -164,10 +167,10 @@ describe("computeMaintenanceOverview with stats", () => {
       liveResult(workOrders),
       liveResult(units),
       liveResult(properties),
-      unavailableResult({ open: 0, in_progress: 0, resolved: 0, closed: 0 }),
+      unavailableResult({ submitted: 0, in_review: 0, scheduled: 0, in_progress: 0, completed: 0, closed: 0, cancelled: 0 }),
     );
 
-    // Should count from work orders: 2 OPEN, 1 IN_PROGRESS
+    // Should count from work orders: 2 SUBMITTED, 1 IN_PROGRESS
     expect(result.open.value).toBe(2);
     expect(result.inProgress.value).toBe(1);
     expect(result.open.source).toBe("live"); // from maintenance list
@@ -186,10 +189,13 @@ describe("computeMaintenanceOverview with stats", () => {
 
   test("still computes derived metrics (waiting, urgent) from full list even with stats", () => {
     const statsData: MaintenanceStats = {
-      open: 10,
+      submitted: 10,
+      in_review: 0,
+      scheduled: 0,
       in_progress: 7,
-      resolved: 3,
+      completed: 3,
       closed: 1,
+      cancelled: 0,
     };
 
     const result = computeMaintenanceOverview(
@@ -199,15 +205,15 @@ describe("computeMaintenanceOverview with stats", () => {
       liveResult(statsData),
     );
 
-    // waiting: OPEN, no assignee, >3 days old → wo1 matches (5 days old, no assignee)
+    // waiting: SUBMITTED, no assignee, >3 days old → wo1 matches (5 days old, no assignee)
     expect(result.waiting.value).toBe(1);
-    // urgent: OPEN or IN_PROGRESS with HIGH priority → wo1 is OPEN + HIGH
+    // urgent: SUBMITTED or IN_PROGRESS with HIGH priority → wo1 is SUBMITTED + HIGH
     expect(result.urgent.value).toBe(1);
   });
 
   test("handles stats with missing keys gracefully", () => {
     // Stats might not have all keys if no work orders exist for a status
-    const statsData = { open: 3 } as MaintenanceStats;
+    const statsData = { submitted: 3 } as MaintenanceStats;
 
     const result = computeMaintenanceOverview(
       liveResult(workOrders),
@@ -216,7 +222,7 @@ describe("computeMaintenanceOverview with stats", () => {
       liveResult(statsData),
     );
 
-    expect(result.open.value).toBe(3);
+    expect(result.open.value).toBe(3); // submitted
     expect(result.inProgress.value).toBe(0); // missing key defaults to 0
   });
 });

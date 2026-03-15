@@ -44,7 +44,7 @@ const ledger = [
 ];
 
 const workOrders = [
-  { id: "wo1", unit_id: "u1", status: "OPEN", priority: "MEDIUM", description: "Leaky faucet", assignee_id: null, created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: "wo1", unit_id: "u1", status: "SUBMITTED", priority: "MEDIUM", description: "Leaky faucet", assignee_id: null, created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
   { id: "wo2", unit_id: "u2", status: "COMPLETED", priority: "LOW", description: "Replace bulb", assignee_id: "maint-1", created_at: "2024-06-01T00:00:00.000Z" },
 ];
 
@@ -65,7 +65,7 @@ describe("computeKpis", () => {
     expect(kpis.totalProperties.source).toBe("live");
     expect(kpis.totalUnits.value).toBe(3);
     expect(kpis.occupiedUnits.value).toBe(2); // u1 and u2 have active leases
-    expect(kpis.openMaintenanceRequests.value).toBe(1); // wo1 is OPEN
+    expect(kpis.openMaintenanceRequests.value).toBe(1); // wo1 is SUBMITTED
   });
 
   test("marks KPIs unavailable when domain fails", () => {

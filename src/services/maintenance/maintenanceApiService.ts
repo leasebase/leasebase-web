@@ -12,19 +12,32 @@ import { apiRequest } from "@/lib/api/client";
 
 export interface MaintenanceWorkOrder {
   id: string;
-  organizationId: string;
-  unitId: string;
-  createdByUserId: string;
-  tenantUserId: string | null;
-  assigneeId: string | null;
+  organization_id: string;
+  unit_id: string;
+  property_id: string | null;
+  created_by_user_id: string;
+  tenant_user_id: string | null;
+  assignee_id: string | null;
+  title: string | null;
   category: string;
-  priority: "LOW" | "MEDIUM" | "HIGH";
-  status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+  status: "SUBMITTED" | "IN_REVIEW" | "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CLOSED" | "CANCELLED";
   description: string;
-  /** Resolved via JOIN from Unit — present on list/detail reads. */
-  propertyId: string | null;
-  createdAt: string;
-  updatedAt: string;
+  entry_permission: string | null;
+  contact_preference: string | null;
+  availability_notes: string | null;
+  request_number: string | null;
+  assignee_name: string | null;
+  scheduled_date: string | null;
+  submitted_at: string | null;
+  completed_at: string | null;
+  closed_at: string | null;
+  cancelled_at: string | null;
+  created_at: string;
+  updated_at: string;
+  /* Enriched via JOIN */
+  unit_number?: string;
+  property_name?: string;
 }
 
 export interface MaintenanceListFilters {
@@ -43,19 +56,22 @@ interface PaginatedResponse<T> {
 
 export interface MaintenanceComment {
   id: string;
-  workOrderId: string;
-  userId: string;
+  work_order_id: string;
+  user_id: string;
   comment: string;
-  authorName: string;
-  createdAt: string;
+  author_name: string;
+  created_at: string;
 }
 
 /** Server-side aggregated counts by status from GET /api/maintenance/stats. */
 export interface MaintenanceStats {
-  open: number;
+  submitted: number;
+  in_review: number;
+  scheduled: number;
   in_progress: number;
-  resolved: number;
+  completed: number;
   closed: number;
+  cancelled: number;
   [key: string]: number;
 }
 
@@ -134,5 +150,35 @@ export async function assignMaintenanceWorkOrder(
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ assigneeId }),
+  });
+}
+
+/** Cancel a work order. Allowed from SUBMITTED / IN_REVIEW. */
+export async function cancelMaintenanceWorkOrder(
+  id: string,
+): Promise<{ data: MaintenanceWorkOrder }> {
+  return apiRequest<{ data: MaintenanceWorkOrder }>({
+    path: `api/maintenance/${id}/cancel`,
+    method: "POST",
+  });
+}
+
+/** Update work order fields. Requires OWNER. */
+export async function updateMaintenanceWorkOrder(
+  id: string,
+  fields: Partial<{
+    title: string;
+    category: string;
+    priority: string;
+    description: string;
+    scheduledDate: string | null;
+    assigneeName: string | null;
+  }>,
+): Promise<{ data: MaintenanceWorkOrder }> {
+  return apiRequest<{ data: MaintenanceWorkOrder }>({
+    path: `api/maintenance/${id}`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(fields),
   });
 }

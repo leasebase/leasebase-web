@@ -38,16 +38,29 @@ export async function fetchTenantMaintenance(): Promise<DomainResult<WorkOrderRo
 
 /** Create a new work order — LIVE. POST /api/maintenance is safe (sets created_by_user_id server-side). */
 export async function createMaintenanceRequest(payload: {
-  unit_id: string;
+  unitId: string;
+  title?: string;
   category: string;
-  priority: "LOW" | "MEDIUM" | "HIGH";
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   description: string;
+  entryPermission?: "ANYTIME" | "WITH_NOTICE" | "ACCOMPANIED_ONLY" | "NO_ENTRY";
+  contactPreference?: "EMAIL" | "PHONE" | "TEXT" | "ANY";
+  availabilityNotes?: string;
 }): Promise<WorkOrderRow> {
   const res = await apiRequest<{ data: WorkOrderRow }>({
     path: "api/maintenance",
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
+  });
+  return res.data;
+}
+
+/** Cancel a work order — LIVE. Only from SUBMITTED / IN_REVIEW. */
+export async function cancelMaintenanceRequest(id: string): Promise<WorkOrderRow> {
+  const res = await apiRequest<{ data: WorkOrderRow }>({
+    path: `api/maintenance/${id}/cancel`,
+    method: "POST",
   });
   return res.data;
 }

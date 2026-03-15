@@ -16,15 +16,27 @@ import {
 } from "@/services/maintenance/maintenanceApiService";
 
 const STATUS_VARIANTS: Record<string, "success" | "warning" | "danger" | "info" | "neutral"> = {
-  OPEN: "warning",
+  SUBMITTED: "warning",
+  IN_REVIEW: "info",
+  SCHEDULED: "info",
   IN_PROGRESS: "info",
-  WAITING: "neutral",
-  RESOLVED: "success",
   COMPLETED: "success",
   CLOSED: "neutral",
+  CANCELLED: "neutral",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  SUBMITTED: "Submitted",
+  IN_REVIEW: "In Review",
+  SCHEDULED: "Scheduled",
+  IN_PROGRESS: "In Progress",
+  COMPLETED: "Completed",
+  CLOSED: "Closed",
+  CANCELLED: "Cancelled",
 };
 
 const PRIORITY_VARIANTS: Record<string, "danger" | "warning" | "neutral"> = {
+  URGENT: "danger",
   HIGH: "danger",
   MEDIUM: "warning",
   LOW: "neutral",
@@ -84,10 +96,13 @@ export function OwnerMaintenancePage() {
             aria-label="Filter by status"
           >
             <option value="">All statuses</option>
-            <option value="OPEN">Open</option>
+            <option value="SUBMITTED">Submitted</option>
+            <option value="IN_REVIEW">In Review</option>
+            <option value="SCHEDULED">Scheduled</option>
             <option value="IN_PROGRESS">In Progress</option>
-            <option value="RESOLVED">Resolved</option>
+            <option value="COMPLETED">Completed</option>
             <option value="CLOSED">Closed</option>
+            <option value="CANCELLED">Cancelled</option>
           </Select>
         </div>
         <div className="w-40">
@@ -98,6 +113,7 @@ export function OwnerMaintenancePage() {
             aria-label="Filter by priority"
           >
             <option value="">All priorities</option>
+            <option value="URGENT">Urgent</option>
             <option value="HIGH">High</option>
             <option value="MEDIUM">Medium</option>
             <option value="LOW">Low</option>
@@ -150,15 +166,15 @@ export function OwnerMaintenancePage() {
                   className="block rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-300">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-slate-900 truncate">{wo.description}</p>
+                      <p className="text-sm font-medium text-slate-900 truncate">{wo.title || wo.description}</p>
                       <p className="mt-1 text-xs text-slate-400">
-                        {wo.category}
-                        {" "}· {new Date(wo.createdAt).toLocaleDateString()}
+                        {wo.request_number ? `${wo.request_number} · ` : ""}{wo.category}
+                        {" "}· {new Date(wo.created_at).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="flex shrink-0 gap-2">
                       <Badge variant={PRIORITY_VARIANTS[wo.priority] || "neutral"}>{wo.priority}</Badge>
-                      <Badge variant={STATUS_VARIANTS[wo.status] || "neutral"}>{wo.status.replace("_", " ")}</Badge>
+                      <Badge variant={STATUS_VARIANTS[wo.status] || "neutral"}>{STATUS_LABELS[wo.status] || wo.status}</Badge>
                     </div>
                   </div>
                 </Link>

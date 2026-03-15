@@ -87,8 +87,9 @@ export async function fetchTenantDashboard(): Promise<TenantDashboardData> {
   const recentPayments = activePayments.slice(0, 3);
 
   // Maintenance stats
+  const activeStatuses = ["SUBMITTED", "IN_REVIEW", "SCHEDULED", "IN_PROGRESS"];
   const openMaintenanceCount = maintenanceResult.data.filter(
-    (w) => w.status === "OPEN" || w.status === "IN_PROGRESS",
+    (w) => activeStatuses.includes(w.status),
   ).length;
 
   // Notification stats

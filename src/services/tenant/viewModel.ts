@@ -129,10 +129,13 @@ const PAYMENT_STATUS_VARIANT: Record<string, "success" | "warning" | "danger" | 
 };
 
 const MAINTENANCE_STATUS_VARIANT: Record<string, "success" | "warning" | "danger" | "info" | "neutral"> = {
-  OPEN: "info",
-  IN_PROGRESS: "warning",
-  RESOLVED: "success",
+  SUBMITTED: "warning",
+  IN_REVIEW: "info",
+  SCHEDULED: "info",
+  IN_PROGRESS: "info",
+  COMPLETED: "success",
   CLOSED: "neutral",
+  CANCELLED: "neutral",
 };
 
 /* ── KPI Header ── */
