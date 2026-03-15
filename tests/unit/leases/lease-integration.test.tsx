@@ -50,6 +50,8 @@ jest.mock("lucide-react", () => {
     ChevronsRight: icon("ChevronsRight"),
     X: icon("X"),
     FilePlus: icon("FilePlus"),
+    CheckCircle: icon("CheckCircle"),
+    Mail: icon("Mail"),
   };
 });
 
@@ -70,6 +72,19 @@ jest.mock("@/services/leases/leaseService", () => ({
   updateLease: jest.fn(),
   terminateLease: jest.fn(),
   renewLease: jest.fn(),
+}));
+
+// Mock invitation service (used by InviteStep in create-lease flow)
+const mockCreateInvitation = jest.fn();
+jest.mock("@/services/invitations/invitationApiService", () => ({
+  createInvitation: (dto: any) => mockCreateInvitation(dto),
+  InvitationApiError: class InvitationApiError extends Error {
+    code: string;
+    constructor(message: string, code: string) {
+      super(message);
+      this.code = code;
+    }
+  },
 }));
 
 // Mock property service (for LeaseForm)
@@ -113,6 +128,7 @@ const lease1 = {
 beforeEach(() => {
   mockFetchLeases.mockReset();
   mockCreateLease.mockReset();
+  mockCreateInvitation.mockReset();
   mockPush.mockReset();
   mockUser = { persona: "owner" as const, role: "OWNER", name: "Test Owner" };
 });
@@ -204,8 +220,10 @@ describe("Lease Management Integration", () => {
       });
     });
 
-    test("successful submit redirects to /app/leases/{id}", async () => {
-      mockCreateLease.mockResolvedValueOnce({ data: { id: "new-lease" } });
+    test("successful submit shows invite step, skip redirects to /app/leases/{id}", async () => {
+      mockCreateLease.mockResolvedValueOnce({
+        data: { id: "new-lease", property_id: "p1", unit_id: "u1" },
+      });
       const user = userEvent.setup();
 
       render(<CreatePage />);
@@ -219,6 +237,14 @@ describe("Lease Management Integration", () => {
       await user.type(screen.getByLabelText(/monthly rent/i), "1500");
 
       await user.click(screen.getByRole("button", { name: /create lease/i }));
+
+      // After lease creation, the invite step is shown
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: /skip for now/i })).toBeInTheDocument();
+      });
+
+      // Click "Skip for now" to proceed to the lease detail page
+      await user.click(screen.getByRole("button", { name: /skip for now/i }));
 
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith("/app/leases/new-lease");

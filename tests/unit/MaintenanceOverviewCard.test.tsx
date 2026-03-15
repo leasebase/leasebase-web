@@ -4,6 +4,14 @@ import { computeMaintenanceOverview } from "@/services/dashboard/ownerDashboardS
 import type { MaintenanceOverviewViewModel, DomainResult } from "@/services/dashboard/types";
 import type { MaintenanceStats } from "@/services/maintenance/maintenanceApiService";
 
+/* ── Global polyfills for jsdom ── */
+
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as any;
+
 /* ── Mocks ── */
 
 jest.mock("next/link", () => {
@@ -62,7 +70,7 @@ describe("MaintenanceOverviewCard", () => {
     expect(zeros.length).toBe(4); // open, in progress, waiting, urgent
   });
 
-  test("renders nothing when source is unavailable", () => {
+  test("renders unavailable placeholder when source is unavailable", () => {
     const vm: MaintenanceOverviewViewModel = {
       open: 0,
       inProgress: 0,
@@ -72,8 +80,8 @@ describe("MaintenanceOverviewCard", () => {
       mostAffectedProperty: null,
       source: "unavailable",
     };
-    const { container } = render(<MaintenanceOverviewCard vm={vm} />);
-    expect(container.innerHTML).toBe("");
+    render(<MaintenanceOverviewCard vm={vm} />);
+    expect(screen.getByText(/currently unavailable/i)).toBeInTheDocument();
   });
 
   test("renders link to /app/maintenance", () => {
