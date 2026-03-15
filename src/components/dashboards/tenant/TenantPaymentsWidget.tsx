@@ -2,6 +2,7 @@
 
 import { CreditCard } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { DonutChart, CHART_COLORS } from "@/components/dashboards/charts";
 import type { TenantPaymentsWidgetViewModel, PaymentStatus } from "@/services/tenant/types";
 
 const statusBadgeVariant: Record<PaymentStatus, "success" | "warning" | "danger" | "info" | "neutral"> = {
@@ -51,6 +52,35 @@ export function TenantPaymentsWidget({ vm }: TenantPaymentsWidgetProps) {
             </Badge>
           </div>
         )}
+
+        {/* Payment status donut (only when live data with payments) */}
+        {vm.source === "live" && vm.recentPayments.length > 0 && (() => {
+          const counts: Record<string, number> = {};
+          for (const p of vm.recentPayments) {
+            counts[p.status] = (counts[p.status] || 0) + 1;
+          }
+          const segments = Object.entries(counts).map(([status, count]) => ({
+            label: status,
+            value: count,
+            color:
+              status === "Succeeded" || status === "Paid" ? CHART_COLORS.success :
+              status === "Pending" ? CHART_COLORS.warning :
+              status === "Failed" ? CHART_COLORS.danger :
+              CHART_COLORS.info,
+          }));
+          return segments.length > 0 ? (
+            <div className="mb-4">
+              <DonutChart
+                segments={segments}
+                centerLabel={`${vm.recentPayments.length}`}
+                centerSub="payments"
+                height={100}
+                innerRadius={28}
+                outerRadius={44}
+              />
+            </div>
+          ) : null;
+        })()}
 
         {/* Payment history section — always stub */}
         {vm.source === "stub" ? (

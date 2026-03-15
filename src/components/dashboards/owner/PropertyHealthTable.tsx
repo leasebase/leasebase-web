@@ -128,7 +128,13 @@ const statusFilter = {
 };
 
 export function PropertyHealthTable({ vm }: PropertyHealthTableProps) {
-  if (!vm.hasData) return null;
+  if (!vm.hasData) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-6 text-center text-sm text-slate-400">
+        No property health data available yet.
+      </div>
+    );
+  }
 
   return (
     <div>

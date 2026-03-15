@@ -15,7 +15,16 @@ interface AlertsPanelProps {
 }
 
 export function AlertsPanel({ vm }: AlertsPanelProps) {
-  if (!vm.hasAlerts) return null;
+  if (!vm.hasAlerts) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white">
+        <div className="border-b border-slate-200 px-4 py-3">
+          <h2 className="text-sm font-semibold text-slate-900">Alerts</h2>
+        </div>
+        <p className="px-4 py-6 text-center text-sm text-slate-400">No active alerts.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white">

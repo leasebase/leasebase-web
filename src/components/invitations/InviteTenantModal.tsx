@@ -4,9 +4,18 @@ import { useState, useEffect, type FormEvent } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { createInvitation } from "@/services/invitations/invitationApiService";
+import { createInvitation, InvitationApiError } from "@/services/invitations/invitationApiService";
 import { fetchProperties, fetchUnitsForProperty } from "@/services/properties/propertyService";
 import type { PropertyRow, UnitRow } from "@/services/properties/types";
+
+const ERROR_MESSAGES: Record<string, string> = {
+  TENANT_ALREADY_INVITED:
+    "A pending invitation has already been sent to this email address for this unit. Use the Invitations page to resend or revoke it.",
+  TENANT_ALREADY_EXISTS:
+    "A user with this email address already exists in your organization.",
+  ACTIVE_LEASE_EXISTS:
+    "This unit already has an active lease. Terminate the existing lease before inviting a new tenant.",
+};
 
 interface PropertyUnit {
   propertyId: string;
@@ -95,7 +104,12 @@ export function InviteTenantModal({ open, onClose, onSuccess, propertyUnit }: In
       setSuccess(true);
       onSuccess?.();
     } catch (err: any) {
-      setError(err.message || "Failed to send invitation");
+      const code = err instanceof InvitationApiError ? err.code : undefined;
+      setError(
+        (code && ERROR_MESSAGES[code]) ||
+          err.message ||
+          "Failed to send invitation",
+      );
     } finally {
       setIsSubmitting(false);
     }

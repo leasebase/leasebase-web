@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Wrench, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { MiniBarChart, CHART_COLORS } from "@/components/dashboards/charts";
 import type { TenantMaintenanceWidgetViewModel } from "@/services/tenant/types";
 
 const provenanceLabel: Record<string, string> = {
@@ -46,6 +47,24 @@ export function TenantMaintenanceWidget({ vm }: TenantMaintenanceWidgetProps) {
           </div>
         ) : vm.recentRequests.length > 0 ? (
           <>
+            {/* Status breakdown mini chart */}
+            {vm.recentRequests.length >= 2 && (() => {
+              const statusCounts: Record<string, number> = {};
+              for (const r of vm.recentRequests) {
+                statusCounts[r.status] = (statusCounts[r.status] || 0) + 1;
+              }
+              const items = Object.entries(statusCounts).map(([status, count]) => ({
+                label: status,
+                value: count,
+                color:
+                  status === "Completed" || status === "Closed" ? CHART_COLORS.success :
+                  status === "In Progress" || status === "Scheduled" ? CHART_COLORS.brand :
+                  status === "Submitted" || status === "In Review" ? CHART_COLORS.warning :
+                  CHART_COLORS.info,
+              }));
+              return <MiniBarChart items={items} height={40} />;
+            })()}
+
             {vm.openCount > 0 && (
               <p className="mb-2 text-xs text-slate-400">
                 {vm.openCount} open request{vm.openCount !== 1 ? "s" : ""}

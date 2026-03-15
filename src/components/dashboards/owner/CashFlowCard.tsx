@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { DollarSign, TrendingUp } from "lucide-react";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { DashboardBarChart, CHART_COLORS } from "@/components/dashboards/charts";
 import type { CashFlowViewModel } from "@/services/dashboard/types";
 
 interface CashFlowCardProps {
@@ -11,7 +11,25 @@ interface CashFlowCardProps {
 }
 
 export function CashFlowCard({ vm }: CashFlowCardProps) {
-  if (vm.source === "unavailable") return null;
+  if (vm.source === "unavailable") {
+    return (
+      <Card>
+        <CardHeader>
+          <h2 className="text-sm font-semibold text-slate-900">Cash Flow &amp; Receivables</h2>
+        </CardHeader>
+        <CardBody>
+          <p className="py-4 text-center text-sm text-slate-400">Cash flow data is currently unavailable.</p>
+        </CardBody>
+      </Card>
+    );
+  }
+
+  const chartData = [
+    { category: "Billed", amount: parseCurrency(vm.billedThisMonth) },
+    { category: "Collected", amount: parseCurrency(vm.collectedThisMonth) },
+    { category: "Overdue", amount: parseCurrency(vm.overdueAmount) },
+    { category: "Upcoming", amount: parseCurrency(vm.upcomingDue) },
+  ];
 
   return (
     <Card>
@@ -31,6 +49,18 @@ export function CashFlowCard({ vm }: CashFlowCardProps) {
           <Metric label="Overdue" value={vm.overdueAmount} accent="text-red-600" />
           <Metric label="Upcoming (30d)" value={vm.upcomingDue} />
         </div>
+
+        {/* Cash flow bar chart */}
+        <DashboardBarChart
+          data={chartData}
+          xAxisKey="category"
+          bars={[
+            { dataKey: "amount", label: "Amount", color: CHART_COLORS.brand },
+          ]}
+          height={120}
+          showYAxis={false}
+          showGrid={false}
+        />
 
         {/* Collection progress */}
         <ProgressBar
@@ -72,4 +102,11 @@ function Metric({ label, value, accent }: { label: string; value: string; accent
       <p className={`text-lg font-semibold ${accent ?? "text-slate-900"}`}>{value}</p>
     </div>
   );
+}
+
+/** Parse formatted currency string like "$1,234" or "$1.2k" back to a number for charting. */
+function parseCurrency(s: string): number {
+  const cleaned = s.replace(/[^\d.k-]/gi, "");
+  if (cleaned.endsWith("k")) return parseFloat(cleaned) * 1000;
+  return parseFloat(cleaned) || 0;
 }

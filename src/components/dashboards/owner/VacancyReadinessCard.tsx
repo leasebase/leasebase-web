@@ -12,7 +12,18 @@ interface VacancyReadinessCardProps {
 }
 
 export function VacancyReadinessCard({ vm }: VacancyReadinessCardProps) {
-  if (vm.source === "unavailable") return null;
+  if (vm.source === "unavailable") {
+    return (
+      <Card>
+        <CardHeader>
+          <h2 className="text-sm font-semibold text-slate-900">Vacancy &amp; Readiness</h2>
+        </CardHeader>
+        <CardBody>
+          <p className="py-4 text-center text-sm text-slate-400">Vacancy data is currently unavailable.</p>
+        </CardBody>
+      </Card>
+    );
+  }
 
   return (
     <Card>

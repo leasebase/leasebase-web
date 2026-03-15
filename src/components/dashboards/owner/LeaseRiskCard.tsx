@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { FileWarning, CalendarClock } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { DashboardBarChart, CHART_COLORS } from "@/components/dashboards/charts";
 import type { LeaseRiskViewModel } from "@/services/dashboard/types";
 
 interface LeaseRiskCardProps {
@@ -12,7 +13,18 @@ interface LeaseRiskCardProps {
 }
 
 export function LeaseRiskCard({ vm }: LeaseRiskCardProps) {
-  if (vm.source === "unavailable") return null;
+  if (vm.source === "unavailable") {
+    return (
+      <Card>
+        <CardHeader>
+          <h2 className="text-sm font-semibold text-slate-900">Lease Risk &amp; Expirations</h2>
+        </CardHeader>
+        <CardBody>
+          <p className="py-4 text-center text-sm text-slate-400">Lease risk data is currently unavailable.</p>
+        </CardBody>
+      </Card>
+    );
+  }
 
   const hasRisk = vm.expiring30 > 0 || vm.expiring60 > 0 || vm.monthToMonth > 0;
 
@@ -27,6 +39,24 @@ export function LeaseRiskCard({ vm }: LeaseRiskCardProps) {
         </div>
       </CardHeader>
       <CardBody className="space-y-4">
+        {/* Lease risk bar chart */}
+        {hasRisk && (
+          <DashboardBarChart
+            data={[
+              { tier: "30 days", count: vm.expiring30 },
+              { tier: "60 days", count: vm.expiring60 },
+              { tier: "Month-to-month", count: vm.monthToMonth },
+            ]}
+            xAxisKey="tier"
+            bars={[
+              { dataKey: "count", label: "Leases", color: CHART_COLORS.warning },
+            ]}
+            height={120}
+            showYAxis={false}
+            showGrid={false}
+          />
+        )}
+
         {/* Tier summary */}
         <div className="flex flex-wrap gap-3">
           <TierBadge label="Expiring in 30 days" count={vm.expiring30} variant={vm.expiring30 > 0 ? "danger" : "neutral"} />
