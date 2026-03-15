@@ -8,9 +8,10 @@ export interface SwitchProps {
   label?: string;
   disabled?: boolean;
   id?: string;
+  "aria-label"?: string;
 }
 
-export function Switch({ checked, onChange, label, disabled = false, id: externalId }: SwitchProps) {
+export function Switch({ checked, onChange, label, disabled = false, id: externalId, "aria-label": ariaLabel }: SwitchProps) {
   const autoId = useId();
   const id = externalId || autoId;
 
@@ -21,6 +22,7 @@ export function Switch({ checked, onChange, label, disabled = false, id: externa
         type="button"
         role="switch"
         aria-checked={checked}
+        aria-label={ariaLabel}
         disabled={disabled}
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-50 disabled:cursor-not-allowed ${

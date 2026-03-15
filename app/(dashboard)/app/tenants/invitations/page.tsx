@@ -7,8 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Mail, Plus, ArrowLeft, RefreshCw, XCircle } from "lucide-react";
-import { InviteTenantModal } from "@/components/invitations/InviteTenantModal";
+import { Mail, ArrowLeft, RefreshCw, XCircle } from "lucide-react";
 import {
   fetchInvitations,
   resendInvitation,
@@ -36,7 +35,6 @@ export default function InvitationsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [inviteOpen, setInviteOpen] = useState(false);
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -85,9 +83,9 @@ export default function InvitationsPage() {
         <Link href="/app/tenants">
           <Button variant="ghost" size="sm" icon={<ArrowLeft size={14} />}>Back to Tenants</Button>
         </Link>
-        <Button variant="primary" size="sm" icon={<Plus size={14} />} onClick={() => setInviteOpen(true)}>
-          Invite Tenant
-        </Button>
+        <Link href="/app/leases/new">
+          <Button variant="primary" size="sm" icon={<Mail size={14} />}>Invite via New Lease</Button>
+        </Link>
       </div>
 
       {error && (
@@ -105,12 +103,7 @@ export default function InvitationsPage() {
           <EmptyState
             icon={<Mail size={48} strokeWidth={1.5} />}
             title="No invitations"
-            description="Invite your first tenant to get started."
-            action={
-              <Button variant="primary" icon={<Plus size={16} />} onClick={() => setInviteOpen(true)}>
-                Invite Tenant
-              </Button>
-            }
+            description="Create a new lease to invite your first tenant."
           />
         ) : (
           <div className="space-y-2">
@@ -166,7 +159,6 @@ export default function InvitationsPage() {
         )}
       </div>
 
-      <InviteTenantModal open={inviteOpen} onClose={() => setInviteOpen(false)} onSuccess={load} />
     </>
   );
 }

@@ -1,33 +1,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Settings2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { Button } from "@/components/ui/Button";
 import type { OwnerDashboardData, OwnerDashboardViewModel } from "@/services/dashboard/types";
 import { fetchOwnerDashboard } from "@/services/dashboard/ownerDashboardService";
 import { toOwnerDashboardViewModel } from "@/services/dashboard/viewModel";
 import { WidgetErrorBoundary } from "./owner/WidgetErrorBoundary";
-import { KpiGrid } from "./owner/KpiGrid";
-import { AlertsPanel } from "./owner/AlertsPanel";
-import { ActivityFeed } from "./owner/ActivityFeed";
-import { PortfolioHealthWidget } from "./owner/PortfolioHealth";
-import { QuickActions } from "./owner/QuickActions";
-import { CashFlowCard } from "./owner/CashFlowCard";
-import { MaintenanceOverviewCard } from "./owner/MaintenanceOverviewCard";
-import { LeaseRiskCard } from "./owner/LeaseRiskCard";
-import { VacancyReadinessCard } from "./owner/VacancyReadinessCard";
-import { PropertyHealthTable } from "./owner/PropertyHealthTable";
 import { OwnerDashboardSkeleton } from "./owner/OwnerDashboardSkeleton";
 import { OwnerEmptyState } from "./owner/OwnerEmptyState";
 import { PriorityActions } from "@/components/ui/PriorityActions";
 import { RecommendedActions } from "@/components/ui/RecommendedActions";
 import { WorkflowChecklist } from "@/components/ui/WorkflowChecklist";
+import { CustomizeDashboard } from "./CustomizeDashboard";
 import { deriveOwnerPriorityActions, deriveOwnerInsights } from "@/lib/intelligence/deriveActions";
 import { ownerOnboardingSteps } from "@/lib/intelligence/checklists";
+import { OWNER_WIDGETS } from "@/lib/dashboard/ownerWidgets";
+import { mergePreferences, type ResolvedWidget } from "@/lib/dashboard/widgetRegistry";
+import { loadPreferences } from "@/lib/dashboard/preferences";
 
 export function OwnerDashboard() {
   const [data, setData] = useState<OwnerDashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [customizeOpen, setCustomizeOpen] = useState(false);
+  const [widgets, setWidgets] = useState<ResolvedWidget[]>(() =>
+    mergePreferences(OWNER_WIDGETS, []),
+  );
+
+  // Load saved preferences on mount (after hydration)
+  useEffect(() => {
+    const saved = loadPreferences("owner");
+    if (saved.length > 0) {
+      setWidgets(mergePreferences(OWNER_WIDGETS, saved));
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -85,75 +93,83 @@ export function OwnerDashboard() {
   const insights = deriveOwnerInsights(data);
   const onboardingSteps = ownerOnboardingSteps(data);
 
+  // Build registry-driven widget elements
+  const enabledWidgets = widgets.filter((w) => w.enabled);
+  const widgetElements: JSX.Element[] = [];
+  let idx = 0;
+
+  while (idx < enabledWidgets.length) {
+    const w = enabledWidgets[idx];
+    const Component = w.definition.component;
+    const vmProp = w.definition.vmKey
+      ? (vm as unknown as Record<string, unknown>)[w.definition.vmKey]
+      : undefined;
+
+    // Pair consecutive half-size widgets into a 2-col grid
+    if (
+      w.size === "half" &&
+      idx + 1 < enabledWidgets.length &&
+      enabledWidgets[idx + 1].size === "half"
+    ) {
+      const next = enabledWidgets[idx + 1];
+      const NextComponent = next.definition.component;
+      const nextVmProp = next.definition.vmKey
+        ? (vm as unknown as Record<string, unknown>)[next.definition.vmKey]
+        : undefined;
+
+      widgetElements.push(
+        <div key={`pair-${w.definition.id}`} className="grid gap-6 lg:grid-cols-2">
+          <WidgetErrorBoundary name={w.definition.title}>
+            <Component vm={vmProp} />
+          </WidgetErrorBoundary>
+          <WidgetErrorBoundary name={next.definition.title}>
+            <NextComponent vm={nextVmProp} />
+          </WidgetErrorBoundary>
+        </div>,
+      );
+      idx += 2;
+    } else {
+      widgetElements.push(
+        <WidgetErrorBoundary key={w.definition.id} name={w.definition.title}>
+          <Component vm={vmProp} />
+        </WidgetErrorBoundary>,
+      );
+      idx += 1;
+    }
+  }
+
   return (
     <section aria-labelledby="owner-heading" className="space-y-6">
-      {/* 1. Page Header — dynamic subtitle */}
+      {/* Page Header with Customize button */}
       <PageHeader
         title={vm.header.title}
         description={vm.header.subtitle}
+        actions={
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={<Settings2 size={14} />}
+            onClick={() => setCustomizeOpen(true)}
+          >
+            Customize
+          </Button>
+        }
       />
 
-      {/* 2. Priority Actions */}
+      {/* Priority Actions (fixed) */}
       <WidgetErrorBoundary name="Priority Actions">
         <PriorityActions actions={priorityActions} />
       </WidgetErrorBoundary>
 
-      {/* 3. KPI Row — 4 cards */}
-      <WidgetErrorBoundary name="KPI Grid">
-        <KpiGrid vm={vm.kpis} />
-      </WidgetErrorBoundary>
+      {/* Registry-driven configurable widgets */}
+      {widgetElements}
 
-      {/* 4. Cash Flow + Maintenance Overview */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <WidgetErrorBoundary name="Cash Flow">
-          <CashFlowCard vm={vm.cashFlow} />
-        </WidgetErrorBoundary>
-        <WidgetErrorBoundary name="Maintenance Overview">
-          <MaintenanceOverviewCard vm={vm.maintenanceOverview} />
-        </WidgetErrorBoundary>
-      </div>
-
-      {/* 5. Lease Risk + Vacancy / Readiness */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <WidgetErrorBoundary name="Lease Risk">
-          <LeaseRiskCard vm={vm.leaseRisk} />
-        </WidgetErrorBoundary>
-        <WidgetErrorBoundary name="Vacancy Readiness">
-          <VacancyReadinessCard vm={vm.vacancyReadiness} />
-        </WidgetErrorBoundary>
-      </div>
-
-      {/* 6. Property Health Table */}
-      <WidgetErrorBoundary name="Property Health">
-        <PropertyHealthTable vm={vm.propertyHealthTable} />
-      </WidgetErrorBoundary>
-
-      {/* 7. Recommended Actions */}
+      {/* Recommended Actions (fixed) */}
       <WidgetErrorBoundary name="Recommended Actions">
         <RecommendedActions insights={insights} />
       </WidgetErrorBoundary>
 
-      {/* 8. Recent Activity + Alerts */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <WidgetErrorBoundary name="Activity Feed">
-          <ActivityFeed vm={vm.activityFeed} />
-        </WidgetErrorBoundary>
-        <WidgetErrorBoundary name="Alerts">
-          <AlertsPanel vm={vm.alerts} />
-        </WidgetErrorBoundary>
-      </div>
-
-      {/* 9. Portfolio Health (summary bars) */}
-      <WidgetErrorBoundary name="Portfolio Health">
-        <PortfolioHealthWidget vm={vm.portfolioHealth} />
-      </WidgetErrorBoundary>
-
-      {/* 10. Quick Actions */}
-      <WidgetErrorBoundary name="Quick Actions">
-        <QuickActions vm={vm.quickActions} />
-      </WidgetErrorBoundary>
-
-      {/* 11. Onboarding Checklist */}
+      {/* Onboarding Checklist (fixed) */}
       <WidgetErrorBoundary name="Onboarding Checklist">
         <WorkflowChecklist
           title="Getting started"
@@ -161,6 +177,15 @@ export function OwnerDashboard() {
           dismissKey="lb-owner-onboarding-dismissed"
         />
       </WidgetErrorBoundary>
+
+      {/* Customization modal */}
+      <CustomizeDashboard
+        open={customizeOpen}
+        onClose={() => setCustomizeOpen(false)}
+        role="owner"
+        widgets={widgets}
+        onSave={setWidgets}
+      />
     </section>
   );
 }

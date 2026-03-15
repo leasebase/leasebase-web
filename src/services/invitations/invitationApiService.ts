@@ -1,6 +1,18 @@
 import { apiRequest } from "@/lib/api/client";
 import { getApiBaseUrl } from "@/lib/apiBase";
 
+// ── Typed API error (carries error code from backend responses) ────────────
+export class InvitationApiError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly status: number,
+  ) {
+    super(message);
+    this.name = "InvitationApiError";
+  }
+}
+
 // ── Types ──────────────────────────────────────────────────────────────────
 
 export interface TenantInvitation {
@@ -55,12 +67,41 @@ export interface AcceptInvitationPayload {
 export async function createInvitation(
   payload: CreateInvitationPayload,
 ): Promise<{ data: TenantInvitation }> {
-  return apiRequest({
-    path: "api/tenants/invitations",
+  const base = getApiBaseUrl();
+  const url = `${base}/api/tenants/invitations`;
+
+  // Use raw fetch so we can extract both code + message from the error body.
+  const state = (await import("@/lib/auth/store")).authStore.getState();
+  const { getIdToken } = await import("@/lib/auth/tokens");
+  const headers = new Headers({ "Content-Type": "application/json" });
+  if (state.mode === "cognito") {
+    const token = getIdToken();
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+  } else if (state.mode === "devBypass" && state.devBypass) {
+    headers.set("x-dev-user-email", state.devBypass.email);
+    headers.set("x-dev-user-role", state.devBypass.role);
+    headers.set("x-dev-org-id", state.devBypass.orgId);
+  }
+
+  const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    let message = `Request failed (${res.status})`;
+    let code = "UNKNOWN";
+    try {
+      const body = JSON.parse(text);
+      message = body?.error?.message || body?.message || message;
+      code = body?.error?.code || code;
+    } catch { /* non-JSON */ }
+    throw new InvitationApiError(message, code, res.status);
+  }
+
+  return res.json();
 }
 
 export async function fetchInvitations(

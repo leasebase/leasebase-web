@@ -5,6 +5,7 @@ import { Wrench, AlertTriangle, Clock } from "lucide-react";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { MiniBarChart, CHART_COLORS } from "@/components/dashboards/charts";
 import type { MaintenanceOverviewViewModel } from "@/services/dashboard/types";
 
 interface MaintenanceOverviewCardProps {
@@ -12,7 +13,18 @@ interface MaintenanceOverviewCardProps {
 }
 
 export function MaintenanceOverviewCard({ vm }: MaintenanceOverviewCardProps) {
-  if (vm.source === "unavailable") return null;
+  if (vm.source === "unavailable") {
+    return (
+      <Card>
+        <CardHeader>
+          <h2 className="text-sm font-semibold text-slate-900">Maintenance Overview</h2>
+        </CardHeader>
+        <CardBody>
+          <p className="py-4 text-center text-sm text-slate-400">Maintenance data is currently unavailable.</p>
+        </CardBody>
+      </Card>
+    );
+  }
 
   const total = vm.open + vm.inProgress;
 
@@ -27,6 +39,17 @@ export function MaintenanceOverviewCard({ vm }: MaintenanceOverviewCardProps) {
         </div>
       </CardHeader>
       <CardBody className="space-y-4">
+        {/* Status breakdown chart */}
+        <MiniBarChart
+          items={[
+            { label: "Open", value: vm.open, color: CHART_COLORS.info },
+            { label: "In Progress", value: vm.inProgress, color: CHART_COLORS.brand },
+            { label: "Needs Review", value: vm.waiting, color: CHART_COLORS.warning },
+            { label: "Urgent", value: vm.urgent, color: CHART_COLORS.danger },
+          ]}
+          height={48}
+        />
+
         {/* Status breakdown */}
         <div className="grid grid-cols-2 gap-3">
           <StatusStat label="Open" value={vm.open} icon={<Wrench size={14} />} />

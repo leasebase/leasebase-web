@@ -29,7 +29,16 @@ interface ActivityFeedProps {
 }
 
 export function ActivityFeed({ vm }: ActivityFeedProps) {
-  if (vm.events.length === 0) return null;
+  if (vm.events.length === 0) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white">
+        <div className="border-b border-slate-200 px-4 py-3">
+          <h2 className="text-sm font-semibold text-slate-900">Recent Activity</h2>
+        </div>
+        <p className="px-4 py-6 text-center text-sm text-slate-400">No recent activity.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white">

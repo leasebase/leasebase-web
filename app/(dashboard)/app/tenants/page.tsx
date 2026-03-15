@@ -7,10 +7,9 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { Users, Plus, Mail, Search } from "lucide-react";
+import { Users, Mail, Search } from "lucide-react";
 import { fetchTenants } from "@/services/tenants/tenantApiService";
 import type { TenantListRow, PaginationMeta } from "@/services/tenants/tenantApiService";
-import { InviteTenantModal } from "@/components/invitations/InviteTenantModal";
 
 /* ─── Shared status badge helper ─── */
 function statusBadge(status: string) {
@@ -24,7 +23,6 @@ function OwnerTenantsPage() {
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [inviteOpen, setInviteOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
@@ -42,11 +40,11 @@ function OwnerTenantsPage() {
     <>
       <PageHeader title="Tenants" description="Manage tenant records, contacts, and lease associations." />
       <div className="mt-4 flex items-center gap-2">
-        <Button variant="primary" icon={<Plus size={16} />} onClick={() => setInviteOpen(true)}>
-          Invite Tenant
-        </Button>
         <Link href="/app/tenants/invitations">
           <Button variant="secondary" icon={<Mail size={16} />}>Invitations</Button>
+        </Link>
+        <Link href="/app/leases/new">
+          <Button variant="primary" icon={<Mail size={16} />}>Invite via New Lease</Button>
         </Link>
       </div>
 
@@ -82,12 +80,7 @@ function OwnerTenantsPage() {
           <EmptyState
             icon={<Users size={48} strokeWidth={1.5} />}
             title="No tenants"
-            description={search || statusFilter ? "No tenants match your search or filter." : "Invite your first tenant to get started."}
-            action={
-              !search && !statusFilter
-                ? <Button variant="primary" icon={<Plus size={16} />} onClick={() => setInviteOpen(true)}>Invite Tenant</Button>
-                : undefined
-            }
+            description={search || statusFilter ? "No tenants match your search or filter." : "Create a new lease to invite your first tenant."}
           />
         ) : (
           <div className="space-y-2">
@@ -115,7 +108,6 @@ function OwnerTenantsPage() {
           </div>
         )}
       </div>
-      <InviteTenantModal open={inviteOpen} onClose={() => setInviteOpen(false)} onSuccess={loadTenants} />
     </>
   );
 }
