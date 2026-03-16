@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
-  return <LegalArticle markdownPath="../docs/legal/privacy-policy.md" />;
+  return <LegalArticle markdownPath="docs/legal/privacy-policy.md" />;
 }
