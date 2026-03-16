@@ -60,6 +60,7 @@ export interface InvitationAcceptInfo {
 export interface AcceptInvitationPayload {
   token: string;
   password: string;
+  legalAcceptance?: Array<{ slug: string; version: string; hash?: string }>;
 }
 
 // ── Protected endpoints (require auth) ─────────────────────────────────────

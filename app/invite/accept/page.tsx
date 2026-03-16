@@ -11,6 +11,9 @@ import {
   acceptInvitation,
   type InvitationAcceptInfo,
 } from "@/services/invitations/invitationApiService";
+import { getTenantSignupDocs, buildLegalAcceptancePayload } from "@/lib/legal";
+
+const TENANT_LEGAL_DOCS = getTenantSignupDocs();
 
 type PageState =
   | { kind: "loading" }
@@ -28,10 +31,11 @@ function AcceptInviteContent() {
   const [passwordDirty, setPasswordDirty] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const pwResult = validatePassword(password);
   const passwordsMatch = password === confirmPassword;
-  const canSubmit = pwResult.valid && passwordsMatch && password.length > 0;
+  const canSubmit = pwResult.valid && passwordsMatch && password.length > 0 && agreedToTerms;
 
   useEffect(() => {
     if (!token) {
@@ -58,7 +62,11 @@ function AcceptInviteContent() {
     setIsSubmitting(true);
 
     try {
-      const res = await acceptInvitation({ token, password });
+      const res = await acceptInvitation({
+        token,
+        password,
+        legalAcceptance: buildLegalAcceptancePayload(TENANT_LEGAL_DOCS),
+      });
       setState({ kind: "success", email: res.data.email });
     } catch (err: any) {
       // If the invite was already accepted or revoked during submit, show that state
@@ -171,6 +179,32 @@ function AcceptInviteContent() {
                   error={confirmPassword && !passwordsMatch ? "Passwords do not match" : undefined}
                 />
 
+                {/* Legal consent */}
+                <label className="flex items-start gap-2 text-xs text-slate-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                  />
+                  <span>
+                    I agree to the{" "}
+                    {TENANT_LEGAL_DOCS.map((doc, i) => (
+                      <span key={doc.slug}>
+                        {i > 0 && (i === TENANT_LEGAL_DOCS.length - 1 ? ", and " : ", ")}
+                        <a
+                          href={doc.path}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-brand-600 hover:text-brand-500 underline"
+                        >
+                          {doc.title}
+                        </a>
+                      </span>
+                    ))}
+                  </span>
+                </label>
+
                 <Button
                   type="submit"
                   variant="primary"
@@ -200,6 +234,13 @@ function AcceptInviteContent() {
             </div>
           )}
         </div>
+
+        {/* Legal links */}
+        <p className="mt-4 text-center text-xs text-slate-400">
+          <a href="/legal/terms" className="hover:text-slate-500 transition-colors">Terms</a>
+          {" · "}
+          <a href="/legal/privacy" className="hover:text-slate-500 transition-colors">Privacy</a>
+        </p>
       </div>
     </div>
   );

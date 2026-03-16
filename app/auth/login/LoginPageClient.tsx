@@ -317,6 +317,13 @@ export default function LoginPageClient({
               Sign up
             </a>
           </p>
+
+          {/* Legal links */}
+          <p className="text-center text-xs text-slate-400">
+            <a href="/legal/terms" className="hover:text-slate-500 transition-colors">Terms</a>
+            {" · "}
+            <a href="/legal/privacy" className="hover:text-slate-500 transition-colors">Privacy</a>
+          </p>
         </div>
       </AuthCard>
     </AuthShell>
