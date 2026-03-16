@@ -320,9 +320,9 @@ export default function LoginPageClient({
 
           {/* Legal links */}
           <p className="text-center text-xs text-slate-400">
-            <a href="/legal/terms" className="hover:text-slate-500 transition-colors">Terms</a>
+            <a href="https://leasebase.ai/terms-of-service/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-500 transition-colors">Terms</a>
             {" · "}
-            <a href="/legal/privacy" className="hover:text-slate-500 transition-colors">Privacy</a>
+            <a href="https://leasebase.ai/privacy-policy/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-500 transition-colors">Privacy</a>
           </p>
         </div>
       </AuthCard>

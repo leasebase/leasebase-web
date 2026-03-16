@@ -57,6 +57,19 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    // Legal documents are now hosted on the public WordPress site.
+    // Redirect old app-hosted /legal/* paths to canonical WordPress URLs.
+    const wpBase = 'https://leasebase.ai';
+    return [
+      { source: '/legal/terms', destination: `${wpBase}/terms-of-service/`, permanent: true },
+      { source: '/legal/privacy', destination: `${wpBase}/privacy-policy/`, permanent: true },
+      { source: '/legal/payments', destination: `${wpBase}/payment-terms/`, permanent: true },
+      { source: '/legal/owner-agreement', destination: `${wpBase}/property-owner-agreement/`, permanent: true },
+      { source: '/legal/tenant-agreement', destination: `${wpBase}/tenant-user-agreement/`, permanent: true },
+      { source: '/legal', destination: `${wpBase}/terms-of-service/`, permanent: true },
+    ];
+  },
   // No rewrites / API proxy.  All browser-side API calls use the explicit
   // NEXT_PUBLIC_API_BASE_URL (e.g. https://api.dev.leasebase.ai) so there
   // is no hidden same-origin proxying to debug.

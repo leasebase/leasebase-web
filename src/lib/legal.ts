@@ -2,12 +2,16 @@
  * Canonical legal document metadata.
  *
  * This is the single source of truth for legal document slugs, versions,
- * paths, and titles used by both the frontend (links, checkboxes) and
+ * titles, and public URLs used by the frontend (links, checkboxes) and
  * the API payload sent to the backend for acceptance persistence.
  *
- * Paths are relative (no hardcoded domain) so production can use any
- * base URL without code churn.
+ * Legal documents are hosted publicly on the WordPress marketing site
+ * at leasebase.ai. The web app links to those URLs and persists
+ * acceptance records keyed on slug/version/hash — never on the URL.
  */
+
+/** Base URL of the public marketing site where legal docs are hosted. */
+const LEGAL_BASE_URL = "https://leasebase.ai";
 
 export interface LegalDocument {
   /** URL-safe identifier, e.g. "terms" */
@@ -18,8 +22,8 @@ export interface LegalDocument {
   version: string;
   /** ISO date when this version became effective */
   effectiveDate: string;
-  /** Relative path on the app domain, e.g. "/legal/terms" */
-  path: string;
+  /** Full public URL on the WordPress marketing site */
+  publicUrl: string;
   /**
    * SHA-256 hash of the source markdown content.
    * Regenerate with: node scripts/compute-legal-hashes.mjs
@@ -33,7 +37,7 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
     title: "Terms of Service",
     version: "2026-03-v1",
     effectiveDate: "2026-03-16",
-    path: "/legal/terms",
+    publicUrl: `${LEGAL_BASE_URL}/terms-of-service/`,
     contentHash: "29b27b742fc794f684c55cf405fd7c9c5ef411b0c84f3248b210709ed9568a7d",
   },
   {
@@ -41,7 +45,7 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
     title: "Privacy Policy",
     version: "2026-03-v1",
     effectiveDate: "2026-03-16",
-    path: "/legal/privacy",
+    publicUrl: `${LEGAL_BASE_URL}/privacy-policy/`,
     contentHash: "4773b5b32e1fa06c111f91e2c0ba78d921723d622a98fbd7820c4a3207a4f6e1",
   },
   {
@@ -49,7 +53,7 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
     title: "Payment Terms",
     version: "2026-03-v1",
     effectiveDate: "2026-03-16",
-    path: "/legal/payments",
+    publicUrl: `${LEGAL_BASE_URL}/payment-terms/`,
     contentHash: "d85a2b2a0df691c77395ddc4a8517ee95649fad1177b3b6746dfdecbfc0eb3a7",
   },
   {
@@ -57,7 +61,7 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
     title: "Property Owner Agreement",
     version: "2026-03-v1",
     effectiveDate: "2026-03-16",
-    path: "/legal/owner-agreement",
+    publicUrl: `${LEGAL_BASE_URL}/property-owner-agreement/`,
     contentHash: "03d192006d6e0d55d2ad7695746e183f579d1dc8b1eaadc1c1b607fd836188b6",
   },
   {
@@ -65,7 +69,7 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
     title: "Tenant User Agreement",
     version: "2026-03-v1",
     effectiveDate: "2026-03-16",
-    path: "/legal/tenant-agreement",
+    publicUrl: `${LEGAL_BASE_URL}/tenant-user-agreement/`,
     contentHash: "2cfe9121c97d0de47c2c1e6b56cd416a79e5ca875a6c49cff30cf389b5313f1e",
   },
 ];
