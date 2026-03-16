@@ -7,21 +7,33 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Banknote } from "lucide-react";
+import { Banknote, Clock, CheckCircle, AlertCircle } from "lucide-react";
 import { fetchTenantProfile } from "@/services/tenant/adapters/profileAdapter";
 import { fetchTenantLease } from "@/services/tenant/adapters/leaseAdapter";
-import { createCheckoutSession } from "@/services/tenant/adapters/paymentAdapter";
-import type { TenantProfileRow, LeaseRow } from "@/services/tenant/types";
+import {
+  createCheckoutSession,
+  fetchTenantCharges,
+  fetchTenantPayments,
+  type TenantChargeRow,
+} from "@/services/tenant/adapters/paymentAdapter";
+import type { TenantProfileRow, LeaseRow, PaymentRow } from "@/services/tenant/types";
+
+function formatCents(cents: number, currency = "usd"): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(cents / 100);
+}
 
 /**
- * Pay Rent — LIVE (Phase 2).
- *
- * Fetches tenant's lease to show rent amount, then creates a Stripe
- * Checkout Session via POST /api/payments/checkout on click.
+ * Pay Rent — shows current charge from payments-service, with ACH
+ * processing awareness and Stripe Checkout redirect.
  */
 export default function Page() {
   const [profile, setProfile] = useState<TenantProfileRow | null>(null);
   const [lease, setLease] = useState<LeaseRow | null>(null);
+  const [currentCharge, setCurrentCharge] = useState<TenantChargeRow | null>(null);
+  const [processingPayment, setProcessingPayment] = useState<PaymentRow | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,8 +46,23 @@ export default function Page() {
         if (cancelled) return;
         setProfile(profileResult.data);
         if (profileResult.data?.lease_id) {
-          const leaseResult = await fetchTenantLease(profileResult.data.lease_id);
-          if (!cancelled) setLease(leaseResult.data);
+          const [leaseResult, chargesResult, paymentsResult] = await Promise.all([
+            fetchTenantLease(profileResult.data.lease_id),
+            fetchTenantCharges(),
+            fetchTenantPayments(),
+          ]);
+          if (cancelled) return;
+          setLease(leaseResult.data);
+
+          // Find the most recent unpaid charge (PENDING or OVERDUE)
+          const unpaid = chargesResult.data.find(
+            (c) => c.status === "PENDING" || c.status === "OVERDUE",
+          );
+          setCurrentCharge(unpaid ?? null);
+
+          // Check for any PROCESSING payment (ACH in flight)
+          const processing = paymentsResult.data.find((p) => p.status === "PROCESSING");
+          setProcessingPayment(processing ?? null);
         }
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -66,15 +93,16 @@ export default function Page() {
     }
   }
 
-  const rentFormatted = lease
-    ? `$${(lease.rent_amount / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}`
-    : null;
+  const chargeAmount = currentCharge?.amount ?? lease?.rent_amount ?? 0;
+  const amountFormatted = formatCents(chargeAmount);
+  const chargeIsPaid = currentCharge?.status === "PAID";
+  const hasProcessing = !!processingPayment;
 
   return (
     <>
       <PageHeader
         title="Pay Rent"
-        description="Make a rent payment — select payment method and amount."
+        description="Make a rent payment securely via Stripe."
       />
 
       <div className="mt-6 max-w-lg">
@@ -98,10 +126,70 @@ export default function Page() {
               <h2 className="text-sm font-semibold text-slate-900">Rent Payment</h2>
             </CardHeader>
             <CardBody>
+              {/* ACH Processing banner */}
+              {hasProcessing && (
+                <div className="mb-4 flex items-start gap-2.5 rounded-md border border-amber-800/40 bg-amber-950/20 px-3 py-2.5">
+                  <Clock size={16} className="mt-0.5 text-amber-400 shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-200">Payment is being processed</p>
+                    <p className="mt-0.5 text-xs text-amber-400/80">
+                      Your bank transfer is in progress. This typically takes 3–5 business days.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Charge already paid banner */}
+              {chargeIsPaid && !hasProcessing && (
+                <div className="mb-4 flex items-start gap-2.5 rounded-md border border-emerald-800/40 bg-emerald-950/20 px-3 py-2.5">
+                  <CheckCircle size={16} className="mt-0.5 text-emerald-400 shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-emerald-200">Rent is paid</p>
+                    <p className="mt-0.5 text-xs text-emerald-400/80">
+                      Your current rent charge has been paid. No action needed.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <dl className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-slate-400">Amount Due</dt>
-                  <dd className="text-2xl font-bold text-slate-900">{rentFormatted}</dd>
+                  <dd className="text-2xl font-bold text-slate-900">{amountFormatted}</dd>
+                </div>
+                {currentCharge?.billing_period && (
+                  <div className="flex justify-between">
+                    <dt className="text-slate-400">Billing Period</dt>
+                    <dd className="text-slate-900">
+                      {new Date(currentCharge.billing_period + "T00:00:00").toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                    </dd>
+                  </div>
+                )}
+                {currentCharge?.due_date && (
+                  <div className="flex justify-between">
+                    <dt className="text-slate-400">Due Date</dt>
+                    <dd className="text-slate-900">
+                      {new Date(currentCharge.due_date).toLocaleDateString()}
+                    </dd>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <dt className="text-slate-400">Charge Status</dt>
+                  <dd>
+                    {currentCharge ? (
+                      <Badge
+                        variant={
+                          currentCharge.status === "PAID" ? "success" :
+                          currentCharge.status === "OVERDUE" ? "danger" :
+                          "neutral"
+                        }
+                      >
+                        {currentCharge.status}
+                      </Badge>
+                    ) : (
+                      <Badge variant="neutral">No charge</Badge>
+                    )}
+                  </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-slate-400">Lease Period</dt>
@@ -109,18 +197,11 @@ export default function Page() {
                     {new Date(lease.start_date).toLocaleDateString()} – {new Date(lease.end_date).toLocaleDateString()}
                   </dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-slate-400">Status</dt>
-                  <dd>
-                    <Badge variant={lease.status === "ACTIVE" ? "success" : "neutral"}>
-                      {lease.status}
-                    </Badge>
-                  </dd>
-                </div>
               </dl>
 
               {error && (
-                <div className="mt-4 rounded-md border border-red-800/50 bg-red-950/30 px-3 py-2 text-xs text-red-700">
+                <div className="mt-4 flex items-start gap-2 rounded-md border border-red-800/50 bg-red-950/30 px-3 py-2 text-xs text-red-700">
+                  <AlertCircle size={14} className="mt-0.5 shrink-0" />
                   {error}
                 </div>
               )}
@@ -130,10 +211,13 @@ export default function Page() {
                 className="mt-6 w-full"
                 onClick={handlePayRent}
                 loading={isCheckingOut}
-                disabled={lease.status !== "ACTIVE"}
+                disabled={lease.status !== "ACTIVE" || chargeIsPaid || hasProcessing}
                 icon={<Banknote size={16} />}
               >
-                {isCheckingOut ? "Redirecting to checkout…" : `Pay ${rentFormatted}`}
+                {isCheckingOut ? "Redirecting to checkout…" :
+                 chargeIsPaid ? "Paid" :
+                 hasProcessing ? "Processing…" :
+                 `Pay ${amountFormatted}`}
               </Button>
 
               <p className="mt-3 text-center text-xs text-slate-500">

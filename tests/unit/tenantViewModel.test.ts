@@ -82,7 +82,7 @@ describe("computePaymentStatus", () => {
       currency: "usd",
       method: "card",
       status: "SUCCEEDED",
-      ledger_entry_id: null,
+      charge_id: null, billing_period: null, charge_type: null,
       created_at: now.toISOString(),
       updated_at: now.toISOString(),
     };
@@ -99,7 +99,7 @@ describe("computePaymentStatus", () => {
       currency: "usd",
       method: "card",
       status: "PENDING",
-      ledger_entry_id: null,
+      charge_id: null, billing_period: null, charge_type: null,
       created_at: now.toISOString(),
       updated_at: now.toISOString(),
     };
@@ -116,7 +116,7 @@ describe("computePaymentStatus", () => {
       currency: "usd",
       method: "card",
       status: "FAILED",
-      ledger_entry_id: null,
+      charge_id: null, billing_period: null, charge_type: null,
       created_at: now.toISOString(),
       updated_at: now.toISOString(),
     };

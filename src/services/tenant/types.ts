@@ -53,8 +53,10 @@ export interface PaymentRow {
   amount: number; // cents
   currency: string;
   method: string | null;
-  status: "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELED";
-  ledger_entry_id: string | null;
+  status: "PENDING" | "PROCESSING" | "SUCCEEDED" | "FAILED" | "CANCELED" | "REFUNDED";
+  charge_id: string | null;
+  billing_period: string | null;
+  charge_type: string | null;
   created_at: string;
   updated_at: string;
 }
