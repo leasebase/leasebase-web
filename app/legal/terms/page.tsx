@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function TermsPage() {
-  return <LegalArticle markdownPath="../docs/legal/terms-of-service.md" />;
+  return <LegalArticle markdownPath="docs/legal/terms-of-service.md" />;
 }

@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function OwnerAgreementPage() {
-  return <LegalArticle markdownPath="../docs/legal/owner-agreement.md" />;
+  return <LegalArticle markdownPath="docs/legal/owner-agreement.md" />;
 }

@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function PaymentsPage() {
-  return <LegalArticle markdownPath="../docs/legal/payment-terms.md" />;
+  return <LegalArticle markdownPath="docs/legal/payment-terms.md" />;
 }
