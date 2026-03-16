@@ -23,6 +23,14 @@ function fillBasicFields() {
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "a@b.co" } });
 }
 
+/** Check the legal consent checkbox so the form becomes submittable. */
+function acceptTerms() {
+  const checkbox = screen.getByRole("checkbox");
+  if (!(checkbox as HTMLInputElement).checked) {
+    fireEvent.click(checkbox);
+  }
+}
+
 describe("Register page — password validation UX", () => {
   beforeEach(() => {
     jest.resetAllMocks();
@@ -53,14 +61,19 @@ describe("Register page — password validation UX", () => {
     expect(btn).toBeDisabled();
   });
 
-  test("submit button becomes enabled with a valid password + matching confirm", () => {
+  test("submit button becomes enabled with a valid password + matching confirm + consent", () => {
     render(<RegisterPage />);
     fillBasicFields();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
     fireEvent.change(screen.getByLabelText("Confirm Password"), { target: { value: "GoodP@ss1" } });
 
+    // Still disabled without consent
     const btn = screen.getByRole("button", { name: /create account/i });
+    expect(btn).toBeDisabled();
+
+    // Now accept terms
+    acceptTerms();
     expect(btn).not.toBeDisabled();
   });
 
@@ -102,6 +115,7 @@ describe("Register page — password validation UX", () => {
 
     render(<RegisterPage />);
     fillBasicFields();
+    acceptTerms();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
     fireEvent.change(screen.getByLabelText("Confirm Password"), { target: { value: "GoodP@ss1" } });
@@ -128,6 +142,7 @@ describe("Register page — password validation UX", () => {
 
     render(<RegisterPage />);
     fillBasicFields();
+    acceptTerms();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
     fireEvent.change(screen.getByLabelText("Confirm Password"), { target: { value: "GoodP@ss1" } });
