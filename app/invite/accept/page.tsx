@@ -193,7 +193,7 @@ function AcceptInviteContent() {
                       <span key={doc.slug}>
                         {i > 0 && (i === TENANT_LEGAL_DOCS.length - 1 ? ", and " : ", ")}
                         <a
-                          href={doc.path}
+                          href={doc.publicUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-medium text-brand-600 hover:text-brand-500 underline"
@@ -237,9 +237,9 @@ function AcceptInviteContent() {
 
         {/* Legal links */}
         <p className="mt-4 text-center text-xs text-slate-400">
-          <a href="/legal/terms" className="hover:text-slate-500 transition-colors">Terms</a>
+          <a href="https://leasebase.ai/terms-of-service/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-500 transition-colors">Terms</a>
           {" · "}
-          <a href="/legal/privacy" className="hover:text-slate-500 transition-colors">Privacy</a>
+          <a href="https://leasebase.ai/privacy-policy/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-500 transition-colors">Privacy</a>
         </p>
       </div>
     </div>

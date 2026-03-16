@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { getApiBaseUrl } from "@/lib/apiBase";
 import { getSignInUrl, buildSignInRedirect, navigateToSignIn } from "@/lib/hostname";
 import { validatePassword, isPasswordComplexityError } from "@/lib/validation/password";
-import { getOwnerSignupDocs, buildLegalAcceptancePayload } from "@/lib/legal";
+import { getOwnerSignupDocs, buildLegalAcceptancePayload, LEGAL_DOCUMENTS } from "@/lib/legal";
 import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthCard } from "@/components/auth/AuthCard";
@@ -271,7 +271,7 @@ function RegisterContent() {
                   <span key={doc.slug}>
                     {i > 0 && (i === OWNER_LEGAL_DOCS.length - 1 ? ", and " : ", ")}
                     <a
-                      href={doc.path}
+                      href={doc.publicUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium text-brand-600 hover:text-brand-500 underline"
@@ -306,9 +306,9 @@ function RegisterContent() {
 
           {/* Legal links */}
           <p className="text-center text-xs text-slate-400">
-            <a href="/legal/terms" className="hover:text-slate-500 transition-colors">Terms</a>
+            <a href={LEGAL_DOCUMENTS.find(d => d.slug === "terms")!.publicUrl} target="_blank" rel="noopener noreferrer" className="hover:text-slate-500 transition-colors">Terms</a>
             {" · "}
-            <a href="/legal/privacy" className="hover:text-slate-500 transition-colors">Privacy</a>
+            <a href={LEGAL_DOCUMENTS.find(d => d.slug === "privacy")!.publicUrl} target="_blank" rel="noopener noreferrer" className="hover:text-slate-500 transition-colors">Privacy</a>
           </p>
         </div>
       </AuthCard>
