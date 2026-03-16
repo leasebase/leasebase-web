@@ -5,11 +5,14 @@ import { useRouter } from "next/navigation";
 import { getApiBaseUrl } from "@/lib/apiBase";
 import { getSignInUrl, buildSignInRedirect, navigateToSignIn } from "@/lib/hostname";
 import { validatePassword, isPasswordComplexityError } from "@/lib/validation/password";
+import { getOwnerSignupDocs, buildLegalAcceptancePayload } from "@/lib/legal";
 import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+
+const OWNER_LEGAL_DOCS = getOwnerSignupDocs();
 
 // Only OWNER signup is publicly available.
 export type UserType = "OWNER";
@@ -41,6 +44,7 @@ function RegisterContent() {
   const [passwordDirty, setPasswordDirty] = useState(false);
   const [confirmDirty, setConfirmDirty] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   // Live password validation — recomputed on every keystroke.
   const pwResult = useMemo(() => validatePassword(password), [password]);
@@ -55,7 +59,8 @@ function RegisterContent() {
     firstName.length > 0 &&
     lastName.length > 0 &&
     pwResult.valid &&
-    password === confirmPassword;
+    password === confirmPassword &&
+    agreedToTerms;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +90,14 @@ function RegisterContent() {
       const res = await fetch(`${getApiBaseUrl()}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, firstName, lastName, userType }),
+        body: JSON.stringify({
+          email,
+          password,
+          firstName,
+          lastName,
+          userType,
+          legalAcceptance: buildLegalAcceptancePayload(OWNER_LEGAL_DOCS),
+        }),
       });
       if (!res.ok) {
         const text = await res.text();
@@ -245,6 +257,32 @@ function RegisterContent() {
               )}
             </div>
 
+            {/* Legal consent */}
+            <label className="flex items-start gap-2 text-sm text-slate-600 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+              />
+              <span>
+                I agree to the{" "}
+                {OWNER_LEGAL_DOCS.map((doc, i) => (
+                  <span key={doc.slug}>
+                    {i > 0 && (i === OWNER_LEGAL_DOCS.length - 1 ? ", and " : ", ")}
+                    <a
+                      href={doc.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-brand-600 hover:text-brand-500 underline"
+                    >
+                      {doc.title}
+                    </a>
+                  </span>
+                ))}
+              </span>
+            </label>
+
             <Button
               type="submit"
               disabled={!formValid}
@@ -264,6 +302,13 @@ function RegisterContent() {
             >
               Sign in
             </a>
+          </p>
+
+          {/* Legal links */}
+          <p className="text-center text-xs text-slate-400">
+            <a href="/legal/terms" className="hover:text-slate-500 transition-colors">Terms</a>
+            {" · "}
+            <a href="/legal/privacy" className="hover:text-slate-500 transition-colors">Privacy</a>
           </p>
         </div>
       </AuthCard>

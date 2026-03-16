@@ -11,3 +11,45 @@
 body {
   @apply bg-surface-base text-slate-900 antialiased;
 }
+
+/* ── Legal document prose styling ─────────────────────────── */
+.legal-prose {
+  @apply text-slate-700 leading-relaxed;
+}
+.legal-prose h1 {
+  @apply text-3xl font-bold text-slate-900 mb-2 mt-0;
+}
+.legal-prose h2 {
+  @apply text-xl font-semibold text-slate-900 mt-8 mb-3;
+}
+.legal-prose h3 {
+  @apply text-lg font-medium text-slate-800 mt-6 mb-2;
+}
+.legal-prose p {
+  @apply mb-4;
+}
+.legal-prose ul,
+.legal-prose ol {
+  @apply mb-4 pl-6;
+}
+.legal-prose ul {
+  @apply list-disc;
+}
+.legal-prose ol {
+  @apply list-decimal;
+}
+.legal-prose li {
+  @apply mb-1;
+}
+.legal-prose a {
+  @apply text-brand-600 hover:text-brand-500 underline;
+}
+.legal-prose hr {
+  @apply my-8 border-slate-200;
+}
+.legal-prose blockquote {
+  @apply border-l-4 border-slate-300 pl-4 italic text-slate-500 my-4;
+}
+.legal-prose strong {
+  @apply font-semibold text-slate-900;
+}
