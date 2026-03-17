@@ -108,19 +108,17 @@ const lease1 = {
   org_id: "org-1",
   property_id: "p1",
   unit_id: "u1",
-  tenant_id: "t1",
-  lease_type: "FIXED_TERM",
+  term_type: "TWELVE_MONTH",
   status: "ACTIVE",
   start_date: "2026-01-01T00:00:00Z",
   end_date: "2026-12-31T00:00:00Z",
-  monthly_rent: 150000,
   security_deposit: 300000,
   lease_terms: null,
-  signed_at: null,
   created_at: now,
   updated_at: now,
   property_name: "Sunset Apartments",
   unit_number: "101",
+  tenants: [{ id: "t1", name: "John Doe", role: "PRIMARY" }],
 };
 
 /* ── Tests ── */
@@ -210,8 +208,6 @@ describe("Lease Management Integration", () => {
       await waitFor(() => expect(screen.getByText("Unit 101")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/unit/i), "u1");
       await user.type(screen.getByLabelText(/start date/i), "2026-01-01");
-      await user.type(screen.getByLabelText(/end date/i), "2026-12-31");
-      await user.type(screen.getByLabelText(/monthly rent/i), "1500");
 
       await user.click(screen.getByRole("button", { name: /create lease/i }));
 
@@ -233,8 +229,6 @@ describe("Lease Management Integration", () => {
       await waitFor(() => expect(screen.getByText("Unit 101")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/unit/i), "u1");
       await user.type(screen.getByLabelText(/start date/i), "2026-01-01");
-      await user.type(screen.getByLabelText(/end date/i), "2026-12-31");
-      await user.type(screen.getByLabelText(/monthly rent/i), "1500");
 
       await user.click(screen.getByRole("button", { name: /create lease/i }));
 
@@ -262,8 +256,6 @@ describe("Lease Management Integration", () => {
       await waitFor(() => expect(screen.getByText("Unit 101")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/unit/i), "u1");
       await user.type(screen.getByLabelText(/start date/i), "2026-01-01");
-      await user.type(screen.getByLabelText(/end date/i), "2026-12-31");
-      await user.type(screen.getByLabelText(/monthly rent/i), "1500");
 
       await user.click(screen.getByRole("button", { name: /create lease/i }));
 
