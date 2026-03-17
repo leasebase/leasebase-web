@@ -247,6 +247,7 @@ export default function Page() {
                     <th className="pb-2 pr-4">Date</th>
                     <th className="pb-2 pr-4">Period</th>
                     <th className="pb-2 pr-4">Method</th>
+                    <th className="pb-2 pr-4">Source</th>
                     <th className="pb-2 pr-4 text-right">Amount</th>
                     <th className="pb-2 pr-4 text-right">Fee</th>
                     <th className="pb-2">Status</th>
@@ -264,6 +265,11 @@ export default function Page() {
                           : "—"}
                       </td>
                       <td className="py-2.5 pr-4 text-slate-600">{p.method ?? "—"}</td>
+                      <td className="py-2.5 pr-4">
+                        <Badge variant={p.source === "AUTOPAY" ? "info" : "neutral"}>
+                          {p.source ?? "MANUAL"}
+                        </Badge>
+                      </td>
                       <td className="py-2.5 pr-4 text-right font-medium text-slate-900">
                         {formatCents(p.amount, p.currency)}
                       </td>

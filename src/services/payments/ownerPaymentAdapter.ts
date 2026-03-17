@@ -41,6 +41,7 @@ export interface PaymentTransactionRow {
   charge_type: string | null;    // from charge join
   charge_due_date: string | null;
   application_fee_amount: number;
+  source: "MANUAL" | "AUTOPAY" | null;
   created_at: string;
   updated_at: string;
 }

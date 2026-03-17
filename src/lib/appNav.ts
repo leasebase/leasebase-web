@@ -38,6 +38,7 @@ export const appNavItems: AppNavItem[] = [
   // ── Operations ──
   { path: "/app/payments", label: "Payments", icon: "payments", personas: ["owner"], group: "operations" },
   { path: "/app/pay-rent", label: "Pay Rent", icon: "pay-rent", personas: ["tenant"], group: "operations" },
+  { path: "/app/payment-methods", label: "Payment Methods", icon: "payment-methods", personas: ["tenant"], group: "operations" },
   { path: "/app/payment-history", label: "Payment History", icon: "payment-history", personas: ["tenant"], group: "operations" },
   { path: "/app/maintenance", label: "Maintenance", icon: "maintenance", personas: ["owner", "tenant"], group: "operations" },
   { path: "/app/documents", label: "Documents", icon: "documents", personas: ["owner", "tenant"], group: "operations" },

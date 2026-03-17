@@ -117,6 +117,38 @@ export interface CheckoutResult {
   sessionId: string;
 }
 
+export interface PaymentMethodRow {
+  id: string;
+  type: string;
+  last4: string | null;
+  brand: string | null;
+  exp_month: number | null;
+  exp_year: number | null;
+  is_default: boolean;
+  status: "ACTIVE" | "DETACHED" | "FAILED";
+  created_at: string;
+}
+
+export interface AutopayStatus {
+  enabled: boolean;
+  status: "ENABLED" | "DISABLED" | "PAUSED";
+  lease_id: string | null;
+  enrollment_id: string | null;
+  payment_method: {
+    id: string;
+    type: string;
+    last4: string | null;
+    brand: string | null;
+  } | null;
+}
+
+export interface SetupIntentResult {
+  clientSecret: string;
+  setupIntentId: string;
+  customerId: string;
+  publishableKey: string;
+}
+
 export interface NotificationRow {
   id: string;
   organization_id: string;
