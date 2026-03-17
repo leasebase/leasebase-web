@@ -454,8 +454,8 @@ body.home header .has-small-font-size {
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: #ECFDF5;
-  color: var(--lb-success);
+  background: var(--lb-accent-light);
+  color: var(--lb-accent);
   border-radius: 50%;
   font-size: 1rem;
   font-weight: 700;
@@ -720,8 +720,8 @@ body.home header .has-small-font-size {
   font-size: 0.75rem;
   font-weight: 600;
   padding: 3px 10px;
-  background: #ECFDF5;
-  color: var(--lb-success);
+  background: var(--lb-accent-light);
+  color: var(--lb-accent);
   border-radius: 12px;
 }
 

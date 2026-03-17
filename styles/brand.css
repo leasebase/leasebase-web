@@ -1,3 +1,10 @@
+/*
+ * LeaseBase Brand System — Source of Truth
+ * Do NOT redefine brand colors outside this file.
+ * All components must consume these variables.
+ * See also: src/design-system/tokens.css (auto-generated; brand.css overrides where needed).
+ */
+
 :root {
   --lb-color-bg-dark: #05070B;
   --lb-color-base: #0D1320;
@@ -111,6 +118,7 @@ select {
 }
 
 .lb-logo-mark {
-  width: 2rem;
-  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
