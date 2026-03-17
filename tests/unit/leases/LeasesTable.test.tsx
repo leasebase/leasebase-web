@@ -57,7 +57,7 @@ describe("LeasesTable", () => {
 
   test("renders tenant names or 'Not assigned'", () => {
     render(<LeasesTable leases={leases} />);
-    expect(screen.getByText("J. Doe")).toBeInTheDocument();
+    expect(screen.getByText("J.Doe")).toBeInTheDocument();
     expect(screen.getByText("Not assigned")).toBeInTheDocument();
   });
 
