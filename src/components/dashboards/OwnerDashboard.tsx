@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Settings2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -19,6 +19,7 @@ import { ownerOnboardingSteps } from "@/lib/intelligence/checklists";
 import { OWNER_WIDGETS } from "@/lib/dashboard/ownerWidgets";
 import { mergePreferences, type ResolvedWidget } from "@/lib/dashboard/widgetRegistry";
 import { loadPreferences } from "@/lib/dashboard/preferences";
+import { track } from "@/lib/analytics";
 
 export function OwnerDashboard() {
   const [data, setData] = useState<OwnerDashboardData | null>(null);
@@ -28,6 +29,7 @@ export function OwnerDashboard() {
   const [widgets, setWidgets] = useState<ResolvedWidget[]>(() =>
     mergePreferences(OWNER_WIDGETS, []),
   );
+  const onboardingTracked = useRef(false);
 
   // Load saved preferences on mount (after hydration)
   useEffect(() => {
@@ -56,6 +58,20 @@ export function OwnerDashboard() {
     load();
     return () => { cancelled = true; };
   }, []);
+
+  // Track onboarding completion (fires once when all 3 steps done).
+  useEffect(() => {
+    if (!data || data.setupStage !== "active") return;
+    const steps = ownerOnboardingSteps(data);
+    if (
+      !onboardingTracked.current &&
+      steps.length > 0 &&
+      steps.every((s) => s.done)
+    ) {
+      onboardingTracked.current = true;
+      track("onboarding_completed");
+    }
+  }, [data]);
 
   if (isLoading) return <OwnerDashboardSkeleton />;
 
