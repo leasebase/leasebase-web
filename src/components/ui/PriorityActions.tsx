@@ -75,7 +75,7 @@ export function PriorityActions({ actions, loading = false, className = "" }: Pr
   return (
     <div className={`rounded-lg border border-slate-200 bg-white ${className}`} role="region" aria-label="Priority actions">
       <div className="border-b border-slate-200 px-4 py-3">
-        <h2 className="text-sm font-semibold text-slate-900">Priority Actions</h2>
+        <h2 className="text-sm font-semibold text-slate-900">Next Actions</h2>
       </div>
       <ul className="divide-y divide-slate-200">
         {actions.map((action) => {

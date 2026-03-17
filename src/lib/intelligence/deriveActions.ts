@@ -35,8 +35,8 @@ export function deriveOwnerPriorityActions(data: OwnerDashboardData): PriorityAc
   if (kpis.overdueAmount.value > 0 && kpis.overdueAmount.source !== "unavailable") {
     actions.push({
       id: "owner-overdue",
-      title: "Overdue tenant balances need follow-up",
-      description: `${fmtCents(kpis.overdueAmount.value)} in overdue rent across your portfolio.`,
+      title: "Review overdue payments",
+      description: `${fmtCents(kpis.overdueAmount.value)} outstanding across your portfolio.`,
       severity: "danger",
       ctaLabel: "View Payments",
       ctaHref: "/app/payments",
@@ -48,7 +48,7 @@ export function deriveOwnerPriorityActions(data: OwnerDashboardData): PriorityAc
   if (leaseAlert) {
     actions.push({
       id: "owner-lease-expiring",
-      title: `${leaseAlert.count} lease${leaseAlert.count > 1 ? "s" : ""} expiring soon`,
+      title: `Start renewal for ${leaseAlert.count} expiring lease${leaseAlert.count > 1 ? "s" : ""}`,
       description: leaseAlert.message,
       severity: "warning",
       ctaLabel: "View Leases",
@@ -61,7 +61,7 @@ export function deriveOwnerPriorityActions(data: OwnerDashboardData): PriorityAc
   if (maintAlert) {
     actions.push({
       id: "owner-maint-aging",
-      title: `${maintAlert.count} maintenance request${maintAlert.count > 1 ? "s" : ""} waiting`,
+      title: `Respond to ${maintAlert.count} maintenance request${maintAlert.count > 1 ? "s" : ""}`,
       description: maintAlert.message,
       severity: "warning",
       ctaLabel: "Review Requests",
@@ -70,8 +70,8 @@ export function deriveOwnerPriorityActions(data: OwnerDashboardData): PriorityAc
   } else if (kpis.openMaintenanceRequests.value > 0 && kpis.openMaintenanceRequests.source !== "unavailable") {
     actions.push({
       id: "owner-open-maint",
-      title: `${kpis.openMaintenanceRequests.value} open maintenance request${kpis.openMaintenanceRequests.value > 1 ? "s" : ""}`,
-      description: "Review and assign open work orders to keep your properties in top shape.",
+      title: `Respond to ${kpis.openMaintenanceRequests.value} open maintenance request${kpis.openMaintenanceRequests.value > 1 ? "s" : ""}`,
+      description: "Assign or resolve open work orders to keep your properties in top shape.",
       severity: "info",
       ctaLabel: "Review Requests",
       ctaHref: "/app/maintenance",
@@ -110,8 +110,8 @@ export function deriveOwnerPriorityActions(data: OwnerDashboardData): PriorityAc
   if (data.documentCount === 0 && data.setupStage === "active") {
     actions.push({
       id: "owner-no-docs",
-      title: "Upload property documents",
-      description: "No documents on file. Upload leases, insurance, or inspection reports.",
+      title: "Upload your first document",
+      description: "Keep leases, insurance, and inspection reports organized in one place.",
       severity: "info",
       ctaLabel: "Upload Documents",
       ctaHref: "/app/documents",
@@ -145,7 +145,7 @@ export function deriveOwnerInsights(data: OwnerDashboardData): Insight[] {
   if (kpis.overdueAmount.value > 0 && kpis.overdueAmount.source !== "unavailable") {
     insights.push({
       id: "oi-overdue",
-      message: "Send payment reminders to tenants with overdue balances",
+      message: "Send rent reminders to tenants with outstanding balances",
       explanation: `${fmtCents(kpis.overdueAmount.value)} is past due.`,
       severity: "danger",
       ctaLabel: "View Payments",

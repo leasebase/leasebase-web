@@ -12,55 +12,31 @@ import type { OwnerDashboardData } from "@/services/dashboard/types";
    ═══════════════════════════════════════════ */
 
 export function ownerOnboardingSteps(data: OwnerDashboardData): ChecklistStep[] {
-  const hasProperties = data.kpis.totalProperties.value > 0;
-  const hasUnits = data.kpis.totalUnits.value > 0;
-  const hasLeases = data.setupStage === "active" || data.setupStage === "no-payments";
-  const hasPayments = data.setupStage === "active";
+  const hasProperty = data.kpis.totalProperties.value > 0 && data.kpis.totalUnits.value > 0;
+  const hasTenant = data.setupStage === "active" || data.setupStage === "no-payments";
+  const hasRent = data.setupStage === "active";
 
   return [
     {
-      key: "add-property",
-      label: "Add your first property",
-      done: hasProperties,
+      key: "property-basics",
+      label: "Add your property and units",
+      done: hasProperty,
       href: "/app/properties",
       ctaLabel: "Add Property",
     },
     {
-      key: "add-units",
-      label: "Create units for your property",
-      done: hasUnits,
-      href: "/app/units",
-      ctaLabel: "Add Units",
-    },
-    {
-      key: "create-lease",
-      label: "Set up a lease agreement",
-      done: hasLeases,
-      href: "/app/leases",
-      ctaLabel: "Create Lease",
-    },
-    {
-      key: "invite-tenants",
-      label: "Invite tenants to the platform",
-      // Proxy: OWNER can't call /api/tenants — inferred from active lease existence.
-      // Will show as done if any lease exists, even without a confirmed tenant invite.
-      done: hasLeases,
+      key: "add-tenant",
+      label: "Add a tenant (or skip for now)",
+      done: hasTenant,
       href: "/app/tenants",
-      ctaLabel: "Invite Tenants",
+      ctaLabel: "Add Tenant",
     },
     {
-      key: "record-payment",
-      label: "Record or receive your first payment",
-      done: hasPayments,
+      key: "set-rent",
+      label: "Set your rent amount",
+      done: hasRent,
       href: "/app/payments",
-      ctaLabel: "Record Payment",
-    },
-    {
-      key: "upload-docs",
-      label: "Upload property documents",
-      done: data.documentCount > 0,
-      href: "/app/documents",
-      ctaLabel: "Upload",
+      ctaLabel: "Set Rent",
     },
   ];
 }
