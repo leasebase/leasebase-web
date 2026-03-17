@@ -3,19 +3,34 @@
 import Link from "next/link";
 import { DataTable, type Column, type FilterConfig } from "@/components/ui/DataTable";
 import { Badge, type BadgeVariant } from "@/components/ui/Badge";
-import type { LeaseRow } from "@/services/leases/types";
+import type { LeaseRow, LeaseTenantRow } from "@/services/leases/types";
+import { TERM_TYPE_LABELS } from "@/services/leases/types";
 
 function statusVariant(status: string): BadgeVariant {
   switch (status) {
-    case "ACTIVE": return "success";
-    case "PENDING": return "warning";
-    case "TERMINATED": return "danger";
+    case "ACTIVE":
+    case "EXTENDED": return "success";
+    case "DRAFT":
+    case "ASSIGNED":
+    case "INVITED":
+    case "ACKNOWLEDGED": return "warning";
+    case "INACTIVE": return "danger";
+    case "EXPIRED":
+    case "RENEWED": return "neutral";
     default: return "neutral";
   }
 }
 
-function formatCurrency(cents: number): string {
-  return `$${(cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+/** Format tenant name as "F.LastName". For multiple tenants, comma-separate. */
+function formatTenantNames(tenants?: LeaseTenantRow[]): string {
+  if (!tenants || tenants.length === 0) return "Not assigned";
+  return tenants
+    .map((t) => {
+      const parts = t.name.trim().split(/\s+/);
+      if (parts.length < 2) return t.name;
+      return `${parts[0][0]}.${parts[parts.length - 1]}`;
+    })
+    .join(", ");
 }
 
 function formatDate(iso: string): string {
@@ -46,19 +61,22 @@ const columns: Column<LeaseRow>[] = [
     ),
   },
   {
-    key: "tenant_id",
-    header: "Tenant",
+    key: "tenants",
+    header: "Tenants",
     render: (row) => (
       <span className="text-slate-600">
-        {row.tenant_id || "Not assigned"}
+        {formatTenantNames(row.tenants)}
       </span>
     ),
   },
   {
-    key: "monthly_rent",
-    header: "Rent",
-    sortable: true,
-    render: (row) => <span>{formatCurrency(row.monthly_rent)}/mo</span>,
+    key: "term_type",
+    header: "Term",
+    render: (row) => (
+      <span className="text-slate-600 text-xs">
+        {TERM_TYPE_LABELS[row.term_type] ?? row.term_type}
+      </span>
+    ),
   },
   {
     key: "status",
@@ -95,10 +113,14 @@ const statusFilter: FilterConfig = {
   label: "Status",
   options: [
     { label: "Draft", value: "DRAFT" },
-    { label: "Pending", value: "PENDING" },
+    { label: "Assigned", value: "ASSIGNED" },
+    { label: "Invited", value: "INVITED" },
+    { label: "Acknowledged", value: "ACKNOWLEDGED" },
     { label: "Active", value: "ACTIVE" },
-    { label: "Terminated", value: "TERMINATED" },
     { label: "Expired", value: "EXPIRED" },
+    { label: "Extended", value: "EXTENDED" },
+    { label: "Renewed", value: "RENEWED" },
+    { label: "Inactive", value: "INACTIVE" },
   ],
 };
 
@@ -119,7 +141,7 @@ export function LeasesTable({ leases, loading, error }: LeasesTableProps) {
       emptyMessage="No leases found"
       searchable
       searchPlaceholder="Search leases…"
-      searchKeys={["property_name", "unit_number", "tenant_id"]}
+      searchKeys={["property_name", "unit_number"]}
       filters={[statusFilter]}
       pageSize={20}
     />

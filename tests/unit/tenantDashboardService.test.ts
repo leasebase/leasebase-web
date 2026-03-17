@@ -20,18 +20,18 @@ const activeLease: LeaseRow = {
   id: "l1",
   organization_id: "org1",
   unit_id: "unit1",
+  term_type: "TWELVE_MONTH",
   start_date: "2024-01-01",
   end_date: "2026-12-31",
-  rent_amount: 145000,
   deposit_amount: 145000,
   status: "ACTIVE",
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
 };
 
-const terminatedLease: LeaseRow = {
+const inactiveLease: LeaseRow = {
   ...activeLease,
-  status: "TERMINATED",
+  status: "INACTIVE",
 };
 
 const expiredLease: LeaseRow = {
@@ -68,8 +68,8 @@ describe("computeTenantSetupStage", () => {
     expect(computeTenantSetupStage(profile, "live", activeLease, "live")).toBe("active");
   });
 
-  test('returns "lease-ended" for TERMINATED lease', () => {
-    expect(computeTenantSetupStage(profile, "live", terminatedLease, "live")).toBe("lease-ended");
+  test('returns "lease-ended" for INACTIVE lease', () => {
+    expect(computeTenantSetupStage(profile, "live", inactiveLease, "live")).toBe("lease-ended");
   });
 
   test('returns "lease-ended" for EXPIRED lease', () => {

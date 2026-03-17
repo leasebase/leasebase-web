@@ -43,9 +43,9 @@ export function computeTenantSetupStage(
   if (!profile.lease_id) return "no-lease";
   // Lease fetch failed
   if (leaseSource === "unavailable" || !lease) return "no-lease";
-  if (lease.status === "TERMINATED" || lease.status === "EXPIRED") return "lease-ended";
-  if (lease.status === "ACTIVE") return "active";
-  // DRAFT leases — treat as no-lease (not yet started)
+  if (lease.status === "INACTIVE" || lease.status === "EXPIRED" || lease.status === "RENEWED") return "lease-ended";
+  if (lease.status === "ACTIVE" || lease.status === "EXTENDED") return "active";
+  // DRAFT / ASSIGNED / INVITED / ACKNOWLEDGED — treat as no-lease (not yet started)
   return "no-lease";
 }
 

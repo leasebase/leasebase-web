@@ -7,11 +7,15 @@
  * Row shapes mirror the canonical DB columns returned by the
  * lease-service (snake_case). Form DTOs use camelCase to match
  * the API request body.
- *
- * NOTE: tenant_name enrichment is deferred. The frontend displays
- * tenant_id as a raw value (or "Not assigned") until a follow-up
- * adds tenant name resolution.
  */
+
+/* ── Tenant on a lease (from lease_tenants join) ── */
+
+export interface LeaseTenantRow {
+  id: string;
+  name: string;
+  role: "PRIMARY" | "OCCUPANT";
+}
 
 /* ── API row shape (from GET /api/leases, /api/leases/:id) ── */
 
@@ -20,20 +24,18 @@ export interface LeaseRow {
   org_id: string;
   property_id: string;
   unit_id: string;
-  tenant_id: string | null;
-  lease_type: string;
+  term_type: string;
   status: string;
   start_date: string;
   end_date: string;
-  monthly_rent: number; // cents
   security_deposit: number | null;
   lease_terms: Record<string, unknown> | null;
-  signed_at: string | null;
   created_at: string;
   updated_at: string;
-  // Enrichment (optional, from cross-schema JOIN)
+  // Enrichment (from cross-schema JOINs)
   property_name?: string;
   unit_number?: string;
+  tenants?: LeaseTenantRow[];
 }
 
 /* ── Form DTOs (camelCase — matches API request body) ── */
@@ -41,23 +43,19 @@ export interface LeaseRow {
 export interface CreateLeaseDTO {
   propertyId: string;
   unitId: string;
-  tenantId?: string;
-  leaseType?: string;
-  status?: string;
+  termType: string;
   startDate: string;
-  endDate: string;
-  monthlyRent: number; // cents
+  endDate?: string; // required only for CUSTOM
   securityDeposit?: number;
   leaseTerms?: Record<string, unknown>;
-  signedAt?: string;
 }
 
 export type UpdateLeaseDTO = Partial<CreateLeaseDTO>;
 
 export interface RenewLeaseDTO {
+  termType: string;
   startDate: string;
-  endDate: string;
-  monthlyRent: number; // cents
+  endDate?: string;
   securityDeposit?: number;
   leaseTerms?: Record<string, unknown>;
 }
@@ -76,21 +74,36 @@ export interface PaginatedResponse<T> {
   meta: PaginationMeta;
 }
 
-/* ── Status & type constants ── */
+/* ── Status & term type constants ── */
 
 export const LEASE_STATUSES = [
   "DRAFT",
-  "PENDING",
+  "ASSIGNED",
+  "INVITED",
+  "ACKNOWLEDGED",
   "ACTIVE",
-  "TERMINATED",
   "EXPIRED",
+  "EXTENDED",
+  "RENEWED",
+  "INACTIVE",
 ] as const;
 
 export type LeaseStatus = (typeof LEASE_STATUSES)[number];
 
-export const LEASE_TYPES = [
-  "FIXED_TERM",
+export const TERM_TYPES = [
   "MONTH_TO_MONTH",
+  "THREE_MONTH",
+  "SIX_MONTH",
+  "TWELVE_MONTH",
+  "CUSTOM",
 ] as const;
 
-export type LeaseType = (typeof LEASE_TYPES)[number];
+export type TermType = (typeof TERM_TYPES)[number];
+
+export const TERM_TYPE_LABELS: Record<string, string> = {
+  MONTH_TO_MONTH: "Month-to-Month",
+  THREE_MONTH: "3 Months",
+  SIX_MONTH: "6 Months",
+  TWELVE_MONTH: "12 Months",
+  CUSTOM: "Custom",
+};

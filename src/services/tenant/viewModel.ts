@@ -164,8 +164,8 @@ function buildKpiHeader(data: TenantDashboardData): TenantKpiHeaderViewModel {
   const paymentStatus = computePaymentStatus(lease, data.payments);
 
   return {
-    rentAmount: fmtCurrency(lease.rent_amount),
-    rentAmountCents: lease.rent_amount,
+    rentAmount: "—",
+    rentAmountCents: 0,
     dueDate: fmtDate(dueDateStr),
     dueDateRaw: dueDateStr,
     paymentStatus,
@@ -221,7 +221,7 @@ function buildPaymentsWidget(data: TenantDashboardData): TenantPaymentsWidgetVie
 
   const nextPayment = lease
     ? {
-        amount: fmtCurrency(lease.rent_amount),
+        amount: "—",
         dueDate: (() => {
           const now = new Date();
           const dueDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;

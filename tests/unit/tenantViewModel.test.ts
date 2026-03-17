@@ -7,9 +7,9 @@ const activeLease: LeaseRow = {
   id: "l1",
   organization_id: "org1",
   unit_id: "unit1",
+  term_type: "TWELVE_MONTH",
   start_date: "2024-01-01",
   end_date: "2026-12-31",
-  rent_amount: 145000,
   deposit_amount: 145000,
   status: "ACTIVE",
   created_at: "2024-01-01T00:00:00Z",
@@ -144,8 +144,8 @@ describe("toTenantDashboardViewModel", () => {
     const data = makeActiveDashboardData();
     const vm = toTenantDashboardViewModel(data);
 
-    expect(vm.kpiHeader.rentAmount).toBe("$1,450");
-    expect(vm.kpiHeader.rentAmountCents).toBe(145000);
+    expect(vm.kpiHeader.rentAmount).toBe("—");
+    expect(vm.kpiHeader.rentAmountCents).toBe(0);
   });
 
   test("KPI header shows dash when no lease", () => {

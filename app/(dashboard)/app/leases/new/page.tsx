@@ -55,7 +55,6 @@ function InviteStep({ lease, onDone }: InviteStepProps) {
         unitId: lease.unit_id,
         leaseStart: lease.start_date?.split("T")[0],
         leaseEnd: lease.end_date?.split("T")[0],
-        monthlyRent: lease.monthly_rent,
         securityDeposit: lease.security_deposit ?? undefined,
       });
       setSent(true);

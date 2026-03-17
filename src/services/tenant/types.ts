@@ -15,7 +15,7 @@ export type { DataSource, DomainResult, Sourced };
 export type TenantSetupStage =
   | "no-profile"     // user is TENANT but has no tenant_profile row
   | "no-lease"       // tenant profile exists but lease_id is null or lease not found
-  | "lease-ended"    // lease exists but status is TERMINATED or EXPIRED
+  | "lease-ended"    // lease exists but status is INACTIVE, EXPIRED, or RENEWED
   | "active";        // active lease found
 
 /* ── API row shapes ── */
@@ -37,13 +37,14 @@ export interface LeaseRow {
   id: string;
   organization_id: string;
   unit_id: string;
+  term_type: string;
   start_date: string;
   end_date: string;
-  rent_amount: number; // cents
   deposit_amount: number | null;
-  status: "DRAFT" | "ACTIVE" | "TERMINATED" | "EXPIRED";
+  status: "DRAFT" | "ASSIGNED" | "INVITED" | "ACKNOWLEDGED" | "ACTIVE" | "EXPIRED" | "EXTENDED" | "RENEWED" | "INACTIVE";
   created_at: string;
   updated_at: string;
+  tenants?: Array<{ id: string; name: string; role: string }>;
 }
 
 export interface PaymentRow {

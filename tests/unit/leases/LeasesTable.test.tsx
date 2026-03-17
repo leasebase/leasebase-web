@@ -20,25 +20,23 @@ const makeLease = (overrides: Partial<LeaseRow> = {}): LeaseRow => ({
   org_id: "org-1",
   property_id: "p1",
   unit_id: "u1",
-  tenant_id: "t1",
-  lease_type: "FIXED_TERM",
+  term_type: "TWELVE_MONTH",
   status: "ACTIVE",
   start_date: "2026-01-01T00:00:00Z",
   end_date: "2026-12-31T00:00:00Z",
-  monthly_rent: 150000,
   security_deposit: 300000,
   lease_terms: null,
-  signed_at: null,
   created_at: now,
   updated_at: now,
   property_name: "Sunset Apartments",
   unit_number: "101",
+  tenants: [{ id: "t1", name: "John Doe", role: "PRIMARY" }],
   ...overrides,
 });
 
 const leases: LeaseRow[] = [
   makeLease({ id: "l1", status: "ACTIVE", property_name: "Sunset Apartments" }),
-  makeLease({ id: "l2", status: "TERMINATED", property_name: "Harbor View", tenant_id: null }),
+  makeLease({ id: "l2", status: "INACTIVE", property_name: "Harbor View", tenants: [] }),
 ];
 
 /* ── Tests ── */
@@ -54,19 +52,18 @@ describe("LeasesTable", () => {
   test("renders status badges with correct text", () => {
     render(<LeasesTable leases={leases} />);
     expect(screen.getByText("ACTIVE")).toBeInTheDocument();
-    expect(screen.getByText("TERMINATED")).toBeInTheDocument();
+    expect(screen.getByText("INACTIVE")).toBeInTheDocument();
   });
 
-  test("renders tenant_id or 'Not assigned'", () => {
+  test("renders tenant names or 'Not assigned'", () => {
     render(<LeasesTable leases={leases} />);
-    expect(screen.getByText("t1")).toBeInTheDocument();
+    expect(screen.getByText("J. Doe")).toBeInTheDocument();
     expect(screen.getByText("Not assigned")).toBeInTheDocument();
   });
 
-  test("renders rent formatted as dollars", () => {
+  test("renders term type", () => {
     render(<LeasesTable leases={leases} />);
-    // $1,500.00/mo
-    expect(screen.getAllByText(/\$1,500\.00\/mo/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("12 Months").length).toBeGreaterThanOrEqual(1);
   });
 
   test("links to lease detail page", () => {
