@@ -81,7 +81,7 @@ describe("MaintenanceOverviewCard", () => {
       source: "unavailable",
     };
     render(<MaintenanceOverviewCard vm={vm} />);
-    expect(screen.getByText(/currently unavailable/i)).toBeInTheDocument();
+    expect(screen.getByText(/No maintenance requests yet/i)).toBeInTheDocument();
   });
 
   test("renders link to /app/maintenance", () => {

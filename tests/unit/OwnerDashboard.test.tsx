@@ -144,7 +144,7 @@ describe("OwnerDashboard", () => {
     await waitFor(() => {
       expect(screen.getByText("Welcome to LeaseBase")).toBeInTheDocument();
     });
-    expect(screen.getByText("Add your first property")).toBeInTheDocument();
+    expect(screen.getByText("Add your property")).toBeInTheDocument();
   });
 
   test("renders active dashboard with KPIs and alerts", async () => {
@@ -155,9 +155,9 @@ describe("OwnerDashboard", () => {
       expect(screen.getByText("Dashboard")).toBeInTheDocument();
     });
 
-    // KPIs rendered — 4 cards: Rent Collected, Overdue Balance, Occupancy, Open Maintenance
-    expect(screen.getByText("Rent Collected")).toBeInTheDocument();
-    expect(screen.getByText("Overdue Balance")).toBeInTheDocument();
+    // KPIs rendered — 4 cards: Monthly Cash Flow, Outstanding Payments, Occupancy, Maintenance Requests
+    expect(screen.getByText("Monthly Cash Flow")).toBeInTheDocument();
+    expect(screen.getByText("Outstanding Payments")).toBeInTheDocument();
 
     // Alert rendered
     expect(screen.getByText("1 rent payment overdue")).toBeInTheDocument();
