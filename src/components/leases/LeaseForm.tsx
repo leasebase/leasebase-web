@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { fetchProperties, fetchUnitsForProperty } from "@/services/properties/propertyService";
 import type { PropertyRow, UnitRow } from "@/services/properties/types";
 import type { LeaseRow, CreateLeaseDTO } from "@/services/leases/types";
-import { LEASE_TYPES } from "@/services/leases/types";
+import { TERM_TYPES, TERM_TYPE_LABELS } from "@/services/leases/types";
 
 interface LeaseFormProps {
   /** If provided, the form is in edit mode with initial values. */
@@ -20,29 +20,28 @@ interface LeaseFormProps {
 interface FormErrors {
   propertyId?: string;
   unitId?: string;
+  termType?: string;
   startDate?: string;
   endDate?: string;
-  monthlyRent?: string;
 }
 
 function validate(data: {
   propertyId: string;
   unitId: string;
+  termType: string;
   startDate: string;
   endDate: string;
-  monthlyRent: string;
 }): FormErrors {
   const errors: FormErrors = {};
   if (!data.propertyId) errors.propertyId = "Property is required";
   if (!data.unitId) errors.unitId = "Unit is required";
+  if (!data.termType) errors.termType = "Term type is required";
   if (!data.startDate) errors.startDate = "Start date is required";
-  if (!data.endDate) errors.endDate = "End date is required";
-  else if (data.startDate && data.endDate && data.endDate <= data.startDate) {
-    errors.endDate = "End date must be after start date";
-  }
-  const rentNum = parseFloat(data.monthlyRent);
-  if (!data.monthlyRent || isNaN(rentNum) || rentNum <= 0) {
-    errors.monthlyRent = "Monthly rent must be greater than 0";
+  if (data.termType === "CUSTOM") {
+    if (!data.endDate) errors.endDate = "End date is required for custom terms";
+    else if (data.startDate && data.endDate <= data.startDate) {
+      errors.endDate = "End date must be after start date";
+    }
   }
   return errors;
 }
@@ -50,22 +49,12 @@ function validate(data: {
 export function LeaseForm({ initial, onSubmit, onCancel, submitLabel }: LeaseFormProps) {
   const [propertyId, setPropertyId] = useState(initial?.property_id ?? "");
   const [unitId, setUnitId] = useState(initial?.unit_id ?? "");
-  const [tenantId, setTenantId] = useState(initial?.tenant_id ?? "");
-  const [leaseType, setLeaseType] = useState(initial?.lease_type ?? "FIXED_TERM");
+  const [termType, setTermType] = useState(initial?.term_type ?? "TWELVE_MONTH");
   const [startDate, setStartDate] = useState(
     initial?.start_date ? initial.start_date.split("T")[0] : "",
   );
   const [endDate, setEndDate] = useState(
     initial?.end_date ? initial.end_date.split("T")[0] : "",
-  );
-  const [monthlyRent, setMonthlyRent] = useState(
-    initial ? String(initial.monthly_rent / 100) : "",
-  );
-  const [securityDeposit, setSecurityDeposit] = useState(
-    initial?.security_deposit ? String(initial.security_deposit / 100) : "",
-  );
-  const [leaseTerms, setLeaseTerms] = useState(
-    initial?.lease_terms ? JSON.stringify(initial.lease_terms, null, 2) : "",
   );
 
   const [properties, setProperties] = useState<PropertyRow[]>([]);
@@ -99,38 +88,23 @@ export function LeaseForm({ initial, onSubmit, onCancel, submitLabel }: LeaseFor
 
   const handlePropertyChange = (newPropertyId: string) => {
     setPropertyId(newPropertyId);
-    if (newPropertyId !== propertyId) setUnitId(""); // Reset unit when property changes
+    if (newPropertyId !== propertyId) setUnitId("");
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setServerError(null);
 
-    const validationErrors = validate({ propertyId, unitId, startDate, endDate, monthlyRent });
+    const validationErrors = validate({ propertyId, unitId, termType, startDate, endDate });
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
-
-    let parsedTerms: Record<string, unknown> | undefined;
-    if (leaseTerms.trim()) {
-      try {
-        parsedTerms = JSON.parse(leaseTerms);
-      } catch {
-        // silently ignore invalid JSON — it's optional
-      }
-    }
 
     const dto: CreateLeaseDTO = {
       propertyId,
       unitId,
-      tenantId: tenantId || undefined,
-      leaseType,
+      termType,
       startDate,
-      endDate,
-      monthlyRent: Math.round(parseFloat(monthlyRent) * 100),
-      securityDeposit: securityDeposit
-        ? Math.round(parseFloat(securityDeposit) * 100)
-        : undefined,
-      leaseTerms: parsedTerms,
+      endDate: termType === "CUSTOM" ? endDate : undefined,
     };
 
     try {
@@ -197,27 +171,20 @@ export function LeaseForm({ initial, onSubmit, onCancel, submitLabel }: LeaseFor
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Input
-          label="Tenant ID"
-          placeholder="Optional — tenant user ID"
-          value={tenantId}
-          onChange={(e) => setTenantId(e.target.value)}
-        />
-
         <Select
-          label="Lease Type"
-          value={leaseType}
-          onChange={(e) => setLeaseType(e.target.value)}
+          label="Term"
+          value={termType}
+          onChange={(e) => setTermType(e.target.value)}
+          error={errors.termType}
+          required
         >
-          {LEASE_TYPES.map((t) => (
+          {TERM_TYPES.map((t) => (
             <option key={t} value={t}>
-              {t.replace(/_/g, " ")}
+              {TERM_TYPE_LABELS[t] ?? t}
             </option>
           ))}
         </Select>
-      </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
         <Input
           label="Start Date"
           type="date"
@@ -226,7 +193,9 @@ export function LeaseForm({ initial, onSubmit, onCancel, submitLabel }: LeaseFor
           error={errors.startDate}
           required
         />
+      </div>
 
+      {termType === "CUSTOM" && (
         <Input
           label="End Date"
           type="date"
@@ -235,40 +204,7 @@ export function LeaseForm({ initial, onSubmit, onCancel, submitLabel }: LeaseFor
           error={errors.endDate}
           required
         />
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Input
-          label="Monthly Rent ($)"
-          type="number"
-          placeholder="0.00"
-          value={monthlyRent}
-          onChange={(e) => setMonthlyRent(e.target.value)}
-          error={errors.monthlyRent}
-          required
-        />
-
-        <Input
-          label="Security Deposit ($)"
-          type="number"
-          placeholder="Optional"
-          value={securityDeposit}
-          onChange={(e) => setSecurityDeposit(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">
-          Lease Terms (JSON, optional)
-        </label>
-        <textarea
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-          rows={4}
-          placeholder='{"pets": false, "parking": true}'
-          value={leaseTerms}
-          onChange={(e) => setLeaseTerms(e.target.value)}
-        />
-      </div>
+      )}
 
       <div className="flex items-center justify-end gap-3 pt-2">
         <Button

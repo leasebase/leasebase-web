@@ -93,7 +93,7 @@ export default function Page() {
     }
   }
 
-  const chargeAmount = currentCharge?.amount ?? lease?.rent_amount ?? 0;
+  const chargeAmount = currentCharge?.amount ?? 0;
   const amountFormatted = formatCents(chargeAmount);
   const chargeIsPaid = currentCharge?.status === "PAID";
   const hasProcessing = !!processingPayment;

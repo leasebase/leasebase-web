@@ -22,9 +22,9 @@ function makeLease(overrides: Partial<LeaseRow> = {}): LeaseRow {
     id: "lease-1",
     organization_id: "org-1",
     unit_id: "unit-1",
+    term_type: "TWELVE_MONTH",
     start_date: "2026-01-01",
     end_date: "2027-01-01",
-    rent_amount: 145000,
     deposit_amount: 145000,
     status: "ACTIVE",
     created_at: "2026-01-01T00:00:00Z",
@@ -66,12 +66,12 @@ describe("computeTenantSetupStage", () => {
     ).toBe("no-lease");
   });
 
-  it('returns "lease-ended" when lease status is TERMINATED', () => {
+  it('returns "lease-ended" when lease status is INACTIVE', () => {
     expect(
       computeTenantSetupStage(
         makeProfile({ lease_id: "lease-1" }),
         "live",
-        makeLease({ status: "TERMINATED" }),
+        makeLease({ status: "INACTIVE" }),
         "live",
       ),
     ).toBe("lease-ended");

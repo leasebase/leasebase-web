@@ -56,9 +56,8 @@ describe("leaseService", () => {
       const dto = {
         propertyId: "p1",
         unitId: "u1",
+        termType: "TWELVE_MONTH",
         startDate: "2026-01-01",
-        endDate: "2026-12-31",
-        monthlyRent: 150000,
       };
       mockApiRequest.mockResolvedValueOnce({ data: { id: "new-1" } });
       await createLease(dto);
@@ -73,7 +72,7 @@ describe("leaseService", () => {
 
   describe("updateLease", () => {
     test("sends PUT with JSON body", async () => {
-      const dto = { monthlyRent: 200000 };
+      const dto = { termType: "CUSTOM", endDate: "2027-06-30" };
       mockApiRequest.mockResolvedValueOnce({ data: { id: "l1" } });
       await updateLease("l1", dto);
       expect(mockApiRequest).toHaveBeenCalledWith({
@@ -100,7 +99,7 @@ describe("leaseService", () => {
 
   describe("renewLease", () => {
     test("sends POST to /:id/renew", async () => {
-      const dto = { startDate: "2027-01-01", endDate: "2027-12-31", monthlyRent: 160000 };
+      const dto = { termType: "TWELVE_MONTH", startDate: "2027-01-01" };
       mockApiRequest.mockResolvedValueOnce({ data: { id: "new-lease" } });
       await renewLease("l1", dto);
       expect(mockApiRequest).toHaveBeenCalledWith({
