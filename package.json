@@ -21,6 +21,8 @@
     "docs:preview": "DOCS_PREVIEW_ONLY=true npx tsx docs-engine/analyzeRepo.ts"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^5.6.1",
+    "@stripe/stripe-js": "^8.10.0",
     "aws-amplify": "^6.16.2",
     "axios": "1.8.4",
     "js-cookie": "3.0.5",
