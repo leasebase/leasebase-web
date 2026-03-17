@@ -68,20 +68,20 @@ function fmtDate(iso: string): string {
 /* ── Page Header ── */
 
 function buildHeader(data: OwnerDashboardData): PageHeaderViewModel {
-  const props = data.kpis.totalProperties.value;
-  const units = data.kpis.totalUnits.value;
   const overdue = data.kpis.overdueAmount.value;
   const openMaint = data.kpis.openMaintenanceRequests.value;
 
-  const parts: string[] = [];
-  parts.push(`${props} ${props === 1 ? "property" : "properties"}`);
-  parts.push(`${units} ${units === 1 ? "unit" : "units"}`);
-  if (overdue > 0) parts.push(`${fmtCurrency(overdue)} overdue`);
-  if (openMaint > 0) parts.push(`${openMaint} open maintenance ${openMaint === 1 ? "request" : "requests"}`);
+  const alerts: string[] = [];
+  if (overdue > 0) alerts.push(`${fmtCurrency(overdue)} outstanding`);
+  if (openMaint > 0) alerts.push(`${openMaint} maintenance ${openMaint === 1 ? "request" : "requests"}`);
+
+  const subtitle = alerts.length > 0
+    ? `Needs attention: ${alerts.join(", ")}.`
+    : "Everything is on track.";
 
   return {
     title: "Dashboard",
-    subtitle: parts.length > 0 ? `You have ${parts.join(", ")}.` : "Welcome to your dashboard.",
+    subtitle,
   };
 }
 
@@ -93,11 +93,11 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
   const items: KpiItem[] = [
     {
       key: "collectedThisMonth",
-      label: "Rent Collected",
+      label: "Monthly Cash Flow",
       value: fmtKpiValue(kpis.collectedThisMonth, fmtCurrency),
       rawValue: kpis.collectedThisMonth.value,
       change: kpis.monthlyScheduledRent.value > 0
-        ? `of ${fmtCurrency(kpis.monthlyScheduledRent.value)} scheduled`
+        ? `${fmtCurrency(kpis.collectedThisMonth.value)} of ${fmtCurrency(kpis.monthlyScheduledRent.value)} expected`
         : undefined,
       source: kpis.collectedThisMonth.source,
       icon: "payments",
@@ -105,7 +105,7 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
     },
     {
       key: "overdueAmount",
-      label: "Overdue Balance",
+      label: "Outstanding Payments",
       value: fmtKpiValue(kpis.overdueAmount, fmtCurrency),
       rawValue: kpis.overdueAmount.value,
       source: kpis.overdueAmount.source,
@@ -130,7 +130,7 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
     },
     {
       key: "openMaintenanceRequests",
-      label: "Open Maintenance",
+      label: "Maintenance Requests",
       value: fmtKpiValue(kpis.openMaintenanceRequests, fmtNumber),
       rawValue: kpis.openMaintenanceRequests.value,
       source: kpis.openMaintenanceRequests.source,

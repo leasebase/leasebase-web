@@ -18,7 +18,9 @@ export function CashFlowCard({ vm }: CashFlowCardProps) {
           <h2 className="text-sm font-semibold text-slate-900">Cash Flow &amp; Receivables</h2>
         </CardHeader>
         <CardBody>
-          <p className="py-4 text-center text-sm text-slate-400">Cash flow data is currently unavailable.</p>
+          <p className="py-4 text-center text-sm text-slate-400">
+            No payment data yet — <Link href="/app/leases/new" className="text-brand-600 hover:text-brand-700">add your first lease</Link> to start tracking rent.
+          </p>
         </CardBody>
       </Card>
     );

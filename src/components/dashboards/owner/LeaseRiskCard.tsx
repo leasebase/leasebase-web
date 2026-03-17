@@ -20,7 +20,9 @@ export function LeaseRiskCard({ vm }: LeaseRiskCardProps) {
           <h2 className="text-sm font-semibold text-slate-900">Lease Risk &amp; Expirations</h2>
         </CardHeader>
         <CardBody>
-          <p className="py-4 text-center text-sm text-slate-400">Lease risk data is currently unavailable.</p>
+          <p className="py-4 text-center text-sm text-slate-400">
+            No lease data yet — <Link href="/app/leases/new" className="text-brand-600 hover:text-brand-700">create a lease</Link> to see expiration tracking.
+          </p>
         </CardBody>
       </Card>
     );

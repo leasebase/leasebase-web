@@ -20,7 +20,9 @@ export function MaintenanceOverviewCard({ vm }: MaintenanceOverviewCardProps) {
           <h2 className="text-sm font-semibold text-slate-900">Maintenance Overview</h2>
         </CardHeader>
         <CardBody>
-          <p className="py-4 text-center text-sm text-slate-400">Maintenance data is currently unavailable.</p>
+          <p className="py-4 text-center text-sm text-slate-400">
+            No maintenance requests yet — they will appear here when tenants submit them.
+          </p>
         </CardBody>
       </Card>
     );
