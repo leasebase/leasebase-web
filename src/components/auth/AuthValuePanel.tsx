@@ -1,6 +1,7 @@
 "use client";
 
 import { Building2, Users, Zap } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 const VALUE_POINTS = [
   {
@@ -23,7 +24,7 @@ const VALUE_POINTS = [
  */
 export function AuthValuePanel() {
   return (
-    <div className="relative hidden md:flex flex-col justify-between overflow-hidden bg-brand-950 p-10 lg:p-14">
+    <div className="relative hidden md:flex flex-col justify-between overflow-hidden lb-brand-surface p-10 lg:p-14">
       {/* Subtle dot-grid background pattern */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03]"
@@ -39,12 +40,7 @@ export function AuthValuePanel() {
       <div className="relative z-10 flex flex-col gap-10">
         {/* Logo wordmark */}
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-lg font-bold text-white shadow-lg">
-            LB
-          </span>
-          <span className="text-xl font-semibold tracking-wide text-slate-100">
-            Leasebase
-          </span>
+          <Logo variant="full" theme="dark" size={190} />
         </div>
 
         {/* Headline + supporting copy */}
@@ -52,7 +48,7 @@ export function AuthValuePanel() {
           <h1 className="text-3xl font-bold leading-tight tracking-tight text-white lg:text-4xl">
             Property operations,
             <br />
-            <span className="text-brand-400">simplified.</span>
+            <span className="lb-gradient-text">built for momentum.</span>
           </h1>
           <p className="max-w-sm text-sm leading-relaxed text-slate-400">
             The modern platform for landlords and tenants to manage leases,
@@ -80,7 +76,7 @@ export function AuthValuePanel() {
         className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
         style={{
           background:
-            "linear-gradient(to top, var(--lb-color-brand-primary-950) 0%, transparent 100%)",
+            "linear-gradient(to top, rgba(5, 7, 11, 0.95) 0%, transparent 100%)",
         }}
         aria-hidden="true"
       />

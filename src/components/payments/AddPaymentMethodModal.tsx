@@ -192,7 +192,7 @@ export function AddPaymentMethodModal({ open, onClose, onSuccess }: AddPaymentMe
               appearance: {
                 theme: "stripe",
                 variables: {
-                  colorPrimary: "#2563eb",
+                  colorPrimary: "#18D7F0",
                   borderRadius: "8px",
                 },
               },

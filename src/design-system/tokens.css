@@ -1,6 +1,11 @@
 /* ──────────────────────────────────────────────────────────────────
  * AUTO-GENERATED — do not edit manually.
  * Source: tokens/*.json → scripts/generate-tokens.mjs
+ *
+ * NOTE: brand-primary and brand-secondary color scales below are
+ * the original generated values. styles/brand.css overrides them
+ * with the Emergence palette (cyan/green). If you regenerate this
+ * file, brand.css will still take precedence at runtime.
  * ────────────────────────────────────────────────────────────────── */
 
 :root {

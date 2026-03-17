@@ -6,11 +6,11 @@
  */
 
 export const CHART_COLORS = {
-  brand:   "#6366f1", // brand-500
-  success: "#10b981", // emerald-500
+  brand:   "#18D7F0", // lb-color-primary (cyan)
+  success: "#5EEA7A", // lb-color-accent (green)
   warning: "#f59e0b", // amber-500
   danger:  "#ef4444", // red-500
-  info:    "#3b82f6", // blue-500
+  info:    "#18D7F0", // lb-color-primary (cyan)
 
   slate100: "#f1f5f9",
   slate200: "#e2e8f0",

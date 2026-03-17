@@ -4,9 +4,9 @@
   "settings": {
     "color": {
       "palette": [
-        {"slug": "primary", "name": "Primary", "color": "#10b981"},
-        {"slug": "secondary", "name": "Secondary", "color": "#1E293B"},
-        {"slug": "accent", "name": "Accent", "color": "#3b82f6"},
+        {"slug": "primary", "name": "Primary", "color": "#18D7F0"},
+        {"slug": "secondary", "name": "Secondary", "color": "#0D1320"},
+        {"slug": "accent", "name": "Accent", "color": "#5EEA7A"},
         {"slug": "background", "name": "Background", "color": "#FFFFFF"},
         {"slug": "surface", "name": "Surface", "color": "#F8FAFC"},
         {"slug": "text", "name": "Text", "color": "#0F172A"}

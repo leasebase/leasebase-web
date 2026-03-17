@@ -1,0 +1,124 @@
+/*
+ * LeaseBase Brand System — Source of Truth
+ * Do NOT redefine brand colors outside this file.
+ * All components must consume these variables.
+ * See also: src/design-system/tokens.css (auto-generated; brand.css overrides where needed).
+ */
+
+:root {
+  --lb-color-bg-dark: #05070B;
+  --lb-color-base: #0D1320;
+  --lb-color-surface: #111827;
+  --lb-color-text: #F3F4F6;
+  --lb-color-text-dark: #0F172A;
+  --lb-color-cyan: #18D7F0;
+  --lb-color-teal: #22D3EE;
+  --lb-color-green: #5EEA7A;
+  --lb-color-lime: #D9FF1F;
+  --lb-color-primary: #18D7F0;
+  --lb-color-accent: #5EEA7A;
+  --lb-color-highlight: #D9FF1F;
+  --lb-color-muted: #94A3B8;
+  --lb-color-bg-light: #F8FAFC;
+  --lb-gradient-brand: linear-gradient(135deg, #18D7F0 0%, #5EEA7A 60%, #D9FF1F 100%);
+  --lb-gradient-dark: linear-gradient(135deg, #0D1320 0%, #111827 100%);
+  --lb-typography-font-family-sans: "Inter", system-ui, sans-serif;
+
+  /* Compatibility aliases for existing app tokens/classes */
+  --lb-color-brand-primary-50: #E8FBFF;
+  --lb-color-brand-primary-100: #D2F8FE;
+  --lb-color-brand-primary-200: #A8F0FB;
+  --lb-color-brand-primary-300: #7DE8F7;
+  --lb-color-brand-primary-400: #4CDEF4;
+  --lb-color-brand-primary-500: #18D7F0;
+  --lb-color-brand-primary-600: #12BED6;
+  --lb-color-brand-primary-700: #0F9AAF;
+  --lb-color-brand-primary-800: #0B7585;
+  --lb-color-brand-primary-900: #095963;
+  --lb-color-brand-primary-950: #05070B;
+  --lb-color-brand-secondary-50: #F0FFF4;
+  --lb-color-brand-secondary-100: #D9FFE6;
+  --lb-color-brand-secondary-200: #BCFFD0;
+  --lb-color-brand-secondary-300: #9AF8B8;
+  --lb-color-brand-secondary-400: #78F29A;
+  --lb-color-brand-secondary-500: #5EEA7A;
+  --lb-color-brand-secondary-600: #3FD45D;
+  --lb-color-brand-secondary-700: #2DAB4A;
+  --lb-color-brand-secondary-800: #237F3A;
+  --lb-color-brand-secondary-900: #1D622F;
+  --lb-color-brand-secondary-950: #12351B;
+  --lb-color-surface-base: var(--lb-color-bg-light);
+  --lb-color-surface-default: #FFFFFF;
+  --lb-color-surface-raised: #EEF2F7;
+  --lb-color-surface-overlay: #FFFFFF;
+  --lb-color-semantic-success-50: #EEFFF5;
+  --lb-color-semantic-success-100: #DBFFE9;
+  --lb-color-semantic-success-500: #5EEA7A;
+  --lb-color-semantic-success-600: #38C95A;
+  --lb-color-semantic-success-700: #2A9C46;
+  --lb-color-semantic-info-50: #EAFBFF;
+  --lb-color-semantic-info-100: #D6F7FE;
+  --lb-color-semantic-info-500: #18D7F0;
+  --lb-color-semantic-info-600: #12BED6;
+  --lb-color-semantic-info-700: #0F9AAF;
+}
+
+html.dark {
+  --lb-color-surface-base: var(--lb-color-base);
+  --lb-color-surface-default: var(--lb-color-surface);
+  --lb-color-surface-raised: #1B2434;
+  --lb-color-surface-overlay: #1B2434;
+}
+
+body,
+input,
+button,
+textarea,
+select {
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.lb-gradient-text {
+  background-image: var(--lb-gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.lb-gradient-border {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--lb-color-surface-default), var(--lb-color-surface-default)) padding-box,
+    var(--lb-gradient-brand) border-box;
+}
+
+.lb-brand-surface {
+  background: var(--lb-gradient-dark);
+  color: var(--lb-color-text);
+}
+
+.lb-brand-glow-subtle {
+  box-shadow:
+    0 0 0 1px rgba(24, 215, 240, 0.16),
+    0 12px 24px rgba(17, 24, 39, 0.24);
+}
+
+.lb-logo {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.lb-logo img,
+.lb-logo svg {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+.lb-logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

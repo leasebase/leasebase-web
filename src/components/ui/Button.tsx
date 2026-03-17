@@ -2,7 +2,7 @@
 
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "success";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -14,11 +14,13 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-brand-500 text-white hover:bg-brand-600 focus-visible:ring-brand-400",
+    "bg-[var(--lb-color-primary)] text-[var(--lb-color-text-dark)] hover:bg-[#12c0d8] focus-visible:ring-[#4adff3]",
+  success:
+    "bg-[var(--lb-color-accent)] text-[var(--lb-color-text-dark)] hover:bg-[#49d865] focus-visible:ring-[#78F29A]",
   secondary:
-    "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-brand-400",
+    "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-[#4adff3]",
   ghost:
-    "bg-transparent text-slate-600 hover:bg-slate-100 focus-visible:ring-brand-400",
+    "bg-transparent text-slate-600 hover:bg-slate-100 focus-visible:ring-[#4adff3]",
   danger:
     "bg-danger text-white hover:bg-red-600 focus-visible:ring-red-400",
 };
