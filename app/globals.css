@@ -1,4 +1,5 @@
 @import "../src/design-system/tokens.css";
+@import "../styles/brand.css";
 
 @tailwind base;
 @tailwind components;

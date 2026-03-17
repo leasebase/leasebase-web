@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 220" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">LeaseBase Full Logo</title>
+  <desc id="desc">LeaseBase full horizontal logo with the emergence ascent mark and wordmark.</desc>
+  <defs>
+    <linearGradient id="lbFullGradient" x1="16" y1="14" x2="206" y2="206" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#18D7F0"/>
+      <stop offset="0.62" stop-color="#5EEA7A"/>
+      <stop offset="1" stop-color="#D9FF1F"/>
+    </linearGradient>
+  </defs>
+  <g id="leasebase-logo-full">
+    <g id="mark" transform="translate(0 10)">
+      <path d="M42 180C30 154 29 123 40 95C57 53 95 26 140 26C171 26 201 39 223 62" stroke="url(#lbFullGradient)" stroke-width="18" stroke-linecap="round"/>
+      <path d="M226 60L198 64L209 38L236 40L232 66L226 60Z" fill="url(#lbFullGradient)"/>
+      <path d="M222 95C229 111 232 129 230 147C223 196 181 232 132 232C95 232 62 212 42 180" stroke="url(#lbFullGradient)" stroke-width="18" stroke-linecap="round"/>
+      <path d="M107 110L208 34" stroke="url(#lbFullGradient)" stroke-width="16" stroke-linecap="round"/>
+      <path d="M205 34L190 36L197 22L214 23L211 40L205 34Z" fill="url(#lbFullGradient)"/>
+      <path d="M154 120L224 74" stroke="url(#lbFullGradient)" stroke-width="12" stroke-linecap="round"/>
+      <path d="M222 73L210 74L216 63L230 64L227 77L222 73Z" fill="url(#lbFullGradient)"/>
+      <path d="M169 147L229 122" stroke="url(#lbFullGradient)" stroke-width="10" stroke-linecap="round"/>
+      <path d="M227 122L217 120L223 112L234 113L233 125L227 122Z" fill="url(#lbFullGradient)"/>
+      <path d="M95 94H160V114H118V168H95V94Z" fill="url(#lbFullGradient)"/>
+      <path d="M95 168H173V190H95V168Z" fill="url(#lbFullGradient)"/>
+    </g>
+    <g id="wordmark" transform="translate(256 0)">
+      <text x="0" y="126" fill="#0F172A" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="78" letter-spacing="4">LEASEBASE</text>
+      <text x="2" y="165" fill="#475569" font-family="Inter, Arial, sans-serif" font-weight="500" font-size="22" letter-spacing="3">PROPERTY PERFORMANCE PLATFORM</text>
+    </g>
+  </g>
+</svg>

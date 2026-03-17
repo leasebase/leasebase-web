@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { AuthValuePanel } from "./AuthValuePanel";
+import { Logo } from "@/components/Logo";
 
 interface AuthShellProps {
   children: ReactNode;
@@ -22,13 +23,8 @@ export function AuthShell({ children }: AuthShellProps) {
       {/* Right: form area */}
       <div className="flex flex-col items-center justify-center bg-surface-base px-4 py-10 sm:px-8 md:px-12">
         {/* Mobile-only compact brand header */}
-        <div className="mb-8 flex items-center gap-2.5 md:hidden">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-500 text-sm font-bold text-white">
-            LB
-          </span>
-          <span className="text-lg font-semibold tracking-wide text-slate-800">
-            Leasebase
-          </span>
+        <div className="mb-8 flex items-center md:hidden">
+          <Logo variant="full" theme="light" size={160} />
         </div>
 
         {children}

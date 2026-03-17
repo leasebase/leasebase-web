@@ -15,6 +15,7 @@ import {
 import { authStore } from "@/lib/auth/store";
 import { Avatar } from "@/components/ui/Avatar";
 import { DropdownMenu, type DropdownMenuItem } from "@/components/ui/DropdownMenu";
+import { Logo } from "@/components/Logo";
 import { useAppShell } from "./AppShell";
 
 /* ─── AppHeader ─── */
@@ -51,18 +52,23 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-surface/80 backdrop-blur">
       <div className="flex items-center justify-between gap-4 px-4 py-2.5">
-        {/* Left: hamburger — mobile only, hidden on desktop */}
-        <div className="flex items-center md:hidden">
-          <button
-            ref={hamburgerRef}
-            type="button"
-            className="rounded p-1.5 text-slate-600 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+        {/* Left: brand + mobile hamburger */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center md:hidden">
+            <button
+              ref={hamburgerRef}
+              type="button"
+              className="rounded p-1.5 text-slate-600 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+          <Link href="/app" className="inline-flex items-center">
+            <Logo variant="full" theme="light" size={152} />
+          </Link>
         </div>
 
         {/* Center: global search — hidden on xs, shown md+ */}

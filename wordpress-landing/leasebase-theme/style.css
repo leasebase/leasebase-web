@@ -17,14 +17,27 @@ Text Domain: leasebase-theme
 /* --- Reset & Global --- */
 
 :root {
-  /* Brand — Emerald green (from web app design system tokens.css) */
-  --lb-primary: #10b981;
-  --lb-primary-dark: #059669;
-  --lb-primary-light: #d1fae5;
-  --lb-primary-lighter: #ecfdf5;
-  /* Secondary / Info — Blue */
-  --lb-info: #3b82f6;
-  --lb-info-light: #dbeafe;
+  /* Brand — Emergence Cyan/Green/Lime */
+  --lb-primary: #18D7F0;
+  --lb-primary-dark: #12BED6;
+  --lb-primary-light: #D2F8FE;
+  --lb-primary-lighter: #E8FBFF;
+  /* Accent — Green */
+  --lb-accent: #5EEA7A;
+  --lb-accent-dark: #3FD45D;
+  --lb-accent-light: #D9FFE6;
+  /* Highlight — Lime (sparingly) */
+  --lb-highlight: #D9FF1F;
+  /* Secondary / Info — Cyan (same as primary) */
+  --lb-info: #18D7F0;
+  --lb-info-light: #D2F8FE;
+  /* Brand gradient */
+  --lb-gradient-brand: linear-gradient(135deg, #18D7F0 0%, #5EEA7A 60%, #D9FF1F 100%);
+  --lb-gradient-dark: linear-gradient(135deg, #0D1320 0%, #111827 100%);
+  /* Dark brand surfaces */
+  --lb-color-bg-dark: #05070B;
+  --lb-color-base: #0D1320;
+  --lb-color-surface-dark: #111827;
   /* Neutrals — Slate */
   --lb-dark: #0F172A;
   --lb-gray-900: #1E293B;
@@ -36,13 +49,13 @@ Text Domain: leasebase-theme
   --lb-gray-50: #F8FAFC;
   --lb-white: #FFFFFF;
   /* Semantic */
-  --lb-success: #10B981;
+  --lb-success: #5EEA7A;
   --lb-warning: #F59E0B;
   --lb-danger: #EF4444;
-  /* Shape — aligned with app radius tokens */
+  /* Shape */
   --lb-radius: 6px;
   --lb-radius-lg: 8px;
-  /* Shadows — aligned with app shadow tokens */
+  /* Shadows */
   --lb-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --lb-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --lb-shadow-lg: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -79,8 +92,27 @@ body.home header .wp-block-site-title a,
 .lb-site-title a {
   font-weight: 700;
   font-size: 1.35rem;
-  color: var(--lb-primary);
+  color: var(--lb-dark);
   text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.lb-header-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.lb-header-logo img {
+  height: 40px;
+  width: auto;
+}
+
+.lb-header-logo-text {
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: var(--lb-dark);
   letter-spacing: -0.01em;
 }
 
@@ -141,7 +173,7 @@ body.home header .has-small-font-size {
 }
 
 .lb-section-dark {
-  background: var(--lb-gray-900);
+  background: var(--lb-color-base);
   color: var(--lb-white);
 }
 
@@ -923,9 +955,21 @@ body.home footer.wp-block-template-part .wp-block-group {
 }
 
 .lb-footer {
-  background: var(--lb-gray-900);
+  background: var(--lb-color-base);
   color: rgba(255,255,255,0.7);
   padding: 48px 24px 32px;
+}
+
+.lb-footer-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.lb-footer-brand-logo img {
+  height: 32px;
+  width: auto;
 }
 
 .lb-footer-grid {

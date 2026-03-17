@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">LeaseBase Icon</title>
+  <desc id="desc">Simplified LeaseBase emergence icon for favicon and compact placements.</desc>
+  <defs>
+    <linearGradient id="lbIconGradient" x1="16" y1="12" x2="112" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#18D7F0"/>
+      <stop offset="0.62" stop-color="#5EEA7A"/>
+      <stop offset="1" stop-color="#D9FF1F"/>
+    </linearGradient>
+  </defs>
+  <g id="leasebase-icon">
+    <path d="M20 92C13 76 13 58 20 43C30 20 52 8 77 8C94 8 111 15 123 28" stroke="url(#lbIconGradient)" stroke-width="9" stroke-linecap="round"/>
+    <path d="M123 28L110 30L115 18L127 19L125 31L123 28Z" fill="url(#lbIconGradient)"/>
+    <path d="M122 45C126 54 128 64 126 74C122 102 99 120 72 120C51 120 33 109 20 92" stroke="url(#lbIconGradient)" stroke-width="9" stroke-linecap="round"/>
+    <path d="M47 53L99 14" stroke="url(#lbIconGradient)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M96 14L88 15L92 8L101 8L99 17L96 14Z" fill="url(#lbIconGradient)"/>
+    <path d="M45 47H78V58H57V84H45V47Z" fill="url(#lbIconGradient)"/>
+    <path d="M45 84H85V95H45V84Z" fill="url(#lbIconGradient)"/>
+  </g>
+</svg>

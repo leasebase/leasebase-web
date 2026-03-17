@@ -6,6 +6,7 @@ import { PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { groupNavForPersona, type NavGroup } from "@/lib/appNav";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { Logo } from "@/components/Logo";
 import { useAppShell } from "./AppShell";
 import { SidebarNavItem } from "./SidebarNavItem";
 
@@ -87,15 +88,10 @@ export function AppSidebar() {
           }`}
         >
           <Link href="/app" className="flex shrink-0 items-center gap-2.5">
-            <span
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 text-sm font-bold text-white shadow-sm"
-              aria-hidden="true"
-            >
-              LB
-            </span>
+            <Logo variant="mark" theme="light" size={32} />
             {!sidebarCollapsed && (
               <span className="text-sm font-semibold tracking-wide text-slate-800">
-                Leasebase
+                LeaseBase
               </span>
             )}
           </Link>
@@ -149,14 +145,9 @@ export function AppSidebar() {
             {/* Mobile header */}
             <div className="flex items-center justify-between border-b border-slate-200 px-3 py-3">
               <Link href="/app" className="flex items-center gap-2.5">
-                <span
-                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 text-sm font-bold text-white"
-                  aria-hidden="true"
-                >
-                  LB
-                </span>
+                <Logo variant="mark" theme="light" size={32} />
                 <span className="text-sm font-semibold text-slate-800">
-                  Leasebase
+                  LeaseBase
                 </span>
               </Link>
               <button
