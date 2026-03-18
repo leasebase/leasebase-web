@@ -233,7 +233,7 @@ async function fetchPaymentsDomain(): Promise<DomainResult<PaymentRow[]>> {
 
 async function fetchLedgerDomain(): Promise<DomainResult<LedgerRow[]>> {
   try {
-    const data = await fetchAllPages<LedgerRow>("api/payments/ledger");
+    const data = await fetchAllPages<LedgerRow>("api/payments/charges");
     return { data, source: "live", error: null };
   } catch (e: any) {
     return { data: [], source: "unavailable", error: e?.message || "Failed to fetch ledger" };
