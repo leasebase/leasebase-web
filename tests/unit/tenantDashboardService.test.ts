@@ -6,7 +6,7 @@ import type { TenantProfileRow, LeaseRow, DataSource } from "@/services/tenant/t
 const profile: TenantProfileRow = {
   id: "tp1",
   user_id: "u1",
-  lease_id: "l1",
+  lease_id: null, // deprecated — dashboard no longer reads this
   phone: "+1234567890",
   emergency_contact: null,
   notification_preferences: null,
@@ -55,9 +55,8 @@ describe("computeTenantSetupStage", () => {
     expect(computeTenantSetupStage(null, "live", null, "live")).toBe("no-profile");
   });
 
-  test('returns "no-lease" when profile has no lease_id', () => {
-    const noLeaseProfile = { ...profile, lease_id: null };
-    expect(computeTenantSetupStage(noLeaseProfile, "live", null, "live")).toBe("no-lease");
+  test('returns "no-lease" when no lease found for the org context', () => {
+    expect(computeTenantSetupStage(profile, "live", null, "live")).toBe("no-lease");
   });
 
   test('returns "no-lease" when lease fetch fails', () => {

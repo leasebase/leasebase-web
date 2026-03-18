@@ -47,6 +47,12 @@ export async function apiRequest<T = any>({ path, anonymous, ...init }: ApiReque
       headers.set("x-dev-user-role", state.devBypass.role);
       headers.set("x-dev-org-id", state.devBypass.orgId);
     }
+
+    // Multi-lease org context switching: send X-Org-Context header
+    // when the selected org differs from the user's primary org.
+    if (state.selectedOrgId && state.user && state.selectedOrgId !== state.user.orgId) {
+      headers.set("X-Org-Context", state.selectedOrgId);
+    }
   }
 
   const response = await fetch(url, {

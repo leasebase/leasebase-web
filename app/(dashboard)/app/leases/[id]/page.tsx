@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -18,8 +18,15 @@ import {
   renewLease,
 } from "@/services/leases/leaseService";
 import type { LeaseRow, CreateLeaseDTO, RenewLeaseDTO } from "@/services/leases/types";
+import {
+  fetchPendingInvitationsForUnit,
+  resendInvitation,
+  type TenantInvitation,
+} from "@/services/invitations/invitationApiService";
+import { InviteTenantModal } from "@/components/invitations/InviteTenantModal";
 import { LeaseForm } from "@/components/leases/LeaseForm";
 import { LeaseDetailSkeleton } from "@/components/leases/LeaseDetailSkeleton";
+import { Mail, RefreshCw } from "lucide-react";
 
 /* ── Helpers ── */
 
@@ -51,12 +58,25 @@ function OverviewPanel({
   onTerminate,
   onRenew,
   onActivate,
+  onInviteTenant,
+  onResendInvite,
+  pendingInvitation,
+  resendLoading,
 }: {
   lease: LeaseRow;
   onTerminate: () => void;
   onRenew: () => void;
   onActivate: () => void;
+  onInviteTenant: () => void;
+  onResendInvite: () => void;
+  pendingInvitation: TenantInvitation | null;
+  resendLoading: boolean;
 }) {
+  const hasTenants = lease.tenants && lease.tenants.length > 0;
+  const showInvite = lease.status === "DRAFT" && !hasTenants;
+  const showResend =
+    ["ASSIGNED", "INVITED"].includes(lease.status) &&
+    pendingInvitation != null;
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -106,14 +126,19 @@ function OverviewPanel({
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Tenants</h3>
-          {lease.tenants && lease.tenants.length > 0 ? (
+          {hasTenants ? (
             <ul className="text-sm text-slate-700 space-y-1">
-              {lease.tenants.map((t) => (
+              {lease.tenants!.map((t) => (
                 <li key={t.id}>{t.name} <span className="text-xs text-slate-400">({t.role})</span></li>
               ))}
             </ul>
           ) : (
             <p className="text-sm text-slate-400">Not assigned</p>
+          )}
+          {pendingInvitation && (
+            <p className="text-xs text-amber-600">
+              Invitation pending — sent to {pendingInvitation.invited_email}
+            </p>
           )}
         </div>
       </div>
@@ -133,6 +158,27 @@ function OverviewPanel({
         {(lease.status === "DRAFT" || lease.status === "ASSIGNED") && (
           <Button variant="primary" size="sm" onClick={onActivate}>
             Activate
+          </Button>
+        )}
+        {showInvite && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onInviteTenant}
+            icon={<Mail size={14} />}
+          >
+            Invite Tenant
+          </Button>
+        )}
+        {showResend && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onResendInvite}
+            loading={resendLoading}
+            icon={<RefreshCw size={14} />}
+          >
+            Re-send Invite
           </Button>
         )}
       </div>
@@ -188,17 +234,36 @@ function LeaseDetailContent() {
   const [error, setError] = useState<string | null>(null);
   const [showTerminate, setShowTerminate] = useState(false);
   const [showRenew, setShowRenew] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [pendingInvitation, setPendingInvitation] = useState<TenantInvitation | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
   // Renew form state
   const [renewStartDate, setRenewStartDate] = useState("");
 
+  const loadInvitations = useCallback(
+    async (unitId: string) => {
+      try {
+        const pending = await fetchPendingInvitationsForUnit(unitId);
+        setPendingInvitation(pending[0] ?? null);
+      } catch {
+        // Non-critical — don't block the page.
+      }
+    },
+    [],
+  );
+
   useEffect(() => {
     let cancelled = false;
     fetchLease(id)
       .then((res) => {
-        if (!cancelled) setLease(res.data);
+        if (!cancelled) {
+          setLease(res.data);
+          loadInvitations(res.data.unit_id);
+        }
       })
       .catch((e: any) => {
         if (!cancelled) setError(e.message || "Failed to load lease");
@@ -209,7 +274,7 @@ function LeaseDetailContent() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, loadInvitations]);
 
   const handleTerminate = async () => {
     setActionLoading(true);
@@ -254,6 +319,34 @@ function LeaseDetailContent() {
     }
   };
 
+  const handleInviteSuccess = () => {
+    setShowInviteModal(false);
+    // Re-fetch lease and invitations to reflect new state.
+    fetchLease(id)
+      .then((res) => {
+        setLease(res.data);
+        loadInvitations(res.data.unit_id);
+      })
+      .catch(() => {});
+  };
+
+  const handleResendInvite = async () => {
+    if (!pendingInvitation) return;
+    setResendLoading(true);
+    setResendSuccess(false);
+    try {
+      await resendInvitation(pendingInvitation.id);
+      setResendSuccess(true);
+      setTimeout(() => setResendSuccess(false), 4000);
+      // Refresh invitation data (token/expiry may have changed).
+      if (lease) loadInvitations(lease.unit_id);
+    } catch (e: any) {
+      setActionError(e.message || "Failed to re-send invitation");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleSaved = (updated: LeaseRow) => setLease(updated);
 
   const tabs: TabItem[] = useMemo(() => {
@@ -270,6 +363,10 @@ function LeaseDetailContent() {
               setShowRenew(true);
             }}
             onActivate={handleActivate}
+            onInviteTenant={() => setShowInviteModal(true)}
+            onResendInvite={handleResendInvite}
+            pendingInvitation={pendingInvitation}
+            resendLoading={resendLoading}
           />
         ),
       },
@@ -280,7 +377,7 @@ function LeaseDetailContent() {
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lease]);
+  }, [lease, pendingInvitation, resendLoading]);
 
   if (isLoading) return <LeaseDetailSkeleton />;
 
@@ -360,6 +457,30 @@ function LeaseDetailContent() {
           </div>
         </div>
       </Modal>
+
+      {/* Resend success banner */}
+      {resendSuccess && (
+        <div className="fixed bottom-4 right-4 z-50 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-lg">
+          Invitation re-sent successfully.
+        </div>
+      )}
+
+      {/* Invite Tenant modal */}
+      <InviteTenantModal
+        open={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        onSuccess={handleInviteSuccess}
+        propertyUnit={
+          lease
+            ? {
+                propertyId: lease.property_id,
+                propertyName: lease.property_name ?? lease.property_id,
+                unitId: lease.unit_id,
+                unitNumber: lease.unit_number ?? lease.unit_id,
+              }
+            : undefined
+        }
+      />
 
       {/* Renew modal */}
       <Modal

@@ -14,7 +14,7 @@ export type { DataSource, DomainResult, Sourced };
 
 export type TenantSetupStage =
   | "no-profile"     // user is TENANT but has no tenant_profile row
-  | "no-lease"       // tenant profile exists but lease_id is null or lease not found
+  | "no-lease"       // tenant profile exists but no lease found for current org
   | "lease-ended"    // lease exists but status is INACTIVE, EXPIRED, or RENEWED
   | "active";        // active lease found
 
@@ -23,6 +23,10 @@ export type TenantSetupStage =
 export interface TenantProfileRow {
   id: string;
   user_id: string;
+  /**
+   * @deprecated Use GET /tenants/me/leases to resolve lease(s) via lease_tenants.
+   * Kept for backward compat; will be removed once all consumers migrate.
+   */
   lease_id: string | null;
   phone: string | null;
   emergency_contact: string | null;

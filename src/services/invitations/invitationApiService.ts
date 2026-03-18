@@ -55,11 +55,14 @@ export interface InvitationAcceptInfo {
   inviterName: string;
   expiresAt: string;
   status: string;
+  /** True if the invited email already has a LeaseBase account (multi-lease). */
+  existingUser?: boolean;
 }
 
 export interface AcceptInvitationPayload {
   token: string;
-  password: string;
+  /** Password is optional for existing users (multi-lease link). */
+  password?: string;
   legalAcceptance?: Array<{ slug: string; version: string; hash?: string }>;
 }
 
@@ -114,6 +117,21 @@ export async function fetchInvitations(
   });
 }
 
+/**
+ * Fetch PENDING invitations for a specific unit.
+ *
+ * Pulls the first page of invitations and filters client-side by unit_id +
+ * status. This is safe given typical invitation volumes per org.
+ */
+export async function fetchPendingInvitationsForUnit(
+  unitId: string,
+): Promise<TenantInvitation[]> {
+  const res = await fetchInvitations(1, 200);
+  return res.data.filter(
+    (inv) => inv.unit_id === unitId && inv.status === "PENDING",
+  );
+}
+
 export async function resendInvitation(
   id: string,
 ): Promise<{ data: { id: string; status: string; expires_at: string } }> {
@@ -161,7 +179,7 @@ export async function fetchInvitationByToken(
 
 export async function acceptInvitation(
   payload: AcceptInvitationPayload,
-): Promise<{ data: { accepted: boolean; email: string; message: string } }> {
+): Promise<{ data: { accepted: boolean; email: string; message: string; existingUser?: boolean } }> {
   const base = getApiBaseUrl();
   const url = `${base}/api/tenants/invitations/accept`;
   const res = await fetch(url, {
