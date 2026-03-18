@@ -91,16 +91,16 @@ export function Modal({ open, onClose, title, children, className = "" }: ModalP
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative z-10 w-full max-w-lg rounded-xl border border-slate-700 bg-slate-900 shadow-modal ${className}`}
+        className={`relative z-10 w-full max-w-lg rounded-xl border border-slate-200 bg-white shadow-modal ${className}`}
       >
         {title && (
-          <div className="flex items-center justify-between border-b border-slate-800 px-5 py-3">
-            <h2 className="text-base font-semibold text-slate-100">{title}</h2>
+          <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
+            <h2 className="text-base font-semibold text-slate-900">{title}</h2>
             <button
               type="button"
               onClick={onClose}
               aria-label="Close dialog"
-              className="rounded p-1 text-slate-400 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="rounded p-1 text-slate-400 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

@@ -2,30 +2,43 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * Middleware — minimal redirect only.
+ * Middleware — single-origin routing for app.dev.leasebase.ai.
  *
- * What it does:
- *   Redirects the bare root ("/") to /auth/login so the user always
- *   lands on a visible page.
- *
- * Why nextUrl.clone():
- *   Next.js already resolves the correct protocol, host and port into
- *   request.nextUrl (respects x-forwarded-proto/host from ALB/CloudFront
- *   in production, and uses http://localhost:PORT in local dev).  Cloning
- *   and patching the pathname is the simplest correct approach.
- *
- * Everything else (auth, session bootstrap) happens client-side.
+ * Responsibilities:
+ *   1. Old-domain 301 redirects (*.leasebase.co → app.{env}.leasebase.ai)
+ *      Gated by ENABLE_OLD_DOMAIN_REDIRECTS env var.
+ *   2. Root path (/) → 307 redirect to /auth/login
+ *   3. Pass-through for all other paths
  */
-export function middleware(request: NextRequest) {
-  const url = request.nextUrl.clone();
-  url.pathname = "/auth/login";
 
-  const res = NextResponse.redirect(url, 307);
-  res.headers.set("cache-control", "no-store, max-age=0");
-  return res;
+const OLD_DOMAIN = process.env.OLD_DOMAIN || "leasebase.co";
+const NEW_APP_ORIGIN = process.env.NEXT_PUBLIC_APP_URL || "https://app.dev.leasebase.ai";
+const ENABLE_OLD_DOMAIN_REDIRECTS =
+  process.env.ENABLE_OLD_DOMAIN_REDIRECTS === "true" ||
+  process.env.ENABLE_OLD_DOMAIN_REDIRECTS === "1";
+
+export function middleware(request: NextRequest) {
+  const hostname = request.headers.get("host") || "";
+  const { pathname, search } = request.nextUrl;
+
+  // ── Old-domain → new-domain 301 redirect ────────────────────────────────
+  // Matches *.leasebase.co and leasebase.co, preserving path and query.
+  if (ENABLE_OLD_DOMAIN_REDIRECTS && hostname.endsWith(OLD_DOMAIN)) {
+    const target = `${NEW_APP_ORIGIN}${pathname}${search}`;
+    return NextResponse.redirect(target, 301);
+  }
+
+  // ── Root path → sign in ────────────────────────────────────────────────
+  if (pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/login";
+    return NextResponse.redirect(url, 307);
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-  // Only match the bare root — nothing else runs through middleware.
-  matcher: "/",
+  // Match root plus auth/app/invite paths — skip static assets and API routes.
+  matcher: ["/", "/auth/:path*", "/app/:path*", "/invite/:path*"],
 };

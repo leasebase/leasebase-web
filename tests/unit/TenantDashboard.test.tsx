@@ -41,7 +41,7 @@ const activeDashboard: TenantDashboardData = {
     unit_id: "unit1",
     start_date: "2024-01-01",
     end_date: "2026-12-31",
-    rent_amount: 145000,
+    term_type: "TWELVE_MONTH",
     deposit_amount: 145000,
     status: "ACTIVE",
     created_at: "2024-01-01T00:00:00Z",
@@ -131,9 +131,9 @@ describe("TenantDashboard", () => {
     render(<TenantDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText("Tenant context unavailable")).toBeInTheDocument();
+      expect(screen.getByText("Setting up your account")).toBeInTheDocument();
     });
-    expect(screen.getAllByText(/tenant context endpoint/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/accept.*invitation/i).length).toBeGreaterThanOrEqual(1);
   });
 
   test('renders "no-lease" empty state', async () => {
@@ -141,7 +141,7 @@ describe("TenantDashboard", () => {
     render(<TenantDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText("No active lease found")).toBeInTheDocument();
+      expect(screen.getByText("Your lease is being set up")).toBeInTheDocument();
     });
   });
 
@@ -153,8 +153,8 @@ describe("TenantDashboard", () => {
       expect(screen.getByText("Tenant dashboard")).toBeInTheDocument();
     });
 
-    // KPI header (also appears in hero balance card)
-    expect(screen.getAllByText("$1,450").length).toBeGreaterThanOrEqual(1);
+    // KPI header — rent amount is now "—" (no rent_amount field)
+    expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(1);
 
     // Quick actions (also appears in hero CTA)
     expect(screen.getAllByText("Pay Rent").length).toBeGreaterThanOrEqual(1);

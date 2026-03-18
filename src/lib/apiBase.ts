@@ -3,7 +3,7 @@
  *
  * The value comes from the NEXT_PUBLIC_API_BASE_URL environment variable which
  * Next.js inlines into the client bundle at build time.  In production this is
- * typically `https://api.dev.leasebase.co`; locally it defaults to
+ * typically `https://api.dev.leasebase.ai`; locally it defaults to
  * `http://localhost:4000` (set in .env.local).
  *
  * If the env var is not set at all the function returns "" (empty string),

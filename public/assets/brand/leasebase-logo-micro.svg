@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" role="img" aria-labelledby="title">
+  <title id="title">LeaseBase</title>
+  <defs>
+    <linearGradient id="lbMicroGrad" x1="4" y1="3" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#18D7F0"/>
+      <stop offset="0.62" stop-color="#5EEA7A"/>
+      <stop offset="1" stop-color="#D9FF1F"/>
+    </linearGradient>
+  </defs>
+  <g id="micro-mark">
+    <path d="M6 23C3 19 3 14 5 10C8 5 13 3 19 3C23 3 27 4 30 7" stroke="url(#lbMicroGrad)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M30 7L26 8L28 4L32 4L31 9L30 7Z" fill="url(#lbMicroGrad)"/>
+    <path d="M29 11C31 14 31 17 31 19C30 25 25 29 18 29C13 29 9 27 6 23" stroke="url(#lbMicroGrad)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M11 11H19V14H14V21H11V11Z" fill="url(#lbMicroGrad)"/>
+    <path d="M11 21H21V24H11V21Z" fill="url(#lbMicroGrad)"/>
+  </g>
+</svg>

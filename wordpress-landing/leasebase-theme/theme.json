@@ -1,0 +1,75 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "color": {
+      "palette": [
+        {"slug": "primary", "name": "Primary", "color": "#18D7F0"},
+        {"slug": "secondary", "name": "Secondary", "color": "#0D1320"},
+        {"slug": "accent", "name": "Accent", "color": "#5EEA7A"},
+        {"slug": "background", "name": "Background", "color": "#FFFFFF"},
+        {"slug": "surface", "name": "Surface", "color": "#F8FAFC"},
+        {"slug": "text", "name": "Text", "color": "#0F172A"}
+      ]
+    },
+    "typography": {
+      "fontFamilies": [
+        {
+          "fontFamily": "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
+          "name": "Inter/System",
+          "slug": "inter-system"
+        }
+      ],
+      "fontSizes": [
+        {"slug": "small", "size": "0.875rem", "name": "Small"},
+        {"slug": "medium", "size": "1rem", "name": "Medium"},
+        {"slug": "large", "size": "1.25rem", "name": "Large"},
+        {"slug": "x-large", "size": "2rem", "name": "XL"},
+        {"slug": "xx-large", "size": "3rem", "name": "2XL"}
+      ]
+    },
+    "spacing": {
+      "spacingScale": {
+        "operator": "*",
+        "increment": 1.5,
+        "steps": 8,
+        "mediumStep": 1,
+        "unit": "rem"
+      }
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "var(--wp--preset--color--background)",
+      "text": "var(--wp--preset--color--text)"
+    },
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--inter-system)",
+      "lineHeight": "1.6"
+    },
+    "elements": {
+      "button": {
+        "border": {
+          "radius": "6px"
+        },
+        "color": {
+          "background": "var(--wp--preset--color--primary)",
+          "text": "#ffffff"
+        },
+        "spacing": {
+          "padding": {
+            "top": "0.75rem",
+            "right": "1.25rem",
+            "bottom": "0.75rem",
+            "left": "1.25rem"
+          }
+        }
+      },
+      "heading": {
+        "typography": {
+          "lineHeight": "1.2"
+        }
+      }
+    }
+  }
+}

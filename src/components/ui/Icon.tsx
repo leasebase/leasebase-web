@@ -49,6 +49,8 @@ const iconMap: Record<string, LucideIcon> = {
   "rent-roll": Receipt,
   "pay-rent": Banknote,
   "payment-history": History,
+  "payment-methods": CreditCard,
+  growth: TrendingUp,
   notifications: Bell,
 };
 

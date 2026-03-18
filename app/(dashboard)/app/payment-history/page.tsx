@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { History } from "lucide-react";
 import { fetchTenantPayments } from "@/services/tenant/adapters/paymentAdapter";
+import { track } from "@/lib/analytics";
 import type { PaymentRow } from "@/services/tenant/types";
 
 const STATUS_VARIANTS: Record<string, "success" | "warning" | "danger" | "info" | "neutral"> = {
@@ -31,6 +33,17 @@ export default function Page() {
   const [payments, setPayments] = useState<PaymentRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const trackedPaymentRef = useRef(false);
+
+  // Fire payment_succeeded once when redirected from Stripe with ?status=success
+  useEffect(() => {
+    if (trackedPaymentRef.current) return;
+    if (searchParams?.get("status") === "success") {
+      trackedPaymentRef.current = true;
+      track("payment_succeeded");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     let cancelled = false;
@@ -63,7 +76,7 @@ export default function Page() {
           ))}
         </div>
       ) : error ? (
-        <div className="mt-6 rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">
+        <div className="mt-6 rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       ) : payments.length === 0 ? (
@@ -77,16 +90,16 @@ export default function Page() {
         <div className="mt-6 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-800 text-left text-xs text-slate-400">
+              <tr className="border-b border-slate-200 text-left text-xs text-slate-400">
                 <th className="pb-2 pr-4">Date</th>
                 <th className="pb-2 pr-4">Amount</th>
                 <th className="pb-2 pr-4">Method</th>
                 <th className="pb-2">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-slate-200">
               {payments.map((p) => (
-                <tr key={p.id} className="text-slate-200">
+                <tr key={p.id} className="text-slate-700">
                   <td className="py-3 pr-4">{new Date(p.created_at).toLocaleDateString()}</td>
                   <td className="py-3 pr-4 font-medium">
                     ${(p.amount / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}

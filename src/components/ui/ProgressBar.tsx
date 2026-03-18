@@ -31,11 +31,11 @@ export function ProgressBar({
       {(label || showValue) && (
         <div className="mb-1 flex items-center justify-between text-xs">
           {label && <span className="text-slate-400">{label}</span>}
-          {showValue && <span className="font-medium text-slate-200">{clamped.toFixed(1)}%</span>}
+          {showValue && <span className="font-medium text-slate-700">{clamped.toFixed(1)}%</span>}
         </div>
       )}
       <div
-        className="h-2 w-full overflow-hidden rounded-full bg-slate-800"
+        className="h-2 w-full overflow-hidden rounded-full bg-slate-200"
         role="progressbar"
         aria-valuenow={clamped}
         aria-valuemin={0}

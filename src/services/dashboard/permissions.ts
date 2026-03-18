@@ -35,19 +35,19 @@ export const DASHBOARD_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/properties",
     service: "property-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     ownerAllowed: true,
   },
   {
     endpoint: "GET /api/properties/:id",
     service: "property-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     ownerAllowed: true,
   },
   {
     endpoint: "GET /api/properties/:id/units",
     service: "property-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     ownerAllowed: true,
   },
 
@@ -55,7 +55,7 @@ export const DASHBOARD_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/leases",
     service: "lease-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     ownerAllowed: true,
     notes: "Data isolation phase: requireRole guard added. TENANT blocked.",
   },
@@ -64,14 +64,14 @@ export const DASHBOARD_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/payments",
     service: "payments-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     ownerAllowed: true,
     notes: "Data isolation phase: requireRole guard added. TENANT blocked.",
   },
   {
     endpoint: "GET /api/payments/ledger",
     service: "payments-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     ownerAllowed: true,
   },
 
@@ -79,7 +79,7 @@ export const DASHBOARD_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/maintenance",
     service: "maintenance-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF", "OWNER"],
+    allowedRoles: ["OWNER"],
     ownerAllowed: true,
     notes: "Data isolation phase: requireRole guard added. TENANT blocked.",
   },
@@ -88,12 +88,9 @@ export const DASHBOARD_ENDPOINT_PERMISSIONS: EndpointPermission[] = [
   {
     endpoint: "GET /api/tenants",
     service: "tenant-service",
-    allowedRoles: ["ORG_ADMIN", "PM_STAFF"],
-    ownerAllowed: false,
-    notes:
-      "OWNER is NOT in the allowedRoles list. Dashboard cannot fetch tenant count. " +
-      "Workaround: derive tenant presence from active leases (if a lease exists, a tenant exists). " +
-      "TODO: Request backend to add OWNER to GET /api/tenants or add a GET /api/tenants/count endpoint.",
+    allowedRoles: ["OWNER"],
+    ownerAllowed: true,
+    notes: "OWNER authorized via ADMIN_ROLES in tenant-service.",
   },
 
   // ── auth-service ──

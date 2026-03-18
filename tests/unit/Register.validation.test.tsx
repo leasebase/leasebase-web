@@ -16,16 +16,19 @@ jest.mock("next/headers", () => ({
   cookies: jest.fn(() => ({ get: jest.fn() })),
 }));
 
-/** Advance past step 1 by selecting a user type. */
-function selectUserType() {
-  fireEvent.click(screen.getByText("Property Manager"));
-}
-
 /** Fill in the non-password fields so only password gates the form. */
 function fillBasicFields() {
   fireEvent.change(screen.getByLabelText("First Name"), { target: { value: "Smoke" } });
   fireEvent.change(screen.getByLabelText("Last Name"), { target: { value: "Test" } });
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "a@b.co" } });
+}
+
+/** Check the legal consent checkbox so the form becomes submittable. */
+function acceptTerms() {
+  const checkbox = screen.getByRole("checkbox");
+  if (!(checkbox as HTMLInputElement).checked) {
+    fireEvent.click(checkbox);
+  }
 }
 
 describe("Register page — password validation UX", () => {
@@ -34,9 +37,9 @@ describe("Register page — password validation UX", () => {
     global.fetch = jest.fn();
   });
 
-  test("renders password requirements checklist on step 2", () => {
+  test("renders password requirements checklist", () => {
     render(<RegisterPage />);
-    selectUserType();
+    // Single-step form — requirements visible immediately, no step navigation needed
     expect(screen.getByRole("list", { name: /password requirements/i })).toBeInTheDocument();
     expect(screen.getByText("At least 8 characters")).toBeInTheDocument();
     expect(screen.getByText("One uppercase letter")).toBeInTheDocument();
@@ -47,7 +50,6 @@ describe("Register page — password validation UX", () => {
 
   test("submit button is disabled when password requirements are not met", () => {
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
 
     const btn = screen.getByRole("button", { name: /create account/i });
@@ -59,21 +61,24 @@ describe("Register page — password validation UX", () => {
     expect(btn).toBeDisabled();
   });
 
-  test("submit button becomes enabled with a valid password + matching confirm", () => {
+  test("submit button becomes enabled with a valid password + matching confirm + consent", () => {
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
     fireEvent.change(screen.getByLabelText("Confirm Password"), { target: { value: "GoodP@ss1" } });
 
+    // Still disabled without consent
     const btn = screen.getByRole("button", { name: /create account/i });
+    expect(btn).toBeDisabled();
+
+    // Now accept terms
+    acceptTerms();
     expect(btn).not.toBeDisabled();
   });
 
   test("does not call API when passwords do not match", () => {
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
@@ -87,7 +92,6 @@ describe("Register page — password validation UX", () => {
 
   test("shows inline mismatch error when confirm password differs", () => {
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
@@ -110,8 +114,8 @@ describe("Register page — password validation UX", () => {
     });
 
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
+    acceptTerms();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
     fireEvent.change(screen.getByLabelText("Confirm Password"), { target: { value: "GoodP@ss1" } });
@@ -127,18 +131,20 @@ describe("Register page — password validation UX", () => {
     expect(screen.queryByText("Registration failed")).not.toBeInTheDocument();
   });
 
-  test("shows generic error for non-password backend errors", async () => {
+  test("shows duplicate-email message when backend returns DUPLICATE_EMAIL code", async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: false,
+      status: 400,
       text: async () =>
         JSON.stringify({
+          code: "DUPLICATE_EMAIL",
           message: "An account with this email already exists",
         }),
     });
 
     render(<RegisterPage />);
-    selectUserType();
     fillBasicFields();
+    acceptTerms();
 
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
     fireEvent.change(screen.getByLabelText("Confirm Password"), { target: { value: "GoodP@ss1" } });
@@ -147,7 +153,64 @@ describe("Register page — password validation UX", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("An account with this email already exists")
+        screen.getByText("An account with this email already exists. Please sign in instead.")
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("shows generic server error for bootstrap failure (500)", async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      text: async () =>
+        JSON.stringify({
+          code: "BOOTSTRAP_FAILED",
+          message: "Account creation failed. Please try again.",
+        }),
+    });
+
+    render(<RegisterPage />);
+    fillBasicFields();
+    acceptTerms();
+
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
+    fireEvent.change(screen.getByLabelText("Confirm Password"), { target: { value: "GoodP@ss1" } });
+
+    fireEvent.click(screen.getByRole("button", { name: /create account/i }));
+
+    await waitFor(() => {
+      // Should show generic server error, NOT the "already exists" message
+      expect(
+        screen.getByText("Registration failed due to a server error. Please try again in a moment.")
+      ).toBeInTheDocument();
+    });
+
+    // Must NOT show duplicate-email message for a server error
+    expect(screen.queryByText(/already exists/i)).not.toBeInTheDocument();
+  });
+
+  test("shows generic server error for 500 without structured code", async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      text: async () =>
+        JSON.stringify({
+          message: "Internal server error",
+        }),
+    });
+
+    render(<RegisterPage />);
+    fillBasicFields();
+    acceptTerms();
+
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
+    fireEvent.change(screen.getByLabelText("Confirm Password"), { target: { value: "GoodP@ss1" } });
+
+    fireEvent.click(screen.getByRole("button", { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Registration failed due to a server error. Please try again in a moment.")
       ).toBeInTheDocument();
     });
   });

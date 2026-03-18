@@ -12,7 +12,10 @@ export interface ApiRequestOptions extends RequestInit {
 /**
  * Centralized API client for authenticated requests.
  *
- * - Automatically attaches the bearer token (or dev-bypass headers).
+ * - Automatically attaches the Cognito **access token** as the bearer token
+ *   (or dev-bypass headers).  A Pre-Token Generation V2 Lambda injects
+ *   `custom:role` into access tokens, so they satisfy the backend
+ *   `requireAuth` middleware (standard OAuth pattern).
  * - On 401, clears auth state and throws.
  * - Does NOT force a redirect — callers decide how to react.
  *
@@ -43,6 +46,12 @@ export async function apiRequest<T = any>({ path, anonymous, ...init }: ApiReque
       headers.set("x-dev-user-email", state.devBypass.email);
       headers.set("x-dev-user-role", state.devBypass.role);
       headers.set("x-dev-org-id", state.devBypass.orgId);
+    }
+
+    // Multi-lease org context switching: send X-Org-Context header
+    // when the selected org differs from the user's primary org.
+    if (state.selectedOrgId && state.user && state.selectedOrgId !== state.user.orgId) {
+      headers.set("X-Org-Context", state.selectedOrgId);
     }
   }
 

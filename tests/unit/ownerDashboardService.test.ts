@@ -36,16 +36,16 @@ const leases = [
 ];
 
 const payments = [
-  { id: "pay1", amount: 150000, status: "SUCCEEDED", created_at: new Date().toISOString() },
+  { id: "pay1", lease_id: "l1", amount: 150000, status: "SUCCEEDED", created_at: new Date().toISOString() },
 ];
 
 const ledger = [
-  { id: "led1", type: "CHARGE", amount: 120000, status: "PENDING", due_date: "2024-01-01" },
+  { id: "led1", lease_id: "l1", type: "CHARGE", amount: 120000, status: "PENDING", due_date: "2024-01-01" },
 ];
 
 const workOrders = [
-  { id: "wo1", status: "OPEN", created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: "wo2", status: "COMPLETED", created_at: "2024-06-01T00:00:00.000Z" },
+  { id: "wo1", unit_id: "u1", status: "SUBMITTED", priority: "MEDIUM", description: "Leaky faucet", assignee_id: null, created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: "wo2", unit_id: "u2", status: "COMPLETED", priority: "LOW", description: "Replace bulb", assignee_id: "maint-1", created_at: "2024-06-01T00:00:00.000Z" },
 ];
 
 /* ── computeKpis ── */
@@ -65,7 +65,7 @@ describe("computeKpis", () => {
     expect(kpis.totalProperties.source).toBe("live");
     expect(kpis.totalUnits.value).toBe(3);
     expect(kpis.occupiedUnits.value).toBe(2); // u1 and u2 have active leases
-    expect(kpis.openMaintenanceRequests.value).toBe(1); // wo1 is OPEN
+    expect(kpis.openMaintenanceRequests.value).toBe(1); // wo1 is SUBMITTED
   });
 
   test("marks KPIs unavailable when domain fails", () => {
@@ -238,19 +238,48 @@ describe("toOwnerDashboardViewModel", () => {
       openWorkOrders: { value: 1, source: "live" },
       trendAvailable: false,
     },
+    cashFlow: {
+      billedThisMonth: { value: 0, source: "live" },
+      collectedThisMonth: { value: 150000, source: "live" },
+      overdueAmount: { value: 120000, source: "live" },
+      upcomingDue: { value: 0, source: "live" },
+      perProperty: [],
+    },
+    maintenanceOverview: {
+      open: { value: 1, source: "live" },
+      inProgress: { value: 0, source: "live" },
+      waiting: { value: 0, source: "live" },
+      urgent: { value: 0, source: "live" },
+      oldestOpenAgeDays: { value: 10, source: "live" },
+      mostAffectedProperty: { value: null, source: "live" },
+    },
+    leaseRisk: {
+      expiring30: { value: 0, source: "live" },
+      expiring60: { value: 0, source: "live" },
+      monthToMonth: { value: 0, source: "live" },
+      topExpirations: [],
+    },
+    vacancyReadiness: {
+      vacantUnits: { value: 1, source: "live" },
+      readyToLease: { value: 1, source: "live" },
+      missingRentConfig: { value: 0, source: "live" },
+      missingSetup: { value: 0, source: "live" },
+    },
+    propertyHealth: [],
     properties: [
       { id: "p1", name: "Main St", address: "123 Main, NY, NY, 10001", totalUnits: 2, occupiedUnits: 2, occupancyRate: 100 },
     ],
+    documentCount: 0,
     setupStage: "active",
     domainErrors: {
       properties: null, units: null, leases: null,
-      payments: null, ledger: null, maintenance: null, activity: null,
+      payments: null, ledger: null, maintenance: null, documents: null, activity: null,
     },
   };
 
-  test("produces 8 KPI items", () => {
+  test("produces 4 KPI items", () => {
     const vm = toOwnerDashboardViewModel(dashboardData);
-    expect(vm.kpis.items).toHaveLength(8);
+    expect(vm.kpis.items).toHaveLength(4);
   });
 
   test("sorts alerts by severity (danger → warning → info)", () => {
@@ -273,8 +302,9 @@ describe("toOwnerDashboardViewModel", () => {
       ),
     };
     const vm = toOwnerDashboardViewModel(data);
-    const unitsKpi = vm.kpis.items.find((k) => k.key === "totalUnits");
-    expect(unitsKpi?.value).toBe("—");
+    // Occupancy depends on units — should show dash when units unavailable
+    const occupancyKpi = vm.kpis.items.find((k) => k.key === "occupancy");
+    expect(occupancyKpi?.value).toBe("—");
   });
 
   test("provides setup-stage-aware quick actions", () => {

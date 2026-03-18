@@ -13,15 +13,15 @@ const stageConfig: Record<
 > = {
   "no-profile": {
     icon: AlertTriangle,
-    title: "Tenant context unavailable",
+    title: "Setting up your account",
     description:
-      "We couldn't load your tenant profile. This may mean the tenant context endpoint is not yet deployed, or your account hasn't been linked to a tenant profile by your property manager. Please contact your property manager for assistance.",
+      "We're finishing setting up your tenant profile. This usually completes within a few minutes after you accept your invitation. If this persists, please reach out to your property manager.",
   },
   "no-lease": {
     icon: Home,
-    title: "No active lease found",
+    title: "Your lease is being set up",
     description:
-      "Your tenant profile doesn't have an active lease linked. Once your property manager assigns a lease to your account, your dashboard will show rent details and more.",
+      "Your account is ready, and your property manager is finalizing your lease details. Once your lease is active, you'll see your rent, payment history, and more right here.",
   },
   "lease-ended": {
     icon: Clock,
@@ -49,8 +49,8 @@ export function TenantEmptyState({ stage }: TenantEmptyStateProps) {
 
       {stage === "no-profile" && (
         <p className="mt-4 rounded-lg border border-amber-800/50 bg-amber-950/30 px-4 py-3 text-xs text-amber-300">
-          If you believe this is an error, your property manager may need to
-          create your tenant profile or deploy the tenant context endpoint.
+          If you just accepted an invitation, try refreshing in a moment.
+          If this continues, contact your property manager for help.
         </p>
       )}
     </div>

@@ -6,7 +6,7 @@ LeaseBase registers **two** webhook endpoints in the Stripe Dashboard:
 
 ### 1.1 Platform Endpoint
 
-**URL:** `https://api.{env}.leasebase.co/api/payments/webhooks/stripe`
+**URL:** `https://api.{env}.leasebase.ai/api/payments/webhooks/stripe`
 **Signing secret:** Stored in `leasebase/{env}/stripe/webhook-signing` → `platform_endpoint_secret`
 
 **Events to subscribe:**
@@ -26,7 +26,7 @@ LeaseBase registers **two** webhook endpoints in the Stripe Dashboard:
 
 ### 1.2 Connect Endpoint
 
-**URL:** `https://api.{env}.leasebase.co/api/payments/webhooks/stripe-connect`
+**URL:** `https://api.{env}.leasebase.ai/api/payments/webhooks/stripe-connect`
 **Signing secret:** Stored in `leasebase/{env}/stripe/webhook-signing` → `connect_endpoint_secret`
 **Listen to:** Connected accounts
 

@@ -59,12 +59,12 @@ export function RecommendedActions({
   /* Loading */
   if (loading) {
     return (
-      <div className={`rounded-lg border border-slate-800 bg-slate-950/70 ${className}`}>
-        <div className="border-b border-slate-800 px-4 py-3 flex items-center gap-2">
+      <div className={`rounded-lg border border-slate-200 bg-white ${className}`}>
+        <div className="border-b border-slate-200 px-4 py-3 flex items-center gap-2">
           <Lightbulb size={14} className="text-amber-400" />
           <Skeleton variant="text" className="h-4 w-40" />
         </div>
-        <div className="divide-y divide-slate-800/50">
+        <div className="divide-y divide-slate-200">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-3">
               <div className="flex-1 space-y-1">
@@ -83,7 +83,7 @@ export function RecommendedActions({
   if (error) {
     return (
       <div
-        className={`rounded-lg border border-red-800/40 bg-red-950/20 p-4 text-sm text-red-300 ${className}`}
+        className={`rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 ${className}`}
         role="alert"
       >
         {error}
@@ -94,10 +94,10 @@ export function RecommendedActions({
   /* Empty — intentional positive messaging */
   if (insights.length === 0) {
     return (
-      <div className={`rounded-lg border border-slate-800 bg-slate-950/70 ${className}`} role="region" aria-label={title}>
-        <div className="border-b border-slate-800 px-4 py-3 flex items-center gap-2">
+      <div className={`rounded-lg border border-slate-200 bg-white ${className}`} role="region" aria-label={title}>
+        <div className="border-b border-slate-200 px-4 py-3 flex items-center gap-2">
           <Lightbulb size={14} className="text-amber-400" aria-hidden="true" />
-          <h2 className="text-sm font-semibold text-slate-100">{title}</h2>
+          <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
         </div>
         <p className="px-4 py-6 text-center text-sm text-slate-500">
           Everything looks good — no actions needed right now.
@@ -109,15 +109,15 @@ export function RecommendedActions({
   /* Normal */
   return (
     <div
-      className={`rounded-lg border border-slate-800 bg-slate-950/70 ${className}`}
+      className={`rounded-lg border border-slate-200 bg-white ${className}`}
       role="region"
       aria-label={title}
     >
-      <div className="border-b border-slate-800 px-4 py-3 flex items-center gap-2">
+      <div className="border-b border-slate-200 px-4 py-3 flex items-center gap-2">
         <Lightbulb size={14} className="text-amber-400" aria-hidden="true" />
-        <h2 className="text-sm font-semibold text-slate-100">{title}</h2>
+        <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
       </div>
-      <ul className="divide-y divide-slate-800/50">
+      <ul className="divide-y divide-slate-200">
         {insights.map((item) => {
           const badge = sevBadge[item.severity];
           const IconCmp = item.icon ?? sevIcon[item.severity];
@@ -125,7 +125,7 @@ export function RecommendedActions({
             <li key={item.id} className="flex items-center gap-3 px-4 py-3">
               <IconCmp size={16} className="shrink-0 text-slate-400" aria-hidden="true" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-slate-200">{item.message}</p>
+                <p className="text-sm text-slate-700">{item.message}</p>
                 {item.explanation && (
                   <p className="text-xs text-slate-500 mt-0.5">{item.explanation}</p>
                 )}
@@ -133,7 +133,7 @@ export function RecommendedActions({
               <Badge variant={badge.variant} className="shrink-0">{badge.label}</Badge>
               <Link
                 href={item.ctaHref}
-                className="shrink-0 rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="shrink-0 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500"
               >
                 {item.ctaLabel}
               </Link>

@@ -32,6 +32,31 @@ export async function fetchTenantPayments(): Promise<DomainResult<PaymentRow[]>>
   }
 }
 
+/** Fetch tenant's own charges — LIVE via GET /api/payments/mine/charges */
+export interface TenantChargeRow {
+  id: string;
+  type: string;
+  amount: number; // cents
+  currency: string;
+  billing_period: string | null;
+  due_date: string;
+  status: "PENDING" | "OVERDUE" | "PAID" | "PARTIALLY_PAID" | "VOID" | "CREDITED";
+  amount_paid: number;
+  description: string | null;
+  created_at: string;
+}
+
+export async function fetchTenantCharges(): Promise<DomainResult<TenantChargeRow[]>> {
+  try {
+    const res = await apiRequest<PaginatedResponse<TenantChargeRow>>({
+      path: "api/payments/mine/charges",
+    });
+    return { data: res.data, source: "live", error: null };
+  } catch (e: any) {
+    return { data: [], source: "unavailable", error: e?.message || "Failed to fetch charges" };
+  }
+}
+
 /** Create a Stripe Checkout Session for rent payment */
 export async function createCheckoutSession(
   returnUrl: string,

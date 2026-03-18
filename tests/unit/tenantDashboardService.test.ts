@@ -6,7 +6,7 @@ import type { TenantProfileRow, LeaseRow, DataSource } from "@/services/tenant/t
 const profile: TenantProfileRow = {
   id: "tp1",
   user_id: "u1",
-  lease_id: "l1",
+  lease_id: null, // deprecated — dashboard no longer reads this
   phone: "+1234567890",
   emergency_contact: null,
   notification_preferences: null,
@@ -20,18 +20,18 @@ const activeLease: LeaseRow = {
   id: "l1",
   organization_id: "org1",
   unit_id: "unit1",
+  term_type: "TWELVE_MONTH",
   start_date: "2024-01-01",
   end_date: "2026-12-31",
-  rent_amount: 145000,
   deposit_amount: 145000,
   status: "ACTIVE",
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
 };
 
-const terminatedLease: LeaseRow = {
+const inactiveLease: LeaseRow = {
   ...activeLease,
-  status: "TERMINATED",
+  status: "INACTIVE",
 };
 
 const expiredLease: LeaseRow = {
@@ -55,9 +55,8 @@ describe("computeTenantSetupStage", () => {
     expect(computeTenantSetupStage(null, "live", null, "live")).toBe("no-profile");
   });
 
-  test('returns "no-lease" when profile has no lease_id', () => {
-    const noLeaseProfile = { ...profile, lease_id: null };
-    expect(computeTenantSetupStage(noLeaseProfile, "live", null, "live")).toBe("no-lease");
+  test('returns "no-lease" when no lease found for the org context', () => {
+    expect(computeTenantSetupStage(profile, "live", null, "live")).toBe("no-lease");
   });
 
   test('returns "no-lease" when lease fetch fails', () => {
@@ -68,8 +67,8 @@ describe("computeTenantSetupStage", () => {
     expect(computeTenantSetupStage(profile, "live", activeLease, "live")).toBe("active");
   });
 
-  test('returns "lease-ended" for TERMINATED lease', () => {
-    expect(computeTenantSetupStage(profile, "live", terminatedLease, "live")).toBe("lease-ended");
+  test('returns "lease-ended" for INACTIVE lease', () => {
+    expect(computeTenantSetupStage(profile, "live", inactiveLease, "live")).toBe("lease-ended");
   });
 
   test('returns "lease-ended" for EXPIRED lease', () => {

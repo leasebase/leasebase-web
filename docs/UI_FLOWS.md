@@ -1,29 +1,33 @@
-# UI flows
+# UI Flows
 
-High-level UI flows for the Leasebase web app personas.
+**Last updated:** 2026-03-14 (alignment audit)
 
-## Property Manager / Landlord
+High-level UI flows for the Leasebase web app. All personas are served from a unified `/app` dashboard — the app renders role-specific content based on `user.role` (OWNER or TENANT).
 
-Core areas:
+## Owner (Landlord)
 
-- **Dashboard** – occupancy, delinquency, open work orders.
+Core areas under `/app`:
+
+- **Dashboard** – occupancy, delinquency, open work orders, revenue summary.
 - **Properties** – list and detail views.
 - **Units** – list and detail per property.
-- **Leases** – create and view leases.
-- **Ledger** – per-lease ledger (charges, payments, balance).
+- **Leases** – create, view, terminate, renew.
+- **Tenants** – invite, manage profiles, deactivate.
 - **Maintenance** – work orders list, detail, status updates, comments.
-- **Documents** – upload/download documents via signed URLs provided by the API.
-- **Organization settings** – manage org profile, users, and roles.
-- **Billing** – plan, unit count, Stripe billing portal link.
+- **Payments** – Stripe Connect onboarding, payment overview, ledger.
+- **Documents** – upload/download documents via signed URLs.
+- **Reports** – occupancy, revenue, payments, maintenance.
+- **Settings** – organization profile, billing.
 
 ## Tenant
 
-Core areas:
+Core areas under `/app`:
 
 - **Dashboard** – balance due, next due date, open maintenance.
-- **Pay rent** – initiate payments and confirm success/failure.
-- **Payment history** – list of payments with receipts.
+- **Pay rent** – Stripe Checkout for rent payments.
+- **Payment history** – list of own payments with receipts.
 - **Maintenance requests** – create, attach photos, view status and comments.
-- **Documents** – view/download lease and related documents.
+- **Documents** – view/download own lease and related documents.
+- **Profile** – update phone, emergency contact, notification preferences.
 
-These flows should be reflected in the App Router structure (e.g., `/pm` and `/tenant` segments) and will be wired up to the typed API client generated from the backend OpenAPI spec.
+All routes live under the `/app` segment. There are no separate `/pm` or `/tenant` URL segments.

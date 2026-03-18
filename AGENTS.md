@@ -8,15 +8,15 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 - It is **frontend-only**:
   - No backend API code lives here.
   - No mobile code lives here.
-- The web client talks to the backend API running from the separate backend repo:
-  - Backend/API: `../leasebase` (a.k.a. `leasebase-backend`), `services/api` (NestJS + Prisma + PostgreSQL).
+- The web client talks to the local dev API running from a separate repo:
+  - Schema & Dev API: `../leasebase-schema-dev`, `services/api` (NestJS + Prisma + PostgreSQL).
   - Mobile app: `../leasebase-mobile`.
 - All **web/frontend concerns** (pages, components, styling, web routing, web-only utilities) belong here once the app is bootstrapped.
-- Backend services, database schema/migrations, and infrastructure code live in `../leasebase` and should not be added to this repo.
+- Backend services, database schema/migrations, and infrastructure code live in `../leasebase-schema-dev` (transitional only) and the v2 microservices, and should not be added to this repo.
 
-For system-level and AWS architecture, consult the backend monorepo:
-- `../leasebase/README.md` – backend & web deployment to AWS (per account).
-- `../leasebase/docs/architecture.md` – overall system and AWS architecture.
+For system-level and AWS architecture, consult the backend repos:
+- `../leasebase-schema-dev/README.md` – schema, migrations, and reference data (transitional — not the active runtime).
+- `../leasebase-schema-dev/docs/architecture.md` – legacy architecture reference.
 
 ## Current state of this repo
 
@@ -31,23 +31,23 @@ If you materially change the frontend stack or core commands, **update this file
 
 A full local environment (API + web + DB) uses **two repos side by side**:
 
-- Backend/API: `../leasebase`
+- Backend/API: `../leasebase-schema-dev` (transitional — schema, migrations, seed) + v2 microservices
 - Web frontend: `./` (this repo, `leasebase-web`)
 
-### 1. Run the backend API locally (from `../leasebase`)
+### 1. Run the backend API locally (from `../leasebase-schema-dev`)
 
-These commands are run in the backend monorepo and are included here because the web client depends on that API:
+These commands are run in the schema-dev repo and are included here because the web client depends on that API:
 
 ```bash path=null start=null
-cd ../leasebase
+cd ../leasebase-schema-dev
 npm install
-# Start or provision the DB (see ../leasebase docs for the exact command, e.g. docker-compose up -d db)
+# Start or provision the DB (see ../leasebase-schema-dev docs for the exact command, e.g. docker-compose up -d db)
 npm run migrate
 npm run seed
-npm run dev:api    # API on http://localhost:4000 (check ../leasebase for the actual port)
+npm run dev:api    # API on http://localhost:4000 (check ../leasebase-schema-dev for the actual port)
 ```
 
-Always treat the backend repo as the source of truth for API ports, env vars, and DB setup.
+Always treat the backend repos as the source of truth for API ports, env vars, and DB setup.
 
 ### 2. Run the web frontend locally (this repo)
 
@@ -113,10 +113,11 @@ npm run lint
 
 ## How future agents should reason about changes
 
-- Keep a **strict separation of concerns** between this repo (web UI) and the backend repo (`../leasebase`):
+- Keep a **strict separation of concerns** between this repo (web UI) and the backend services:
   - Web-only logic, client-side routing, and UI state live here.
-  - Business logic that clearly belongs to the backend (authorization, data validation, persistence, heavy computations) stays in the backend service.
+  - Business logic that clearly belongs to the backend (authorization, data validation, persistence, heavy computations) stays in the backend services.
 - If a change spans both frontend and backend:
-  - Coordinate with the backend code in `../leasebase/services/api` and its schema/migrations.
+  - Coordinate with the relevant v2 microservice and `../leasebase-schema-dev` for schema/migrations.
   - Make sure any API contract changes (types, DTOs, error shapes) are reflected in both repos.
 - When in doubt about infrastructure, deployment pipelines, or API shape, prefer **reading and aligning with the backend repo docs** rather than guessing from this repository alone.
+- `../leasebase-schema-dev` is **transitional only** — it holds the Prisma schema, migrations, and seed data but is not the active backend runtime. The v2 microservices are the canonical runtime.

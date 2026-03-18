@@ -4,7 +4,7 @@ This repository is the **standalone web frontend** for the Leasebase platform.
 
 - **Frontend-only**: no backend API or database code lives here.
 - **Web client only**: mobile apps live in a separate repo.
-- The web client talks to the backend API running from the `../leasebase` backend monorepo (NestJS + Prisma + PostgreSQL).
+- The web client talks to the backend API provided by the v2 microservices. Schema and migrations are in `../leasebase-schema-dev` (transitional only).
 
 The goal of this repo is to host all browser-facing UI for Leasebase: routing, pages, components, styling, and web-specific utilities.
 
@@ -15,7 +15,7 @@ The goal of this repo is to host all browser-facing UI for Leasebase: routing, p
 This repo is now bootstrapped as a **Next.js (TypeScript) + Tailwind CSS** application.
 
 - Uses the **App Router** in `app/`.
-- Integrates with the `../leasebase` backend API via `NEXT_PUBLIC_API_BASE_URL`.
+- Integrates with the backend API via `NEXT_PUBLIC_API_BASE_URL`.
 - Is intended to integrate with AWS Cognito for authentication using `NEXT_PUBLIC_COGNITO_*` env vars.
 
 Concrete dev/build commands and output directory are documented below.
@@ -26,16 +26,16 @@ Concrete dev/build commands and output directory are documented below.
 
 The full Leasebase system spans multiple repos:
 
-- **Backend/API**: `../leasebase`
-  - Core API in `services/api` (NestJS + Prisma + PostgreSQL).
-  - Infrastructure for API and web hosting (managed outside this repo).
+- **Backend/API**: v2 microservices (leasebase-auth-service, leasebase-property-service, etc.)
+  - Schema & migrations: `../leasebase-schema-dev` (transitional only).
+  - Infrastructure: `../leasebase-iac`.
 - **Web frontend**: this repo (`leasebase-web`).
 - **Mobile app**: `../leasebase-mobile`.
 
 Keep a **strict separation of concerns**:
 
 - Web-only UI, client-side routing, and presentation live here.
-- Backend business logic, data validation, persistence, and heavy computations live in `../leasebase`.
+- Backend business logic, data validation, persistence, and heavy computations live in the backend microservices.
 
 ---
 
@@ -43,17 +43,19 @@ Keep a **strict separation of concerns**:
 
 A full local environment (API + web + DB) uses two repos side by side:
 
-- Backend/API: `../leasebase`
+- Backend/API: v2 microservices + `../leasebase-schema-dev` (schema only, transitional)
 - Web frontend: `./` (this repo)
 
-### 1. Run the backend API locally (from `../leasebase`)
+### 1. Run the backend API locally
 
-Refer to the backend repo docs for the authoritative commands. A typical flow is:
+For local development, `leasebase-schema-dev` provides a NestJS dev API on port 4000 (transitional). In production, the v2 microservices are the canonical runtime.
+
+Refer to `../leasebase-schema-dev/README.md` for authoritative commands. A typical flow is:
 
 1. Install dependencies.
 2. Start or provision the database.
 3. Run migrations and seeds.
-4. Start the API server (commonly on `http://localhost:4000`, but always check the backend docs).
+4. Start the API server (commonly on `http://localhost:4000`).
 
 ### 2. Run the web frontend (this repo)
 
@@ -245,10 +247,10 @@ Confluence secrets must be configured in the repository's GitHub Actions secrets
 
 When adding or changing code in this repo:
 
-- Keep backend responsibilities (authorization, persistence, complex business rules) in the backend service (`../leasebase/services/api`).
+- Keep backend responsibilities (authorization, persistence, complex business rules) in the backend microservices.
 - Keep this repo focused on web UI concerns: components, layout, navigation, client-side state, and integration with the backend API.
 - When a change spans both frontend and backend:
-  - Coordinate API contracts (types, DTOs, error responses) between this repo and `../leasebase`.
+  - Coordinate API contracts (types, DTOs, error responses) between this repo and the relevant backend service.
   - Reflect any API shape changes in both places.
 
 This repo is already configured with Next.js + TypeScript + Tailwind, along with Jest and Playwright.

@@ -24,7 +24,7 @@ export function PasswordRequirements({ result, dirty, id }: PasswordRequirements
       {PASSWORD_RULES.map((rule) => {
         const passed = result.rules[rule.key];
         // Before the user types anything, show neutral/muted styling.
-        const colour = !dirty ? "text-slate-500" : passed ? "text-emerald-400" : "text-red-400";
+        const colour = !dirty ? "text-slate-400" : passed ? "text-emerald-600" : "text-red-500";
 
         return (
           <li key={rule.key} className={`flex items-center gap-1.5 text-xs ${colour}`}>

@@ -14,8 +14,8 @@ export type { DataSource, DomainResult, Sourced };
 
 export type TenantSetupStage =
   | "no-profile"     // user is TENANT but has no tenant_profile row
-  | "no-lease"       // tenant profile exists but lease_id is null or lease not found
-  | "lease-ended"    // lease exists but status is TERMINATED or EXPIRED
+  | "no-lease"       // tenant profile exists but no lease found for current org
+  | "lease-ended"    // lease exists but status is INACTIVE, EXPIRED, or RENEWED
   | "active";        // active lease found
 
 /* ── API row shapes ── */
@@ -23,6 +23,10 @@ export type TenantSetupStage =
 export interface TenantProfileRow {
   id: string;
   user_id: string;
+  /**
+   * @deprecated Use GET /tenants/me/leases to resolve lease(s) via lease_tenants.
+   * Kept for backward compat; will be removed once all consumers migrate.
+   */
   lease_id: string | null;
   phone: string | null;
   emergency_contact: string | null;
@@ -37,13 +41,14 @@ export interface LeaseRow {
   id: string;
   organization_id: string;
   unit_id: string;
+  term_type: string;
   start_date: string;
   end_date: string;
-  rent_amount: number; // cents
   deposit_amount: number | null;
-  status: "DRAFT" | "ACTIVE" | "TERMINATED" | "EXPIRED";
+  status: "DRAFT" | "ASSIGNED" | "INVITED" | "ACKNOWLEDGED" | "ACTIVE" | "EXPIRED" | "EXTENDED" | "RENEWED" | "INACTIVE";
   created_at: string;
   updated_at: string;
+  tenants?: Array<{ id: string; name: string; role: string }>;
 }
 
 export interface PaymentRow {
@@ -53,8 +58,10 @@ export interface PaymentRow {
   amount: number; // cents
   currency: string;
   method: string | null;
-  status: "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELED";
-  ledger_entry_id: string | null;
+  status: "PENDING" | "PROCESSING" | "SUCCEEDED" | "FAILED" | "CANCELED" | "REFUNDED";
+  charge_id: string | null;
+  billing_period: string | null;
+  charge_type: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -63,14 +70,30 @@ export interface WorkOrderRow {
   id: string;
   organization_id: string;
   unit_id: string;
+  property_id: string | null;
   created_by_user_id: string;
+  tenant_user_id: string | null;
+  title: string | null;
   category: string;
-  priority: "LOW" | "MEDIUM" | "HIGH";
-  status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+  status: "SUBMITTED" | "IN_REVIEW" | "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CLOSED" | "CANCELLED";
   description: string;
+  entry_permission: string | null;
+  contact_preference: string | null;
+  availability_notes: string | null;
+  request_number: string | null;
   assignee_id: string | null;
+  assignee_name: string | null;
+  scheduled_date: string | null;
+  submitted_at: string | null;
+  completed_at: string | null;
+  closed_at: string | null;
+  cancelled_at: string | null;
   created_at: string;
   updated_at: string;
+  /* Enriched via JOIN */
+  unit_number?: string;
+  property_name?: string;
 }
 
 export interface WorkOrderCommentRow {
@@ -97,6 +120,38 @@ export interface DocumentRow {
 export interface CheckoutResult {
   checkoutUrl: string;
   sessionId: string;
+}
+
+export interface PaymentMethodRow {
+  id: string;
+  type: string;
+  last4: string | null;
+  brand: string | null;
+  exp_month: number | null;
+  exp_year: number | null;
+  is_default: boolean;
+  status: "ACTIVE" | "DETACHED" | "FAILED";
+  created_at: string;
+}
+
+export interface AutopayStatus {
+  enabled: boolean;
+  status: "ENABLED" | "DISABLED" | "PAUSED";
+  lease_id: string | null;
+  enrollment_id: string | null;
+  payment_method: {
+    id: string;
+    type: string;
+    last4: string | null;
+    brand: string | null;
+  } | null;
+}
+
+export interface SetupIntentResult {
+  clientSecret: string;
+  setupIntentId: string;
+  customerId: string;
+  publishableKey: string;
 }
 
 export interface NotificationRow {

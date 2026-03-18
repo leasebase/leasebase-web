@@ -60,7 +60,7 @@ export default function Page() {
               ))}
             </div>
           ) : error ? (
-            <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">
+            <div className="rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-700">
               {error}
             </div>
           ) : documents.length === 0 ? (
@@ -74,11 +74,11 @@ export default function Page() {
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900 p-4"
+                  className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-4"
                 >
                   <FileText size={20} className="shrink-0 text-slate-400" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-slate-100 truncate">{doc.name}</p>
+                    <p className="text-sm font-medium text-slate-900 truncate">{doc.name}</p>
                     <p className="text-xs text-slate-400">
                       {doc.mime_type} · {new Date(doc.created_at).toLocaleDateString()}
                     </p>
@@ -88,10 +88,8 @@ export default function Page() {
             </div>
           )}
         </div>
-      ) : user?.persona === "propertyManager" ? (
-        <PMDocumentsSection />
       ) : (
-      <EmptyState
+        <EmptyState
           icon={<FolderOpen size={48} strokeWidth={1.5} />}
           title="No documents yet"
           description="Upload leases, notices, and receipts to keep everything organized."
@@ -102,43 +100,5 @@ export default function Page() {
         />
       )}
     </>
-  );
-}
-
-function PMDocumentsSection() {
-  const [docs, setDocs] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const { fetchPMDocuments } = await import("@/services/pm/pmApiService");
-        const res = await fetchPMDocuments();
-        if (!cancelled) setDocs(res.data);
-      } catch (e: any) { if (!cancelled) setError(e.message); }
-      finally { if (!cancelled) setIsLoading(false); }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, []);
-
-  if (isLoading) return <div className="mt-6 space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} variant="text" className="h-14 w-full rounded-md" />)}</div>;
-  if (error) return <div className="mt-6 rounded-md border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>;
-  if (docs.length === 0) return <EmptyState icon={<FolderOpen size={48} strokeWidth={1.5} />} title="No documents" description="No documents found for your assigned properties." className="mt-6" />;
-
-  return (
-    <div className="mt-6 space-y-2">
-      {docs.map((doc: any) => (
-        <div key={doc.id} className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900 p-4">
-          <FileText size={20} className="shrink-0 text-slate-400" />
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-slate-100 truncate">{doc.name}</p>
-            <p className="text-xs text-slate-400">{doc.related_type} · {doc.mime_type} · {new Date(doc.created_at).toLocaleDateString()}</p>
-          </div>
-        </div>
-      ))}
-    </div>
   );
 }

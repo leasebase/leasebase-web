@@ -81,7 +81,7 @@ export function Tabs({
       <div
         role="tablist"
         aria-orientation="horizontal"
-        className="flex border-b border-slate-800"
+        className="flex border-b border-slate-200"
         onKeyDown={handleKeyDown}
       >
         {items.map((item) => {
@@ -101,8 +101,8 @@ export function Tabs({
               onClick={() => setActive(item.id)}
               className={`px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
                 isActive
-                  ? "border-b-2 border-brand-500 text-brand-300"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "border-b-2 border-brand-500 text-brand-600"
+                  : "text-slate-400 hover:text-slate-700"
               } ${item.disabled ? "opacity-40 cursor-not-allowed" : ""}`}
             >
               {item.label}
