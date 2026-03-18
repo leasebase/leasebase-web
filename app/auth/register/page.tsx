@@ -1,11 +1,12 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getApiBaseUrl } from "@/lib/apiBase";
 import { getSignInUrl, buildSignInRedirect, navigateToSignIn } from "@/lib/hostname";
 import { validatePassword, isPasswordComplexityError } from "@/lib/validation/password";
 import { getOwnerSignupDocs, buildLegalAcceptancePayload, LEGAL_DOCUMENTS } from "@/lib/legal";
+import { track } from "@/lib/analytics";
 import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthCard } from "@/components/auth/AuthCard";
@@ -45,6 +46,9 @@ function RegisterContent() {
   const [confirmDirty, setConfirmDirty] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  // Track signup page view once on mount.
+  useEffect(() => { track("signup_started"); }, []);
 
   // Live password validation — recomputed on every keystroke.
   const pwResult = useMemo(() => validatePassword(password), [password]);
@@ -129,6 +133,8 @@ function RegisterContent() {
         data.message ||
           "Registration successful. Please check your email for a Leasebase verification code.",
       );
+
+      track("signup_completed");
 
       if (data.userConfirmed) {
         const redirectUrl = buildSignInRedirect({ registered: "true", message: decodeURIComponent(message) });
