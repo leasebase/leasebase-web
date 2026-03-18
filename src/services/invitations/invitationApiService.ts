@@ -117,6 +117,21 @@ export async function fetchInvitations(
   });
 }
 
+/**
+ * Fetch PENDING invitations for a specific unit.
+ *
+ * Pulls the first page of invitations and filters client-side by unit_id +
+ * status. This is safe given typical invitation volumes per org.
+ */
+export async function fetchPendingInvitationsForUnit(
+  unitId: string,
+): Promise<TenantInvitation[]> {
+  const res = await fetchInvitations(1, 200);
+  return res.data.filter(
+    (inv) => inv.unit_id === unitId && inv.status === "PENDING",
+  );
+}
+
 export async function resendInvitation(
   id: string,
 ): Promise<{ data: { id: string; status: string; expires_at: string } }> {
