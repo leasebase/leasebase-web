@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { track } from "@/lib/analytics";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { LeaseForm } from "@/components/leases/LeaseForm";
@@ -190,6 +191,7 @@ export default function CreateLeasePage() {
     const result = await createLease(data);
     setCreatedLease(result.data);
     setStep("invite");
+    track("first_action_taken", { type: "lease" });
   };
 
   const handleInviteDone = () => {

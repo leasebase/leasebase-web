@@ -12,6 +12,7 @@ import { Card, CardBody } from "@/components/ui/Card";
 import { createMaintenanceRequest } from "@/services/tenant/adapters/maintenanceAdapter";
 import { fetchTenantProfile } from "@/services/tenant/adapters/profileAdapter";
 import { fetchTenantLease } from "@/services/tenant/adapters/leaseAdapter";
+import { track } from "@/lib/analytics";
 
 /**
  * New Maintenance Request — LIVE.
@@ -68,6 +69,7 @@ export default function Page() {
       });
 
       setSuccess(true);
+      track("first_action_taken", { type: "maintenance" });
     } catch (err: any) {
       setError(err?.message || "Failed to submit request. Please try again.");
     } finally {

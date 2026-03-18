@@ -118,4 +118,25 @@
 <!-- /wp:group -->
 </main>
 <!-- /wp:group -->
+
+<!-- wp:html -->
+<script>
+(function(){
+  function lbTrack(event, data) {
+    if (typeof console !== 'undefined') console.log('[analytics]', event, data);
+    try {
+      window.dispatchEvent(new CustomEvent('lb:analytics', { detail: { event: event, data: data, ts: Date.now() } }));
+    } catch(e) {}
+  }
+  document.addEventListener('click', function(e) {
+    var a = e.target.closest && e.target.closest('a.wp-block-button__link');
+    if (!a) return;
+    var text = (a.textContent || '').trim();
+    if (text === 'Start Free as an Owner') lbTrack('landing_cta_clicked', { location: 'hero' });
+    if (text === 'Create Your Owner Account') lbTrack('landing_cta_clicked', { location: 'final_cta' });
+  });
+})();
+</script>
+<!-- /wp:html -->
+
 <!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
