@@ -7,6 +7,11 @@ import { identify, resetAnalytics } from "@/lib/analytics";
 
 export type AuthMode = "cognito" | "devBypass";
 
+export interface OrgMembership {
+  orgId: string;
+  role: string;
+}
+
 export interface CurrentUser {
   id: string;
   orgId: string;
@@ -14,6 +19,8 @@ export interface CurrentUser {
   name: string;
   role: string;
   persona: Persona | null;
+  /** All org memberships for multi-lease tenants (from /me). */
+  organizations?: OrgMembership[];
 }
 
 export interface DevBypassSession {
@@ -34,6 +41,8 @@ interface AuthState {
   user?: CurrentUser;
   devBypass?: DevBypassSession;
   status: AuthStatus;
+  /** Selected org context for multi-lease tenants. */
+  selectedOrgId?: string;
 
   /**
    * Bootstrap auth from persisted storage in a single call.
@@ -62,6 +71,8 @@ interface AuthState {
    */
   loadMe: (context?: "bootstrap" | "login") => Promise<void>;
   logout: (reason?: "manual" | "unauthorized") => void;
+  /** Switch the active org context (multi-lease tenants). */
+  setSelectedOrg: (orgId: string) => void;
 }
 
 interface PersistedAuthState {
@@ -72,6 +83,7 @@ interface PersistedAuthState {
   expiresAt?: number;
   devBypass?: DevBypassSession;
   user?: CurrentUser;
+  selectedOrgId?: string;
 }
 
 /** Sentinel so `bootstrapSession` only runs once per page-load. */
@@ -259,10 +271,13 @@ export const authStore = create<AuthState>()(
             throw new Error(body?.error?.message || body?.message || "Unable to load session");
           }
 
-          const me = body as { id: string; orgId: string; email: string; name: string; role: string };
+          const me = body as { id: string; orgId: string; email: string; name: string; role: string; organizations?: OrgMembership[] };
           const persona = mapUserRoleToPersona(me.role as any);
           const user: CurrentUser = { ...me, persona };
-          set({ user, status: "authenticated" });
+          // If user has multiple orgs and no selectedOrgId yet, default to primary.
+          const currentSelectedOrg = get().selectedOrgId;
+          const selectedOrgId = currentSelectedOrg || me.orgId;
+          set({ user, status: "authenticated", selectedOrgId });
 
           // PostHog identify on successful auth
           identify(me.id, { email: me.email, role: me.role, orgId: me.orgId });
@@ -291,6 +306,10 @@ export const authStore = create<AuthState>()(
         }
       },
 
+      setSelectedOrg: (orgId: string) => {
+        set({ selectedOrgId: orgId });
+      },
+
       logout: (_reason?: "manual" | "unauthorized") => {
         // Reset the bootstrap sentinel so a fresh login can re-bootstrap.
         bootstrapPromise = null;
@@ -304,6 +323,7 @@ export const authStore = create<AuthState>()(
           devBypass: undefined,
           user: undefined,
           status: "unauthenticated",
+          selectedOrgId: undefined,
         });
       },
     }),
@@ -321,6 +341,7 @@ export const authStore = create<AuthState>()(
         expiresAt: state.expiresAt,
         devBypass: state.devBypass,
         user: state.user,
+        selectedOrgId: state.selectedOrgId,
       }),
     }
   )

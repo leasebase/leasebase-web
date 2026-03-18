@@ -18,7 +18,7 @@ const TENANT_LEGAL_DOCS = getTenantSignupDocs();
 type PageState =
   | { kind: "loading" }
   | { kind: "invite"; invite: InvitationAcceptInfo }
-  | { kind: "success"; email: string }
+  | { kind: "success"; email: string; existingUser?: boolean }
   | { kind: "error"; code: string; message: string };
 
 function AcceptInviteContent() {
@@ -35,7 +35,10 @@ function AcceptInviteContent() {
 
   const pwResult = validatePassword(password);
   const passwordsMatch = password === confirmPassword;
-  const canSubmit = pwResult.valid && passwordsMatch && password.length > 0 && agreedToTerms;
+  const isExistingUser = state.kind === "invite" && !!state.invite.existingUser;
+  const canSubmit = isExistingUser
+    ? agreedToTerms
+    : pwResult.valid && passwordsMatch && password.length > 0 && agreedToTerms;
 
   useEffect(() => {
     if (!token) {
@@ -64,10 +67,10 @@ function AcceptInviteContent() {
     try {
       const res = await acceptInvitation({
         token,
-        password,
+        ...(isExistingUser ? {} : { password }),
         legalAcceptance: buildLegalAcceptancePayload(TENANT_LEGAL_DOCS),
       });
-      setState({ kind: "success", email: res.data.email });
+      setState({ kind: "success", email: res.data.email, existingUser: res.data.existingUser });
     } catch (err: any) {
       // If the invite was already accepted or revoked during submit, show that state
       if (err.code === "ALREADY_ACCEPTED" || err.code === "REVOKED" || err.code === "EXPIRED") {
@@ -122,12 +125,16 @@ function AcceptInviteContent() {
             </div>
           )}
 
-          {/* ── Invite details + password form ── */}
+          {/* ── Invite details + password form (or link-account for existing users) ── */}
           {state.kind === "invite" && (
             <>
-              <h2 className="text-lg font-semibold text-slate-900 mb-1">Accept Your Invitation</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-1">
+                {isExistingUser ? "Link This Lease" : "Accept Your Invitation"}
+              </h2>
               <p className="text-sm text-slate-500 mb-4">
-                Set your password to activate your account.
+                {isExistingUser
+                  ? "You already have a LeaseBase account. Accept to link this lease to your existing account."
+                  : "Set your password to activate your account."}
               </p>
 
               <div className="rounded-md bg-slate-50 border border-slate-200 p-3 mb-4 space-y-1">
@@ -152,32 +159,37 @@ function AcceptInviteContent() {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-3">
-                <div>
-                  <Input
-                    label="Password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      if (!passwordDirty) setPasswordDirty(true);
-                    }}
-                    required
-                    autoComplete="new-password"
-                    placeholder="Create a strong password"
-                  />
-                  <PasswordRequirements result={pwResult} dirty={passwordDirty} />
-                </div>
+                {/* Password fields only for NEW users */}
+                {!isExistingUser && (
+                  <>
+                    <div>
+                      <Input
+                        label="Password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (!passwordDirty) setPasswordDirty(true);
+                        }}
+                        required
+                        autoComplete="new-password"
+                        placeholder="Create a strong password"
+                      />
+                      <PasswordRequirements result={pwResult} dirty={passwordDirty} />
+                    </div>
 
-                <Input
-                  label="Confirm password"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                  placeholder="Re-enter your password"
-                  error={confirmPassword && !passwordsMatch ? "Passwords do not match" : undefined}
-                />
+                    <Input
+                      label="Confirm password"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      autoComplete="new-password"
+                      placeholder="Re-enter your password"
+                      error={confirmPassword && !passwordsMatch ? "Passwords do not match" : undefined}
+                    />
+                  </>
+                )}
 
                 {/* Legal consent */}
                 <label className="flex items-start gap-2 text-xs text-slate-600 cursor-pointer">
@@ -212,7 +224,7 @@ function AcceptInviteContent() {
                   loading={isSubmitting}
                   disabled={!canSubmit}
                 >
-                  Accept Invitation
+                  {isExistingUser ? "Link Lease to My Account" : "Accept Invitation"}
                 </Button>
               </form>
             </>
@@ -221,10 +233,14 @@ function AcceptInviteContent() {
           {/* ── Success ── */}
           {state.kind === "success" && (
             <div className="space-y-4 text-center py-6">
-              <div className="text-3xl">🎉</div>
-              <h2 className="text-lg font-semibold text-slate-900">Account Created!</h2>
+              <div className="text-3xl">{state.existingUser ? "🔗" : "🎉"}</div>
+              <h2 className="text-lg font-semibold text-slate-900">
+                {state.existingUser ? "Lease Linked!" : "Account Created!"}
+              </h2>
               <p className="text-sm text-slate-500">
-                Your account has been set up. Sign in to access your tenant portal.
+                {state.existingUser
+                  ? "This lease has been linked to your existing account. Sign in to view it."
+                  : "Your account has been set up. Sign in to access your tenant portal."}
               </p>
               <a href={tenantLoginUrl}>
                 <Button variant="primary" className="w-full">

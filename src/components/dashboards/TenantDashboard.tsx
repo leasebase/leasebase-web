@@ -17,6 +17,7 @@ import { deriveTenantInsights } from "@/lib/intelligence/deriveActions";
 import { TENANT_WIDGETS } from "@/lib/dashboard/tenantWidgets";
 import { mergePreferences, type ResolvedWidget } from "@/lib/dashboard/widgetRegistry";
 import { loadPreferences } from "@/lib/dashboard/preferences";
+import { LeaseContextSelector } from "@/components/tenant/LeaseContextSelector";
 
 export function TenantDashboard() {
   const [data, setData] = useState<TenantDashboardData | null>(null);
@@ -143,14 +144,17 @@ export function TenantDashboard() {
         title="Tenant dashboard"
         description="Check your rent status, lease details, and maintenance requests."
         actions={
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={<Settings2 size={14} />}
-            onClick={() => setCustomizeOpen(true)}
-          >
-            Customize
-          </Button>
+          <div className="flex items-center gap-3">
+            <LeaseContextSelector />
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<Settings2 size={14} />}
+              onClick={() => setCustomizeOpen(true)}
+            >
+              Customize
+            </Button>
+          </div>
         }
       />
 

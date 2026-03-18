@@ -55,11 +55,14 @@ export interface InvitationAcceptInfo {
   inviterName: string;
   expiresAt: string;
   status: string;
+  /** True if the invited email already has a LeaseBase account (multi-lease). */
+  existingUser?: boolean;
 }
 
 export interface AcceptInvitationPayload {
   token: string;
-  password: string;
+  /** Password is optional for existing users (multi-lease link). */
+  password?: string;
   legalAcceptance?: Array<{ slug: string; version: string; hash?: string }>;
 }
 
@@ -161,7 +164,7 @@ export async function fetchInvitationByToken(
 
 export async function acceptInvitation(
   payload: AcceptInvitationPayload,
-): Promise<{ data: { accepted: boolean; email: string; message: string } }> {
+): Promise<{ data: { accepted: boolean; email: string; message: string; existingUser?: boolean } }> {
   const base = getApiBaseUrl();
   const url = `${base}/api/tenants/invitations/accept`;
   const res = await fetch(url, {
