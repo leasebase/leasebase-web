@@ -108,8 +108,10 @@ function RegisterContent() {
       if (!res.ok) {
         const text = await res.text();
         let message = "Registration failed";
+        let code = "";
         try {
           const body = JSON.parse(text);
+          code = body.code || "";
           message = body.message || body.error?.message || message;
         } catch {
           // Non-JSON response (likely HTML error page)
@@ -119,6 +121,14 @@ function RegisterContent() {
         if (isPasswordComplexityError(message)) {
           setFieldErrors({ password: "Password does not meet the requirements." });
           return;
+        }
+
+        // Use structured error codes to show the right user-facing message.
+        if (code === "DUPLICATE_EMAIL") {
+          throw new Error("An account with this email already exists. Please sign in instead.");
+        }
+        if (code === "BOOTSTRAP_FAILED" || res.status >= 500) {
+          throw new Error("Registration failed due to a server error. Please try again in a moment.");
         }
 
         throw new Error(message);

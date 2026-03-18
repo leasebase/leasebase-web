@@ -131,11 +131,13 @@ describe("Register page — password validation UX", () => {
     expect(screen.queryByText("Registration failed")).not.toBeInTheDocument();
   });
 
-  test("shows generic error for non-password backend errors", async () => {
+  test("shows duplicate-email message when backend returns DUPLICATE_EMAIL code", async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: false,
+      status: 400,
       text: async () =>
         JSON.stringify({
+          code: "DUPLICATE_EMAIL",
           message: "An account with this email already exists",
         }),
     });
@@ -151,7 +153,64 @@ describe("Register page — password validation UX", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("An account with this email already exists")
+        screen.getByText("An account with this email already exists. Please sign in instead.")
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("shows generic server error for bootstrap failure (500)", async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      text: async () =>
+        JSON.stringify({
+          code: "BOOTSTRAP_FAILED",
+          message: "Account creation failed. Please try again.",
+        }),
+    });
+
+    render(<RegisterPage />);
+    fillBasicFields();
+    acceptTerms();
+
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
+    fireEvent.change(screen.getByLabelText("Confirm Password"), { target: { value: "GoodP@ss1" } });
+
+    fireEvent.click(screen.getByRole("button", { name: /create account/i }));
+
+    await waitFor(() => {
+      // Should show generic server error, NOT the "already exists" message
+      expect(
+        screen.getByText("Registration failed due to a server error. Please try again in a moment.")
+      ).toBeInTheDocument();
+    });
+
+    // Must NOT show duplicate-email message for a server error
+    expect(screen.queryByText(/already exists/i)).not.toBeInTheDocument();
+  });
+
+  test("shows generic server error for 500 without structured code", async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      text: async () =>
+        JSON.stringify({
+          message: "Internal server error",
+        }),
+    });
+
+    render(<RegisterPage />);
+    fillBasicFields();
+    acceptTerms();
+
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "GoodP@ss1" } });
+    fireEvent.change(screen.getByLabelText("Confirm Password"), { target: { value: "GoodP@ss1" } });
+
+    fireEvent.click(screen.getByRole("button", { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Registration failed due to a server error. Please try again in a moment.")
       ).toBeInTheDocument();
     });
   });
