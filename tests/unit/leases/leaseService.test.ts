@@ -58,6 +58,7 @@ describe("leaseService", () => {
         unitId: "u1",
         termType: "TWELVE_MONTH",
         startDate: "2026-01-01",
+        rentAmount: 150000,
       };
       mockApiRequest.mockResolvedValueOnce({ data: { id: "new-1" } });
       await createLease(dto);

@@ -23,6 +23,7 @@ interface FormErrors {
   termType?: string;
   startDate?: string;
   endDate?: string;
+  rentAmount?: string;
 }
 
 function validate(data: {
@@ -31,12 +32,14 @@ function validate(data: {
   termType: string;
   startDate: string;
   endDate: string;
+  rentAmount: number;
 }): FormErrors {
   const errors: FormErrors = {};
   if (!data.propertyId) errors.propertyId = "Property is required";
   if (!data.unitId) errors.unitId = "Unit is required";
   if (!data.termType) errors.termType = "Term type is required";
   if (!data.startDate) errors.startDate = "Start date is required";
+  if (data.rentAmount < 0) errors.rentAmount = "Must be 0 or more";
   if (data.termType === "CUSTOM") {
     if (!data.endDate) errors.endDate = "End date is required for custom terms";
     else if (data.startDate && data.endDate <= data.startDate) {
@@ -55,6 +58,10 @@ export function LeaseForm({ initial, onSubmit, onCancel, submitLabel }: LeaseFor
   );
   const [endDate, setEndDate] = useState(
     initial?.end_date ? initial.end_date.split("T")[0] : "",
+  );
+  // Convert cents to dollars for display
+  const [rentDollars, setRentDollars] = useState(
+    initial ? (initial.rent_amount / 100).toString() : "",
   );
 
   const [properties, setProperties] = useState<PropertyRow[]>([]);
@@ -95,7 +102,8 @@ export function LeaseForm({ initial, onSubmit, onCancel, submitLabel }: LeaseFor
     e.preventDefault();
     setServerError(null);
 
-    const validationErrors = validate({ propertyId, unitId, termType, startDate, endDate });
+    const rentAmountCents = Math.round((Number(rentDollars) || 0) * 100);
+    const validationErrors = validate({ propertyId, unitId, termType, startDate, endDate, rentAmount: rentAmountCents });
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
 
@@ -105,6 +113,7 @@ export function LeaseForm({ initial, onSubmit, onCancel, submitLabel }: LeaseFor
       termType,
       startDate,
       endDate: termType === "CUSTOM" ? endDate : undefined,
+      rentAmount: rentAmountCents, // dollars → cents
     };
 
     try {
@@ -205,6 +214,18 @@ export function LeaseForm({ initial, onSubmit, onCancel, submitLabel }: LeaseFor
           required
         />
       )}
+
+      <Input
+        label="Monthly Rent ($)"
+        type="number"
+        min={0}
+        step={0.01}
+        placeholder="0.00"
+        value={rentDollars}
+        onChange={(e) => setRentDollars(e.target.value)}
+        error={errors.rentAmount}
+        required
+      />
 
       <div className="flex items-center justify-end gap-3 pt-2">
         <Button

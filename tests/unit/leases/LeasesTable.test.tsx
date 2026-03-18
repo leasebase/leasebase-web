@@ -24,6 +24,7 @@ const makeLease = (overrides: Partial<LeaseRow> = {}): LeaseRow => ({
   status: "ACTIVE",
   start_date: "2026-01-01T00:00:00Z",
   end_date: "2026-12-31T00:00:00Z",
+  rent_amount: 150000,
   security_deposit: 300000,
   lease_terms: null,
   created_at: now,

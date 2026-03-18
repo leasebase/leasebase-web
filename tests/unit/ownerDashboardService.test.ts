@@ -25,9 +25,9 @@ const properties = [
 ];
 
 const units = [
-  { id: "u1", property_id: "p1", status: "ACTIVE", rent_amount: 150000 },
-  { id: "u2", property_id: "p1", status: "ACTIVE", rent_amount: 120000 },
-  { id: "u3", property_id: "p2", status: "ACTIVE", rent_amount: 100000 },
+  { id: "u1", property_id: "p1", status: "ACTIVE" },
+  { id: "u2", property_id: "p1", status: "ACTIVE" },
+  { id: "u3", property_id: "p2", status: "ACTIVE" },
 ];
 
 const leases = [
