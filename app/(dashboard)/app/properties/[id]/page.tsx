@@ -25,7 +25,8 @@ import { PropertyDetailSkeleton } from "@/components/properties/PropertyDetailSk
 function OwnerOverviewPanel({ property, units }: { property: PropertyRow; units: UnitRow[] }) {
   const occupied = units.filter((u) => u.status === "OCCUPIED").length;
   const vacant = units.filter((u) => u.status === "AVAILABLE").length;
-  const scheduledRent = units.reduce((sum, u) => sum + u.rent_amount, 0);
+  // Rent now lives on leases, not units — property-level rent summary
+  // requires fetching active leases (omitted here for simplicity).
 
   return (
     <div className="space-y-4">
@@ -44,11 +45,11 @@ function OwnerOverviewPanel({ property, units }: { property: PropertyRow; units:
           <p className="text-xs text-slate-500">{occupied} occupied · {vacant} vacant · {units.length} total</p>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Scheduled Rent</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Units</h3>
           <p className="text-2xl font-semibold text-slate-900">
-            ${(scheduledRent / 100).toLocaleString()}<span className="text-sm font-normal text-slate-400">/mo</span>
+            {units.length}
           </p>
-          <p className="text-xs text-slate-500">{units.length} unit{units.length !== 1 ? "s" : ""}</p>
+          <p className="text-xs text-slate-500">{occupied} occupied · {vacant} vacant</p>
         </div>
       </div>
       <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-2">

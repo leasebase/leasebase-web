@@ -23,7 +23,6 @@ const makeUnit = (overrides: Partial<UnitRow> = {}): UnitRow => ({
   bedrooms: 2,
   bathrooms: 1,
   square_feet: 850,
-  rent_amount: 150000, // $1,500
   status: "AVAILABLE",
   created_at: now,
   updated_at: now,
@@ -31,8 +30,8 @@ const makeUnit = (overrides: Partial<UnitRow> = {}): UnitRow => ({
 });
 
 const units: UnitRow[] = [
-  makeUnit({ id: "u1", unit_number: "101", status: "AVAILABLE", rent_amount: 150000 }),
-  makeUnit({ id: "u2", unit_number: "202", status: "OCCUPIED", rent_amount: 200000, square_feet: null }),
+  makeUnit({ id: "u1", unit_number: "101", status: "AVAILABLE" }),
+  makeUnit({ id: "u2", unit_number: "202", status: "OCCUPIED", square_feet: null }),
 ];
 
 /* ── Tests ── */
@@ -48,12 +47,6 @@ describe("UnitsTable", () => {
   test("renders bed/bath info", () => {
     render(<UnitsTable units={units} />);
     expect(screen.getAllByText("2bd / 1ba").length).toBeGreaterThanOrEqual(1);
-  });
-
-  test("renders rent in dollars from cents", () => {
-    render(<UnitsTable units={units} />);
-    // 150000 cents = $1,500
-    expect(screen.getByText("$1,500/mo")).toBeInTheDocument();
   });
 
   test("renders square feet or dash for null", () => {

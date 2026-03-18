@@ -57,7 +57,6 @@ function OverviewPanel({
   lease,
   onTerminate,
   onRenew,
-  onActivate,
   onInviteTenant,
   onResendInvite,
   pendingInvitation,
@@ -66,7 +65,6 @@ function OverviewPanel({
   lease: LeaseRow;
   onTerminate: () => void;
   onRenew: () => void;
-  onActivate: () => void;
   onInviteTenant: () => void;
   onResendInvite: () => void;
   pendingInvitation: TenantInvitation | null;
@@ -81,8 +79,11 @@ function OverviewPanel({
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Term</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Rent</h3>
           <p className="text-lg font-semibold text-slate-900">
+            {formatCurrency(lease.rent_amount)}/mo
+          </p>
+          <p className="text-xs text-slate-500">
             {(lease.term_type ?? "").replace(/_/g, " ")}
           </p>
           {lease.security_deposit != null && (
@@ -154,11 +155,6 @@ function OverviewPanel({
               Renew
             </Button>
           </>
-        )}
-        {(lease.status === "DRAFT" || lease.status === "ASSIGNED") && (
-          <Button variant="primary" size="sm" onClick={onActivate}>
-            Activate
-          </Button>
         )}
         {showInvite && (
           <Button
@@ -308,17 +304,6 @@ function LeaseDetailContent() {
     }
   };
 
-  const handleActivate = async () => {
-    try {
-      // Status transitions are lifecycle operations, not generic updates.
-      // For now, activate via updateLease with a type assertion.
-      const result = await updateLease(id, {} as any);
-      setLease(result.data);
-    } catch (e: any) {
-      setError(e.message || "Failed to activate lease");
-    }
-  };
-
   const handleInviteSuccess = () => {
     setShowInviteModal(false);
     // Re-fetch lease and invitations to reflect new state.
@@ -362,7 +347,6 @@ function LeaseDetailContent() {
             onRenew={() => {
               setShowRenew(true);
             }}
-            onActivate={handleActivate}
             onInviteTenant={() => setShowInviteModal(true)}
             onResendInvite={handleResendInvite}
             pendingInvitation={pendingInvitation}

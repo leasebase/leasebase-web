@@ -28,6 +28,7 @@ export interface LeaseRow {
   status: string;
   start_date: string;
   end_date: string;
+  rent_amount: number;          // cents — canonical contract rent
   security_deposit: number | null;
   lease_terms: Record<string, unknown> | null;
   created_at: string;
@@ -46,6 +47,7 @@ export interface CreateLeaseDTO {
   termType: string;
   startDate: string;
   endDate?: string; // required only for CUSTOM
+  rentAmount: number;            // cents — canonical contract rent
   securityDeposit?: number;
   leaseTerms?: Record<string, unknown>;
 }
@@ -56,6 +58,7 @@ export interface RenewLeaseDTO {
   termType: string;
   startDate: string;
   endDate?: string;
+  rentAmount?: number;           // cents — if omitted, inherits from original lease
   securityDeposit?: number;
   leaseTerms?: Record<string, unknown>;
 }

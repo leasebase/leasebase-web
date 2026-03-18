@@ -107,10 +107,6 @@ function OwnerUnitDetail() {
         </div>
         <dl className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
           <div>
-            <dt className="text-slate-500">Rent</dt>
-            <dd className="text-slate-900 font-medium">${(unit.rent_amount / 100).toLocaleString()}/mo</dd>
-          </div>
-          <div>
             <dt className="text-slate-500">Square Feet</dt>
             <dd className="text-slate-700">{unit.square_feet ? unit.square_feet.toLocaleString() : "—"}</dd>
           </div>

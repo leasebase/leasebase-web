@@ -26,12 +26,13 @@ jest.mock("next/link", () => {
 const now = new Date().toISOString();
 
 const property = { id: "p1", name: "Sunset", organization_id: "org-1", address_line1: "123", address_line2: null, city: "LA", state: "CA", postal_code: "90001", country: "US", status: "ACTIVE", created_at: now, updated_at: now };
-const unit = { id: "u1", organization_id: "org-1", property_id: "p1", unit_number: "101", bedrooms: 2, bathrooms: 1, square_feet: 850, rent_amount: 150000, status: "AVAILABLE", created_at: now, updated_at: now };
+const unit = { id: "u1", organization_id: "org-1", property_id: "p1", unit_number: "101", bedrooms: 2, bathrooms: 1, square_feet: 850, status: "AVAILABLE", created_at: now, updated_at: now };
 
 const initialLease: LeaseRow = {
   id: "l1", org_id: "org-1", property_id: "p1", unit_id: "u1",
   term_type: "TWELVE_MONTH", status: "ACTIVE",
   start_date: "2026-01-01T00:00:00Z", end_date: "2026-12-31T00:00:00Z",
+  rent_amount: 150000,
   security_deposit: 300000, lease_terms: null,
   created_at: now, updated_at: now, property_name: "Sunset", unit_number: "101",
 };
@@ -46,13 +47,14 @@ beforeEach(() => {
 });
 
 describe("LeaseForm", () => {
-  test("renders all form fields", async () => {
+  test("renders all form fields including rent", async () => {
     render(<LeaseForm onSubmit={jest.fn()} onCancel={jest.fn()} />);
     await waitFor(() => expect(screen.getByText("Sunset")).toBeInTheDocument());
     expect(screen.getByLabelText(/property/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/unit/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/start date/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/term/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/monthly rent/i)).toBeInTheDocument();
   });
 
   test("shows validation errors for required fields", async () => {
@@ -100,6 +102,9 @@ describe("LeaseForm", () => {
     // Fill start date
     await user.type(screen.getByLabelText(/start date/i), "2026-01-01");
 
+    // Fill rent
+    await user.type(screen.getByLabelText(/monthly rent/i), "1500");
+
     await user.click(screen.getByText("Create Lease"));
 
     await waitFor(() => {
@@ -108,6 +113,7 @@ describe("LeaseForm", () => {
       expect(dto.propertyId).toBe("p1");
       expect(dto.unitId).toBe("u1");
       expect(dto.termType).toBe("TWELVE_MONTH");
+      expect(dto.rentAmount).toBe(150000); // $1,500 → 150000 cents
     });
   });
 });
