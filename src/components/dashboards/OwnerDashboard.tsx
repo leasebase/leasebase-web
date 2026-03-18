@@ -20,6 +20,7 @@ import { OWNER_WIDGETS } from "@/lib/dashboard/ownerWidgets";
 import { mergePreferences, type ResolvedWidget } from "@/lib/dashboard/widgetRegistry";
 import { loadPreferences } from "@/lib/dashboard/preferences";
 import { track } from "@/lib/analytics";
+import { CalendlyCta } from "@/components/onboarding/CalendlyCta";
 
 export function OwnerDashboard() {
   const [data, setData] = useState<OwnerDashboardData | null>(null);
@@ -100,6 +101,8 @@ export function OwnerDashboard() {
           description="Track income, performance, and expenses for your properties."
         />
         <OwnerEmptyState stage={data.setupStage} />
+        {/* Calendly CTA for new users */}
+        <CalendlyCta />
       </section>
     );
   }
@@ -193,6 +196,12 @@ export function OwnerDashboard() {
           dismissKey="lb-owner-onboarding-dismissed"
         />
       </WidgetErrorBoundary>
+
+      {/* Calendly CTA — shown after onboarding completion */}
+      <CalendlyCta
+        title="You're all set! Want a walkthrough?"
+        description="Book a free call with our team to explore advanced features."
+      />
 
       {/* Customization modal */}
       <CustomizeDashboard

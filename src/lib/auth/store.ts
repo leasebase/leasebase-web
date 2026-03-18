@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { mapUserRoleToPersona, Persona } from "@/lib/auth/roles";
 import { getApiBaseUrl } from "@/lib/apiBase";
 import { devLog } from "@/lib/debug";
+import { identify, resetAnalytics } from "@/lib/analytics";
 
 export type AuthMode = "cognito" | "devBypass";
 
@@ -262,6 +263,9 @@ export const authStore = create<AuthState>()(
           const persona = mapUserRoleToPersona(me.role as any);
           const user: CurrentUser = { ...me, persona };
           set({ user, status: "authenticated" });
+
+          // PostHog identify on successful auth
+          identify(me.id, { email: me.email, role: me.role, orgId: me.orgId });
         } catch (error) {
           const currentStatus = get().status;
           // Only clear state if we haven't already (e.g. from the 401 handler above).
@@ -290,6 +294,7 @@ export const authStore = create<AuthState>()(
       logout: (_reason?: "manual" | "unauthorized") => {
         // Reset the bootstrap sentinel so a fresh login can re-bootstrap.
         bootstrapPromise = null;
+        resetAnalytics();
         set({
           mode: null,
           accessToken: undefined,

@@ -45,6 +45,7 @@ export const appNavItems: AppNavItem[] = [
 
   // ── Intelligence ──
   { path: "/app/reports", label: "Reports", icon: "reports", personas: ["owner"], group: "intelligence" },
+  { path: "/app/admin/growth", label: "Growth", icon: "growth", personas: ["owner"], group: "intelligence" },
 ];
 
 export function filterNavForPersona(persona: Persona | undefined | null): AppNavItem[] {
