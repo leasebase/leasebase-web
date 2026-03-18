@@ -171,7 +171,7 @@ export function TenantMaintenanceDetail() {
               onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
               placeholder="Add a comment…"
               aria-label="Add a comment"
-              className="flex-1 rounded-md border border-slate-200 bg-slate-800 px-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="flex-1 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
             />
             <Button variant="primary" size="sm" icon={<Send size={14} />} loading={submitting} onClick={handleAddComment}>
               Send
@@ -183,8 +183,8 @@ export function TenantMaintenanceDetail() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   Manager detail — owner (status change, assignment, comments)
+/* ═════════════════════════════════════════════════════════════════════
+   Manager detail
    Uses org-wide /api/maintenance endpoints (authorized for OWNER)
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -372,7 +372,7 @@ export function ManagerMaintenanceDetail() {
               onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
               placeholder="Add a comment…"
               aria-label="Add a comment"
-              className="flex-1 rounded-md border border-slate-200 bg-slate-800 px-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="flex-1 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
             />
             <Button variant="primary" size="sm" icon={<Send size={14} />} loading={submitting} onClick={handleAddComment}>
               Send

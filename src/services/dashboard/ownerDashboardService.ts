@@ -831,8 +831,8 @@ export function buildRecentActivity(
     for (const l of recent) {
       events.push({
         id: `lease-${l.id}`,
-        type: l.status === "TERMINATED" ? "LEASE_TERMINATED" : "LEASE_RENEWED",
-        title: l.status === "TERMINATED" ? "Lease terminated" : "Lease active",
+        type: l.status === "TERMINATED" ? "LEASE_DEACTIVATED" : "LEASE_RENEWED",
+        title: l.status === "TERMINATED" ? "Lease deactivated" : "Lease active",
         description: `Unit ${l.unit_id} — $${(l.rent_amount / 100).toFixed(2)}/mo`,
         timestamp: l.start_date,
         link: "/app/leases",

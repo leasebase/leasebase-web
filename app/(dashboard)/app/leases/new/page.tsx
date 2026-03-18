@@ -81,7 +81,7 @@ function InviteStep({ lease, onDone }: InviteStepProps) {
           password and activate their account.
         </p>
         <Button variant="primary" onClick={onDone}>
-          Go to Lease
+          Go to Leases
         </Button>
       </div>
     );
@@ -195,9 +195,7 @@ export default function CreateLeasePage() {
   };
 
   const handleInviteDone = () => {
-    if (createdLease) {
-      router.push(`/app/leases/${createdLease.id}`);
-    }
+    router.push("/app/leases");
   };
 
   return (

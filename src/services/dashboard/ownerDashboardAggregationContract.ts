@@ -129,7 +129,7 @@ export interface OwnerPropertyHealthRow {
 export interface OwnerActivityItem {
   id: string;
   type: "PAYMENT_RECEIVED" | "MAINTENANCE_CREATED" | "MAINTENANCE_COMPLETED"
-      | "LEASE_RENEWED" | "LEASE_TERMINATED" | "DOCUMENT_UPLOADED" | "TENANT_INVITED";
+      | "LEASE_RENEWED" | "LEASE_DEACTIVATED" | "DOCUMENT_UPLOADED" | "TENANT_INVITED";
   title: string;
   description: string;
   timestamp: string;               // ISO 8601
