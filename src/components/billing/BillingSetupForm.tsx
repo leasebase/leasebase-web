@@ -192,7 +192,9 @@ export function BillingSetupForm({
     );
   }
 
-  // ── Fatal error (no Stripe form) ──────────────────────────────────────────
+  // ── Fatal error (no Stripe form) ──────────────────────────────────────
+  // Show a non-blocking, user-friendly message when billing backend is
+  // unavailable (404, 503, network error) instead of a raw error.
 
   if (error && !clientSecret) {
     return (
@@ -201,17 +203,22 @@ export function BillingSetupForm({
           <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
           <p className="mt-1 text-sm text-slate-500">{description}</p>
         </div>
-        <div className="flex items-start gap-2 rounded-lg border border-danger/30 bg-danger-50/5 px-3 py-2 text-xs text-danger">
-          <AlertCircle size={14} className="mt-0.5 shrink-0" />
-          <span>{error}</span>
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <p className="font-medium">Billing setup is temporarily unavailable.</p>
+          <p className="mt-1 text-xs text-amber-600">
+            You can skip this step and add a payment method later from Settings.
+          </p>
         </div>
         {onSkip && (
           <button
             type="button"
-            onClick={onSkip}
-            className="w-full text-center text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
+            onClick={() => {
+              track("billing_setup_skipped", { reason: "backend_unavailable" });
+              onSkip();
+            }}
+            className="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-500 transition-colors"
           >
-            Skip for now
+            Continue
           </button>
         )}
       </div>
