@@ -5,6 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthCard } from "@/components/auth/AuthCard";
+import { setTokens } from "@/lib/auth/tokens";
+import { authStore } from "@/lib/auth/store";
+import { getPortalUrlForRole } from "@/lib/hostname";
+import { track } from "@/lib/analytics";
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -14,14 +18,54 @@ function AuthCallbackContent() {
   useEffect(() => {
     const state = searchParams.get("state") || "/";
     const err = searchParams.get("error");
+
     if (err) {
       setError(err);
+      track("login_failed", { method: "google", reason: err });
       return;
     }
 
-    // At this point the backend should already have exchanged the code for
-    // tokens and set secure cookies, so we just redirect to the original
-    // destination encoded in `state`.
+    // Check for OAuth tokens in query params (backend passes them after code exchange).
+    const accessToken = searchParams.get("access_token");
+    const idToken = searchParams.get("id_token");
+    const expiresInRaw = searchParams.get("expires_in");
+    const refreshToken = searchParams.get("refresh_token");
+
+    if (accessToken) {
+      // Store tokens, clear them from the URL immediately, then load user.
+      const expiresIn = expiresInRaw ? Number(expiresInRaw) : 3600;
+      setTokens({
+        accessToken,
+        idToken: idToken ?? undefined,
+        refreshToken: refreshToken ?? undefined,
+        expiresIn,
+      });
+
+      // Clear tokens from the visible URL for security.
+      if (typeof window !== "undefined") {
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+
+      // Load user profile, then redirect.
+      authStore
+        .getState()
+        .loadMe()
+        .then(() => {
+          track("login_completed", { method: "google" });
+          const user = authStore.getState().user;
+          const portalUrl = user ? getPortalUrlForRole(user.role) : null;
+          const next = decodeURIComponent(state);
+          router.replace(portalUrl || next || "/");
+        })
+        .catch((loadErr: any) => {
+          const reason = loadErr?.message || "Failed to load user profile";
+          setError(reason);
+          track("login_failed", { method: "google", reason });
+        });
+      return;
+    }
+
+    // No tokens — existing behavior: backend set cookies, just redirect.
     const next = decodeURIComponent(state);
     router.replace(next || "/");
   }, [router, searchParams]);

@@ -41,8 +41,8 @@ function ConfirmEmailContent() {
         throw new Error(body.message || body.error?.message || "Unable to confirm email");
       }
 
-      const redirectUrl = buildSignInRedirect({ message: "Email confirmed" });
-      navigateToSignIn(redirectUrl, router);
+      // After successful confirmation, redirect to optional billing setup step.
+      router.push("/auth/billing-setup");
     } catch (err: any) {
       setError(err.message || "Unable to confirm email");
     } finally {
