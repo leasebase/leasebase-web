@@ -296,12 +296,6 @@ export default function Page() {
                       <dd className="text-slate-900">{profile.emergency_contact ?? "Not set"}</dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-slate-400">Lease ID</dt>
-                      <dd className="text-slate-900 font-mono text-xs">
-                        {profile.lease_id ?? "Not linked"}
-                      </dd>
-                    </div>
-                    <div className="flex justify-between">
                       <dt className="text-slate-400">Member since</dt>
                       <dd className="text-slate-900">
                         {new Date(profile.created_at).toLocaleDateString()}
