@@ -11,7 +11,7 @@ const eventIcons: Record<ActivityEventType, typeof CreditCard> = {
   MAINTENANCE_CREATED: Wrench,
   MAINTENANCE_COMPLETED: Wrench,
   LEASE_RENEWED: FileText,
-  LEASE_TERMINATED: FileText,
+  LEASE_DEACTIVATED: FileText,
 };
 
 function timeAgo(iso: string): string {

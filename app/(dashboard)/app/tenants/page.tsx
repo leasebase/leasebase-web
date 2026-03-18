@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { Users, Mail, Search } from "lucide-react";
+import { Users, Search } from "lucide-react";
 import { fetchTenants } from "@/services/tenants/tenantApiService";
 import type { TenantListRow, PaginationMeta } from "@/services/tenants/tenantApiService";
 
@@ -39,15 +39,6 @@ function OwnerTenantsPage() {
   return (
     <>
       <PageHeader title="Tenants" description="Manage tenant records, contacts, and lease associations." />
-      <div className="mt-4 flex items-center gap-2">
-        <Link href="/app/tenants/invitations">
-          <Button variant="secondary" icon={<Mail size={16} />}>Invitations</Button>
-        </Link>
-        <Link href="/app/leases/new">
-          <Button variant="primary" icon={<Mail size={16} />}>Invite via New Lease</Button>
-        </Link>
-      </div>
-
       {/* Search & Filter */}
       <div className="mt-4 flex items-center gap-2">
         <div className="relative flex-1">

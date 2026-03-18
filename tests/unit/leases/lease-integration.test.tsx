@@ -216,7 +216,7 @@ describe("Lease Management Integration", () => {
       });
     });
 
-    test("successful submit shows invite step, skip redirects to /app/leases/{id}", async () => {
+    test("successful submit shows invite step, skip redirects to /app/leases", async () => {
       mockCreateLease.mockResolvedValueOnce({
         data: { id: "new-lease", property_id: "p1", unit_id: "u1" },
       });
@@ -241,7 +241,7 @@ describe("Lease Management Integration", () => {
       await user.click(screen.getByRole("button", { name: /skip for now/i }));
 
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith("/app/leases/new-lease");
+        expect(mockPush).toHaveBeenCalledWith("/app/leases");
       });
     });
 

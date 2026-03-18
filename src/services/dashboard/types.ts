@@ -73,7 +73,7 @@ export type ActivityEventType =
   | "MAINTENANCE_CREATED"
   | "MAINTENANCE_COMPLETED"
   | "LEASE_RENEWED"
-  | "LEASE_TERMINATED";
+  | "LEASE_DEACTIVATED";
 
 export interface ActivityEvent {
   id: string;
