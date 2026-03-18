@@ -192,6 +192,7 @@ export default function CreateLeasePage() {
     setCreatedLease(result.data);
     setStep("invite");
     track("first_action_taken", { type: "lease" });
+    track("lease_created", { leaseId: result.data.id });
   };
 
   const handleInviteDone = () => {

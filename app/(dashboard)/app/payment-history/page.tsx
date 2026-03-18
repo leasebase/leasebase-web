@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { History } from "lucide-react";
 import { fetchTenantPayments } from "@/services/tenant/adapters/paymentAdapter";
+import { track } from "@/lib/analytics";
 import type { PaymentRow } from "@/services/tenant/types";
 
 const STATUS_VARIANTS: Record<string, "success" | "warning" | "danger" | "info" | "neutral"> = {
@@ -31,6 +33,17 @@ export default function Page() {
   const [payments, setPayments] = useState<PaymentRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const trackedPaymentRef = useRef(false);
+
+  // Fire payment_succeeded once when redirected from Stripe with ?status=success
+  useEffect(() => {
+    if (trackedPaymentRef.current) return;
+    if (searchParams?.get("status") === "success") {
+      trackedPaymentRef.current = true;
+      track("payment_succeeded");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     let cancelled = false;
