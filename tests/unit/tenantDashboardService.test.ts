@@ -24,6 +24,7 @@ const activeLease: LeaseRow = {
   start_date: "2024-01-01",
   end_date: "2026-12-31",
   deposit_amount: 145000,
+  rent_amount: 145000,
   status: "ACTIVE",
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
@@ -75,8 +76,8 @@ describe("computeTenantSetupStage", () => {
     expect(computeTenantSetupStage(profile, "live", expiredLease, "live")).toBe("lease-ended");
   });
 
-  test('returns "no-lease" for DRAFT lease', () => {
-    expect(computeTenantSetupStage(profile, "live", draftLease, "live")).toBe("no-lease");
+  test('returns "pending-activation" for DRAFT lease', () => {
+    expect(computeTenantSetupStage(profile, "live", draftLease, "live")).toBe("pending-activation");
   });
 });
 

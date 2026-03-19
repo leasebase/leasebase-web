@@ -1,0 +1,40 @@
+<!-- wp:html -->
+<div class="lb-footer">
+  <div class="lb-footer-grid">
+
+    <div class="lb-footer-brand">
+      <div class="lb-footer-brand-logo">
+        <img src="/wp-content/themes/leasebase-theme/assets/leasebase-logo-icon.svg" alt="LeaseBase" width="32" height="32" />
+        <h4>LeaseBase</h4>
+      </div>
+      <p>The property performance platform for modern landlords. Manage properties, leases, tenants, maintenance, and finances — all in one place.</p>
+    </div>
+
+    <div class="lb-footer-links">
+      <h5>Product</h5>
+      <a href="/pricing/">Pricing</a>
+      <a href="https://signup.dev.leasebase.ai">Sign Up</a>
+      <a href="https://signin.dev.leasebase.ai">Sign In</a>
+    </div>
+
+    <div class="lb-footer-links">
+      <h5>Company</h5>
+      <a href="/privacy-policy/">Privacy Policy</a>
+      <a href="/terms/">Terms of Service</a>
+      <a href="/contact/">Contact Us</a>
+    </div>
+
+    <div class="lb-footer-links">
+      <h5>Connect</h5>
+      <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="#" target="_blank" rel="noopener">Twitter / X</a>
+      <a href="mailto:info@leasebase.ai">info@leasebase.ai</a>
+    </div>
+
+  </div>
+
+  <div class="lb-footer-bottom">
+    <p>&copy; 2026 LeaseBase. All rights reserved.</p>
+  </div>
+</div>
+<!-- /wp:html -->

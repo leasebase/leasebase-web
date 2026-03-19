@@ -11,6 +11,7 @@ import type { LeaseRow } from "@/services/leases/types";
 import { LeasesTable } from "@/components/leases/LeasesTable";
 import { LeasesEmptyState } from "@/components/leases/LeasesEmptyState";
 import { LeasesSkeleton } from "@/components/leases/LeasesSkeleton";
+import { TenantLeasePage } from "@/components/tenant/TenantLeasePage";
 
 /* ── Owner Leases Page ── */
 
@@ -80,17 +81,11 @@ function LeasesListPage() {
 export default function Page() {
   const { user } = authStore();
 
-  // Owner-focused only. Tenant lease view is out of scope.
-  if (user?.persona !== "owner") {
-    return (
-      <>
-        <PageHeader title="Leases" description="View and manage lease agreements." />
-        <div className="mt-8 text-sm text-slate-400">
-          Lease management is not available for your account type.
-        </div>
-      </>
-    );
+  // Tenant persona: show tenant-specific lease details
+  if (user?.persona === "tenant") {
+    return <TenantLeasePage />;
   }
 
+  // Owner/manager: full lease management view
   return <LeasesListPage />;
 }

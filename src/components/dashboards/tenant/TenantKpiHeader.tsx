@@ -69,6 +69,9 @@ export function TenantKpiHeader({ vm }: TenantKpiHeaderProps) {
                 Lease period
               </p>
               <p className="mt-1 text-xl font-semibold text-slate-100">{vm.leaseDates}</p>
+              {vm.propertyName !== "—" && (
+                <p className="mt-0.5 text-xs text-slate-300 font-medium">{vm.propertyName}</p>
+              )}
               {vm.leaseUnit !== "—" && (
                 <p className="mt-0.5 text-xs text-slate-400">Unit {vm.leaseUnit}</p>
               )}

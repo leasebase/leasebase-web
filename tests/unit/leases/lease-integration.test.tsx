@@ -56,9 +56,25 @@ jest.mock("lucide-react", () => {
 });
 
 // Mock auth store — default is owner
+// authStore() is used as a hook in pages; authStore.getState() is used in TenantLeasePage
 let mockUser: any = { persona: "owner" as const, role: "OWNER", name: "Test Owner" };
 jest.mock("@/lib/auth/store", () => ({
-  authStore: () => ({ user: mockUser }),
+  authStore: Object.assign(
+    () => ({ user: mockUser }),
+    { getState: () => ({ user: mockUser, selectedOrgId: mockUser?.orgId ?? null }) },
+  ),
+}));
+
+// Mock TenantLeasePage to avoid icon/adapter dependency issues in this integration test
+// The TenantLeasePage itself is exercised in TenantLeasePage.test.tsx
+jest.mock("@/components/tenant/TenantLeasePage", () => ({
+  TenantLeasePage: () => <div>My Lease</div>,
+}));
+
+// Also keep fetchTenantLeases mock stub (used by TenantLeasePage before our mock takes effect)
+const mockFetchTenantLeases = jest.fn();
+jest.mock("@/services/tenant/adapters/leaseAdapter", () => ({
+  fetchTenantLeases: () => mockFetchTenantLeases(),
 }));
 
 // Mock lease service
@@ -128,6 +144,7 @@ beforeEach(() => {
   mockCreateLease.mockReset();
   mockCreateInvitation.mockReset();
   mockPush.mockReset();
+  mockFetchTenantLeases.mockReset().mockResolvedValue({ data: [], source: "live", error: null });
   mockUser = { persona: "owner" as const, role: "OWNER", name: "Test Owner" };
 });
 
@@ -176,12 +193,20 @@ describe("Lease Management Integration", () => {
       });
     });
 
-    test("persona guard blocks tenant access", async () => {
+    test("tenant persona sees TenantLeasePage (not owner block message)", async () => {
       mockUser = { persona: "tenant" as const, role: "TENANT", name: "Test Tenant" };
+      // Tenant gets TenantLeasePage which fetches asynchronously — stub returns empty
+      mockFetchTenantLeases.mockResolvedValue({ data: [], source: "live", error: null });
 
       render(<LeasesPage />);
 
-      expect(screen.getByText(/not available/i)).toBeInTheDocument();
+      // Owner "not available" block should NOT appear
+      expect(screen.queryByText(/not available/i)).not.toBeInTheDocument();
+
+      // Tenant eventually sees the "My Lease" page heading
+      await waitFor(() => {
+        expect(screen.getByText("My Lease")).toBeInTheDocument();
+      });
     });
   });
 
