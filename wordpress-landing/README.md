@@ -12,16 +12,18 @@ Modern, high-conversion SaaS landing page for LeaseBase. Built as a child theme 
 wordpress-landing/
 ├── README.md                          ← this file
 ├── homepage-content.html              ← Gutenberg block markup (for WP Page Editor)
+├── contact-content.html               ← Contact page block markup (for WP Page Editor fallback)
 └── leasebase-theme/
-    ├── style.css                      ← Child theme styles (v4.0.0)
-    ├── functions.php                  ← SEO meta, fonts, performance
+    ├── style.css                      ← Child theme styles (v5.0.0)
+    ├── functions.php                  ← SEO meta, fonts, performance, REST endpoints
     ├── templates/
-    │   └── front-page.html            ← FSE homepage template
+    │   ├── front-page.html            ← FSE homepage template
+    │   └── page-contact.html          ← FSE Contact Us page template
     ├── parts/
-    │   ├── header.html                ← Header with Sign Up / Sign In nav
-    │   └── footer.html                ← Footer with product links
+    │   ├── header.html                ← Header with Contact / Sign In / Sign Up nav
+    │   └── footer.html                ← Footer with product & company links
     └── assets/
-        └── js/                        ← (empty — no client-side JS needed)
+        └── js/                        ← (empty — inline JS in templates)
 ```
 
 ---
@@ -47,10 +49,22 @@ The homepage follows a high-conversion SaaS flow:
 
 - **Sign Up** → `https://signup.dev.leasebase.ai`
 - **Sign In** → `https://signin.dev.leasebase.ai`
+- **Contact Us** → `/contact/` (LeaseBase-hosted contact form)
 
-Both appear in: header nav, hero, feature section, dashboard CTA, final CTA, and footer.
+Both auth links appear in: header nav, hero, feature section, dashboard CTA, final CTA, and footer.
 
 The application handles role selection (Owner / Tenant) after sign-in. No role selection on the WordPress site.
+
+### Contact Form
+
+The `/contact/` page is powered by:
+
+- **FSE template**: `leasebase-theme/templates/page-contact.html` — applied automatically to any WP page with slug `contact`.
+- **REST endpoint**: `POST /wp-json/leasebase/v1/contact` — stores submissions as `lb_contact` CPT posts and sends email notification to the site admin.
+- **Admin view**: WP Admin → Contact Messages (stores all submissions with Name, Email, Subject, Date columns).
+- **Rate limiting**: 5 submissions per IP per hour.
+
+Form fields: Full Name, Email Address, Subject (dropdown), Message.
 
 ---
 
@@ -66,7 +80,19 @@ scp -r leasebase-theme/ user@server:/var/www/html/wp-content/themes/leasebase-th
 
 Or upload via **Appearance → Themes → Add New → Upload Theme** (zip the folder first).
 
-### Step 2: Update Homepage Content (if using Page Editor)
+### Step 2: Create the Contact Us Page in WP Admin
+
+1. Go to **WP Admin → Pages → Add New**
+2. Set the title to **Contact Us** and the slug to **contact** (check the URL field in the sidebar)
+3. The FSE template `page-contact.html` should apply automatically since the slug matches.
+4. If the template does **not** apply automatically:
+   - Switch to **Code editor** (⋮ menu → Code editor)
+   - Paste the contents of `contact-content.html`
+   - Switch back to **Visual editor** to verify the form renders
+5. Set **Status** to Published and click **Publish**
+6. Verify the page is live at `https://leasebase.ai/contact/`
+
+### Step 3: Update Homepage Content (if using Page Editor)
 
 1. Go to **WP Admin → Pages → Home** (page ID 5)
 2. Switch to **Code editor** (⋮ menu)
@@ -76,10 +102,12 @@ Or upload via **Appearance → Themes → Add New → Upload Theme** (zip the fo
 
 Note: If using the FSE template (`templates/front-page.html`), this step may not be needed as the template renders directly.
 
-### Step 3: Verify
+### Step 4: Verify
 
 - [ ] Homepage loads with hero, problem, platform, features, how-it-works, tenant experience, and final CTA
-- [ ] Header shows LeaseBase brand + Sign In link + Sign Up button
+- [ ] Header shows LeaseBase brand + **Contact** link + Sign In link + Sign Up button
+- [ ] Contact link in header points to `/contact/`
+- [ ] Footer Company column: "Contact Us" link points to `/contact/` (not mailto:)
 - [ ] Sign Up buttons link to `https://signup.dev.leasebase.ai`
 - [ ] Sign In buttons link to `https://signin.dev.leasebase.ai`
 - [ ] Page title: "LeaseBase — The Operating System for Rental Property Owners"
@@ -87,6 +115,9 @@ Note: If using the FSE template (`templates/front-page.html`), this step may not
 - [ ] Footer shows Product, Company, and Connect columns
 - [ ] Mobile responsive layout works correctly
 - [ ] No "early access", "pilot program", or "Property Manager" language visible
+- [ ] `/contact/` page loads with form, correct H1, and LeaseBase styling
+- [ ] Contact form submission returns success message (verify `POST /wp-json/leasebase/v1/contact`)
+- [ ] WP Admin → Contact Messages shows submitted messages
 
 ---
 
@@ -134,3 +165,5 @@ Go to **WP Admin → Early Access** to see historical form submissions.
 4. **Add a favicon** via Appearance → Customize → Site Identity
 5. **Update social media links** in the footer with real profiles
 6. **Run Lighthouse audit** after deployment to baseline performance
+7. **Configure SMTP/SES** on the WordPress server so `wp_mail()` delivers contact form notifications reliably (e.g., via WP Mail SMTP plugin or server-level SMTP config). Verify by submitting a test contact message and checking the admin inbox.
+8. **Update pricing page** — the `feat/pricing-page` branch references `mailto:info@leasebase.co` for the Portfolio plan CTA. When that branch is merged, update the "Contact Us" CTA there to `/contact/` as well.
