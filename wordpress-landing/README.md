@@ -13,14 +13,16 @@ wordpress-landing/
 ├── README.md                          ← this file
 ├── homepage-content.html              ← Gutenberg block markup (for WP Page Editor)
 ├── contact-content.html               ← Contact page block markup (for WP Page Editor fallback)
+├── pricing-content.html               ← Gutenberg block markup for Pricing page
 └── leasebase-theme/
     ├── style.css                      ← Child theme styles (v5.0.0)
     ├── functions.php                  ← SEO meta, fonts, performance, REST endpoints
     ├── templates/
     │   ├── front-page.html            ← FSE homepage template
     │   └── page-contact.html          ← FSE Contact Us page template
+    │   └── page-pricing.html          ← FSE Pricing page template
     ├── parts/
-    │   ├── header.html                ← Header with Contact / Sign In / Sign Up nav
+    │   ├── header.html                ← Header with Pricing / Contact / Sign In / Sign Up nav
     │   └── footer.html                ← Footer with product & company links
     └── assets/
         └── js/                        ← (empty — inline JS in templates)
@@ -38,7 +40,22 @@ The homepage follows a high-conversion SaaS flow:
 4. **Feature grid** — 12 feature cards covering the full platform capability
 5. **How it works** — 4-step onboarding flow
 6. **Tenant experience** — portal, maintenance, payments, documents
-7. **Final CTA** — Sign Up + Sign In conversion block
+7. **Pricing CTA** — link to pricing page
+8. **Final CTA** — Sign Up + Sign In conversion block
+
+---
+
+## Pricing Page Structure
+
+The pricing page (`/pricing/`) follows this structure:
+
+1. **Hero** — headline, subheadline, Get Started + Contact Us CTAs
+2. **Pricing cards** — Starter (Free), Growth ($9/unit/mo, highlighted), Portfolio (Contact Us)
+3. **Feature comparison** — grid comparing features across plans
+4. **Connected platform** — Owner + Tenant value propositions
+5. **Why LeaseBase** — 5 benefit cards
+6. **FAQ** — 7 expandable questions using native `<details>` elements
+7. **Final CTA** — Get Started + Contact Us conversion block
 
 ---
 
@@ -101,8 +118,20 @@ Or upload via **Appearance → Themes → Add New → Upload Theme** (zip the fo
 5. Click **Update**
 
 Note: If using the FSE template (`templates/front-page.html`), this step may not be needed as the template renders directly.
+### Step 4: Create Pricing Page
+### Step 3: Create Pricing Page
 
-### Step 4: Verify
+1. Go to **WP Admin → Pages → Add New**
+2. Title: **Pricing** / Slug: `pricing`
+3. Switch to **Code editor** (⋮ menu)
+4. Paste the contents of `pricing-content.html`
+5. Switch back to **Visual editor** to verify
+6. Set Template to **Pricing** if available in the Page Attributes sidebar
+7. Click **Publish**
+
+Note: If using FSE templates, the `templates/page-pricing.html` template will auto-apply to the page with slug `pricing`.
+### Step 5: Verify
+>>>>>>> e7e1cb6 (feat(marketing): add Pricing page and site-wide pricing navigation)
 
 - [ ] Homepage loads with hero, problem, platform, features, how-it-works, tenant experience, and final CTA
 - [ ] Header shows LeaseBase brand + **Contact** link + Sign In link + Sign Up button
