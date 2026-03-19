@@ -30,17 +30,21 @@ import { Mail, RefreshCw } from "lucide-react";
 
 /* ── Helpers ── */
 
+/** Badge variant for lease-lifecycle display status. */
 function statusVariant(status: string): BadgeVariant {
   switch (status) {
     case "ACTIVE":
-    case "EXTENDED": return "success";
-    case "DRAFT":
-    case "ASSIGNED":
-    case "INVITED":
-    case "ACKNOWLEDGED": return "warning";
-    case "INACTIVE": return "danger";
-    default: return "neutral";
+    case "EXTENDED":  return "success";
+    case "DRAFT":     return "warning";
+    case "INACTIVE":  return "danger";
+    case "RENEWED":   return "neutral";
+    default:          return "neutral";
   }
+}
+
+/** Resolve display_status (prefers backend-computed field, falls back to raw). */
+function resolveDisplayStatus(lease: LeaseRow): string {
+  return lease.display_status ?? lease.status;
 }
 
 function formatCurrency(cents: number): string {
@@ -100,7 +104,7 @@ function OverviewPanel({
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Status</h3>
-          <Badge variant={statusVariant(lease.status)}>{lease.status}</Badge>
+          <Badge variant={statusVariant(resolveDisplayStatus(lease))}>{resolveDisplayStatus(lease)}</Badge>
         </div>
       </div>
 

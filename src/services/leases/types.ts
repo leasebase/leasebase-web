@@ -26,6 +26,8 @@ export interface LeaseRow {
   unit_id: string;
   term_type: string;
   status: string;
+  /** Owner-facing lease lifecycle status (computed by backend). */
+  display_status?: string;
   start_date: string;
   end_date: string;
   rent_amount: number;          // cents — canonical contract rent
@@ -79,6 +81,7 @@ export interface PaginatedResponse<T> {
 
 /* ── Status & term type constants ── */
 
+/** All raw backend statuses (internal state machine). */
 export const LEASE_STATUSES = [
   "DRAFT",
   "ASSIGNED",
@@ -92,6 +95,21 @@ export const LEASE_STATUSES = [
 ] as const;
 
 export type LeaseStatus = (typeof LEASE_STATUSES)[number];
+
+/**
+ * Owner-facing lease lifecycle statuses only.
+ * Tenant onboarding states (ASSIGNED/INVITED/ACKNOWLEDGED) and EXPIRED
+ * are not surfaced — they map to DRAFT / INACTIVE respectively.
+ */
+export const LEASE_DISPLAY_STATUSES = [
+  "DRAFT",
+  "ACTIVE",
+  "INACTIVE",
+  "EXTENDED",
+  "RENEWED",
+] as const;
+
+export type LeaseDisplayStatus = (typeof LEASE_DISPLAY_STATUSES)[number];
 
 export const TERM_TYPES = [
   "MONTH_TO_MONTH",
