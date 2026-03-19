@@ -73,6 +73,10 @@ function leasebase_seo_meta() {
         $title = 'Contact Us | LeaseBase';
         $desc  = 'Get in touch with the LeaseBase team. Have a question, need support, or want to talk about your property portfolio? We\'re here to help.';
         $url   = home_url('/contact/');
+    } elseif (is_page('pricing')) {
+        $title = 'LeaseBase Pricing | Simple Pricing for Rental Property Owners';
+        $desc  = 'Start free with LeaseBase and upgrade when you\'re ready to automate rent collection, leases, maintenance, and the tenant experience for your rental properties.';
+        $url   = home_url('/pricing/');
     } else {
         return;
     }
@@ -95,7 +99,7 @@ function leasebase_seo_meta() {
     <?php
 }
 
-// Override <title> tag on front page and contact page
+// Override <title> tag on front page, contact page, and pricing page
 add_filter('pre_get_document_title', 'leasebase_document_title');
 function leasebase_document_title($title) {
     if (is_front_page()) {
@@ -103,6 +107,9 @@ function leasebase_document_title($title) {
     }
     if (is_page('contact')) {
         return 'Contact Us | LeaseBase';
+    }
+    if (is_page('pricing')) {
+        return 'LeaseBase Pricing | Simple Pricing for Rental Property Owners';
     }
     return $title;
 }
