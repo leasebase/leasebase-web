@@ -10,10 +10,14 @@ import { apiRequest } from "@/lib/api/client";
 
 export interface TenantListRow {
   id: string;
-  user_id: string;
+  source_type: "TENANT_PROFILE" | "INVITATION";
+  tenant_profile_id: string | null;
+  invitation_id: string | null;
+  user_id: string | null;
   name: string;
   email: string;
   phone: string | null;
+  /** INVITED | JOINED | ACTIVE | INACTIVE */
   status: string;
   emergency_contact: string | null;
   move_in_date: string | null;
