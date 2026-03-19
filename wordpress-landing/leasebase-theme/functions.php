@@ -66,12 +66,12 @@ function leasebase_enqueue_assets() {
 add_action('wp_head', 'leasebase_seo_meta', 1);
 function leasebase_seo_meta() {
     if (is_front_page()) {
-        $title = 'LeaseBase — The Operating System for Rental Property Owners';
-        $desc  = 'Centralize your properties, leases, tenants, maintenance, and finances in one modern platform. Stop managing rentals through spreadsheets.';
+        $title = 'LeaseBase — Manage Your Rentals Without the Chaos';
+        $desc  = 'Automate rent collection, organize tenants and leases, and handle maintenance — all from one simple platform built for independent landlords.';
         $url   = home_url('/');
     } elseif (is_page('contact')) {
         $title = 'Contact Us | LeaseBase';
-        $desc  = 'Get in touch with the LeaseBase team. Have a question, need support, or want to talk about your property portfolio? We\'re here to help.';
+        $desc  = 'Let\'s make rental management easier for you. Have a question, need support, or want to talk about your property portfolio? We\'re here to help.';
         $url   = home_url('/contact/');
     } elseif (is_page('pricing')) {
         $title = 'LeaseBase Pricing | Simple Pricing for Rental Property Owners';
@@ -107,7 +107,7 @@ function leasebase_seo_meta() {
 add_filter('pre_get_document_title', 'leasebase_document_title');
 function leasebase_document_title($title) {
     if (is_front_page()) {
-        return 'LeaseBase — The Operating System for Rental Property Owners';
+        return 'LeaseBase — Manage Your Rentals Without the Chaos';
     }
     if (is_page('contact')) {
         return 'Contact Us | LeaseBase';
