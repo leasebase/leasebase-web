@@ -83,7 +83,7 @@ The pricing page (`/pricing/`) follows this structure:
 - **Contact Us** → `/contact/` (LeaseBase-hosted contact form)
 - **Schedule Demo** → `/demo/` (Calendly inline embed)
 
-> **No `mailto:` CTA links remain in the theme.** The email address `info@leasebase.co` is displayed as a plain text link in the Contact page sidebar and in the footer Connect column, but all CTA buttons and nav links point to `/contact/` or `/demo/`.
+> **No `mailto:` CTA links remain in the theme.** The email address `info@leasebase.ai` is displayed as a plain text link in the Contact page sidebar and in the footer Connect column, but all CTA buttons and nav links point to `/contact/` or `/demo/`.
 
 Both auth links appear in: header nav, hero, feature section, dashboard CTA, final CTA, and footer.
 
@@ -235,4 +235,4 @@ Go to **WP Admin → Early Access** to see historical form submissions.
 5. **Update social media links** in the footer with real profiles
 6. **Run Lighthouse audit** after deployment to baseline performance
 7. **Configure SMTP/SES** on the WordPress server so `wp_mail()` delivers contact form notifications reliably (e.g., via WP Mail SMTP plugin or server-level SMTP config). Verify by submitting a test contact message and checking the admin inbox.
-8. **Update pricing page** — the `feat/pricing-page` branch references `mailto:info@leasebase.co` for the Portfolio plan CTA. When that branch is merged, update the "Contact Us" CTA there to `/contact/` as well.
+8. **Update pricing page** — all `mailto:` CTAs have been replaced with `/contact/` links. No further action needed.
