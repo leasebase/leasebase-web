@@ -35,9 +35,18 @@ describe("filterNavForPersona", () => {
     const items = filterNavForPersona("tenant");
     const labels = items.map((i) => i.label);
     expect(labels).toContain("Dashboard");
-    expect(labels).toContain("Leases");
+    // Tenants see "My Lease" (not "Leases") at the same /app/leases route
+    expect(labels).toContain("My Lease");
+    expect(labels).not.toContain("Leases");
     expect(labels).toContain("Maintenance");
     expect(labels).toContain("Documents");
+  });
+
+  test("tenant 'My Lease' nav item points to /app/leases", () => {
+    const items = filterNavForPersona("tenant");
+    const myLease = items.find((i) => i.label === "My Lease");
+    expect(myLease).toBeDefined();
+    expect(myLease!.path).toBe("/app/leases");
   });
 
   test("Notifications is NOT in the left nav (belongs in header)", () => {

@@ -111,6 +111,14 @@ cd ../leasebase-web
 npm run lint
 ```
 
+## WordPress marketing site
+
+The `wordpress-landing/` directory contains the WordPress theme and content for the marketing site at `leasebase.ai`. This is a separate concern from the Next.js app.
+
+- Theme: `wordpress-landing/leasebase-theme/` (child of Twenty Twenty-Five, FSE-based)
+- Deployed to: AWS Lightsail via SCP
+- Full documentation: **`docs/wordpress/README.md`** — covers site structure, rendering model, branding, deployment, and future work guidance
+
 ## How future agents should reason about changes
 
 - Keep a **strict separation of concerns** between this repo (web UI) and the backend services:

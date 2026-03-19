@@ -43,9 +43,12 @@ const activeDashboard: TenantDashboardData = {
     end_date: "2026-12-31",
     term_type: "TWELVE_MONTH",
     deposit_amount: 145000,
+    rent_amount: 145000,
     status: "ACTIVE",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
+    property_name: "Oak Terrace Apartments",
+    unit_number: "3B",
   },
   payments: [],
   recentPayments: [],
@@ -113,6 +116,31 @@ const noLeaseDashboard: TenantDashboardData = {
   },
 };
 
+const pendingActivationDashboard: TenantDashboardData = {
+  ...activeDashboard,
+  lease: {
+    id: "l2",
+    organization_id: "org1",
+    unit_id: "unit1",
+    start_date: "2026-04-01",
+    end_date: "2027-03-31",
+    term_type: "TWELVE_MONTH",
+    deposit_amount: 145000,
+    rent_amount: 145000,
+    status: "ASSIGNED",
+    created_at: "2026-03-01T00:00:00Z",
+    property_name: "Oak Terrace Apartments",
+    property_address: "123 Oak Ave, Springfield, IL 62701",
+    unit_number: "3B",
+    organization_name: "PM Alpha",
+  },
+  setupStage: "pending-activation",
+  sources: {
+    ...activeDashboard.sources,
+    lease: "live",
+  },
+};
+
 /* ── Tests ── */
 
 beforeEach(() => {
@@ -145,6 +173,21 @@ describe("TenantDashboard", () => {
     });
   });
 
+  test('renders "pending-activation" state with property/unit context', async () => {
+    mockFetchTenantDashboard.mockResolvedValue(pendingActivationDashboard);
+    render(<TenantDashboard />);
+
+    await waitFor(() => {
+      // The page title should be "Your Home" for pending-activation
+      expect(screen.getAllByText("Your Home").length).toBeGreaterThanOrEqual(1);
+    });
+    // Property and unit context should be visible
+    expect(screen.getByText("Oak Terrace Apartments")).toBeInTheDocument();
+    expect(screen.getByText(/Unit 3B/)).toBeInTheDocument();
+    // What happens next section
+    expect(screen.getByText("What happens next")).toBeInTheDocument();
+  });
+
   test("renders active dashboard with KPIs and widgets", async () => {
     mockFetchTenantDashboard.mockResolvedValue(activeDashboard);
     render(<TenantDashboard />);
@@ -153,8 +196,8 @@ describe("TenantDashboard", () => {
       expect(screen.getByText("Tenant dashboard")).toBeInTheDocument();
     });
 
-    // KPI header — rent amount is now "—" (no rent_amount field)
-    expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(1);
+    // KPI header — rent amount from enriched lease (appears in hero + KPI header)
+    expect(screen.getAllByText("$1,450").length).toBeGreaterThanOrEqual(1);
 
     // Quick actions (also appears in hero CTA)
     expect(screen.getAllByText("Pay Rent").length).toBeGreaterThanOrEqual(1);

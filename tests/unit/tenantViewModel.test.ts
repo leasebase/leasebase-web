@@ -11,9 +11,12 @@ const activeLease: LeaseRow = {
   start_date: "2024-01-01",
   end_date: "2026-12-31",
   deposit_amount: 145000,
+  rent_amount: 145000,
   status: "ACTIVE",
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
+  property_name: "Oak Terrace Apartments",
+  unit_number: "3B",
 };
 
 function makeActiveDashboardData(overrides?: Partial<TenantDashboardData>): TenantDashboardData {
@@ -140,12 +143,20 @@ describe("toTenantDashboardViewModel", () => {
     expect(vm.setupStage).toBe("active");
   });
 
-  test("KPI header formats rent amount", () => {
+  test("KPI header formats rent amount when rent_amount is present", () => {
     const data = makeActiveDashboardData();
     const vm = toTenantDashboardViewModel(data);
 
+    expect(vm.kpiHeader.rentAmount).toBe("$1,450");
+    expect(vm.kpiHeader.rentAmountCents).toBe(145000);
+  });
+
+  test("KPI header shows dash for rent when rent_amount is null", () => {
+    const data = makeActiveDashboardData({
+      lease: { ...activeLease, rent_amount: null },
+    });
+    const vm = toTenantDashboardViewModel(data);
     expect(vm.kpiHeader.rentAmount).toBe("—");
-    expect(vm.kpiHeader.rentAmountCents).toBe(0);
   });
 
   test("KPI header shows dash when no lease", () => {
@@ -154,6 +165,27 @@ describe("toTenantDashboardViewModel", () => {
 
     expect(vm.kpiHeader.rentAmount).toBe("—");
     expect(vm.kpiHeader.leaseUnit).toBe("—");
+    expect(vm.kpiHeader.propertyName).toBe("—");
+  });
+
+  test("KPI header uses enriched unit_number and property_name", () => {
+    const data = makeActiveDashboardData();
+    const vm = toTenantDashboardViewModel(data);
+
+    expect(vm.kpiHeader.leaseUnit).toBe("3B");
+    expect(vm.kpiHeader.propertyName).toBe("Oak Terrace Apartments");
+    expect(vm.kpiHeader.leaseAddress).toContain("Unit 3B");
+    expect(vm.kpiHeader.leaseAddress).toContain("Oak Terrace Apartments");
+  });
+
+  test("KPI header falls back to unit_id when unit_number is absent", () => {
+    const data = makeActiveDashboardData({
+      lease: { ...activeLease, unit_number: undefined, property_name: undefined },
+    });
+    const vm = toTenantDashboardViewModel(data);
+
+    expect(vm.kpiHeader.leaseUnit).toBe("unit1");
+    expect(vm.kpiHeader.propertyName).toBe("—");
   });
 
   test("action cards include 4 quick actions", () => {

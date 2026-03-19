@@ -33,7 +33,9 @@ export const appNavItems: AppNavItem[] = [
   // ── Portfolio ──
   { path: "/app/properties", label: "Properties", icon: "properties", personas: ["owner"], group: "portfolio" },
   { path: "/app/tenants", label: "Tenants", icon: "tenants", personas: ["owner"], group: "portfolio" },
-  { path: "/app/leases", label: "Leases", icon: "leases", personas: ["owner", "tenant"], group: "portfolio" },
+  { path: "/app/leases", label: "Leases", icon: "leases", personas: ["owner"], group: "portfolio" },
+  // Tenants see the same route but with a human label that matches their mental model
+  { path: "/app/leases", label: "My Lease", icon: "leases", personas: ["tenant"], group: "portfolio" },
 
   // ── Operations ──
   { path: "/app/payments", label: "Payments", icon: "payments", personas: ["owner"], group: "operations" },

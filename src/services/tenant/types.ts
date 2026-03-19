@@ -13,10 +13,11 @@ export type { DataSource, DomainResult, Sourced };
 /* ── Setup stage (progressive empty states) ── */
 
 export type TenantSetupStage =
-  | "no-profile"     // user is TENANT but has no tenant_profile row
-  | "no-lease"       // tenant profile exists but no lease found for current org
-  | "lease-ended"    // lease exists but status is INACTIVE, EXPIRED, or RENEWED
-  | "active";        // active lease found
+  | "no-profile"         // user is TENANT but has no tenant_profile row
+  | "no-lease"           // tenant profile exists but no lease found for current org
+  | "pending-activation" // lease exists (DRAFT/ASSIGNED/INVITED/ACKNOWLEDGED) — not yet active
+  | "lease-ended"        // lease exists but status is INACTIVE, EXPIRED, or RENEWED
+  | "active";            // active lease found
 
 /* ── API row shapes ── */
 
@@ -45,9 +46,16 @@ export interface LeaseRow {
   start_date: string;
   end_date: string;
   deposit_amount: number | null;
+  /** Monthly rent in cents — from lease.rent_amount (added in enriched /me/leases endpoint). Absent on non-enriched responses. */
+  rent_amount?: number | null;
   status: "DRAFT" | "ASSIGNED" | "INVITED" | "ACKNOWLEDGED" | "ACTIVE" | "EXPIRED" | "EXTENDED" | "RENEWED" | "INACTIVE";
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
+  /** Enriched via JOIN in /me/leases */
+  property_name?: string | null;
+  property_address?: string | null;
+  unit_number?: string | null;
+  organization_name?: string | null;
   tenants?: Array<{ id: string; name: string; role: string }>;
 }
 
@@ -224,8 +232,9 @@ export interface TenantKpiHeaderViewModel {
   dueDateRaw: string;           // ISO date for comparison
   paymentStatus: PaymentStatus;
   paymentStatusLabel: string;
-  leaseAddress: string;         // e.g. "Unit 1A, 123 Main St"
-  leaseUnit: string;
+  leaseAddress: string;         // e.g. "Unit 1A, Oak Terrace Apartments"
+  leaseUnit: string;            // e.g. "3B"
+  propertyName: string;         // e.g. "Oak Terrace Apartments"
   leaseDates: string;           // e.g. "Jan 2024 – Dec 2026"
   leaseStatus: string;
   source: DataSource;

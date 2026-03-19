@@ -88,7 +88,7 @@ describe("computeTenantSetupStage", () => {
     ).toBe("lease-ended");
   });
 
-  it('returns "no-lease" for DRAFT lease (not yet started)', () => {
+  it('returns "pending-activation" for DRAFT lease', () => {
     expect(
       computeTenantSetupStage(
         makeProfile({ lease_id: "lease-1" }),
@@ -96,6 +96,50 @@ describe("computeTenantSetupStage", () => {
         makeLease({ status: "DRAFT" }),
         "live",
       ),
-    ).toBe("no-lease");
+    ).toBe("pending-activation");
+  });
+
+  it('returns "pending-activation" for ASSIGNED lease', () => {
+    expect(
+      computeTenantSetupStage(
+        makeProfile({ lease_id: "lease-1" }),
+        "live",
+        makeLease({ status: "ASSIGNED" }),
+        "live",
+      ),
+    ).toBe("pending-activation");
+  });
+
+  it('returns "pending-activation" for INVITED lease', () => {
+    expect(
+      computeTenantSetupStage(
+        makeProfile({ lease_id: "lease-1" }),
+        "live",
+        makeLease({ status: "INVITED" }),
+        "live",
+      ),
+    ).toBe("pending-activation");
+  });
+
+  it('returns "pending-activation" for ACKNOWLEDGED lease', () => {
+    expect(
+      computeTenantSetupStage(
+        makeProfile({ lease_id: "lease-1" }),
+        "live",
+        makeLease({ status: "ACKNOWLEDGED" }),
+        "live",
+      ),
+    ).toBe("pending-activation");
+  });
+
+  it('returns "active" for EXTENDED lease', () => {
+    expect(
+      computeTenantSetupStage(
+        makeProfile({ lease_id: "lease-1" }),
+        "live",
+        makeLease({ status: "EXTENDED" }),
+        "live",
+      ),
+    ).toBe("active");
   });
 });
