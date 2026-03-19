@@ -77,6 +77,10 @@ function leasebase_seo_meta() {
         $title = 'LeaseBase Pricing | Simple Pricing for Rental Property Owners';
         $desc  = 'Start free with LeaseBase and upgrade when you\'re ready to automate rent collection, leases, maintenance, and the tenant experience for your rental properties.';
         $url   = home_url('/pricing/');
+    } elseif (is_page('demo')) {
+        $title = 'LeaseBase Demo | Book a Product Demo';
+        $desc  = 'Book a LeaseBase demo to see how owners can manage leases, rent collection, maintenance, and the tenant experience in one connected platform.';
+        $url   = home_url('/demo/');
     } else {
         return;
     }
@@ -110,6 +114,9 @@ function leasebase_document_title($title) {
     }
     if (is_page('pricing')) {
         return 'LeaseBase Pricing | Simple Pricing for Rental Property Owners';
+    }
+    if (is_page('demo')) {
+        return 'LeaseBase Demo | Book a Product Demo';
     }
     return $title;
 }
