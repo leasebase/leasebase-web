@@ -41,8 +41,11 @@ function ConfirmEmailContent() {
         throw new Error(body.message || body.error?.message || "Unable to confirm email");
       }
 
-      // After successful confirmation, redirect to optional billing setup step.
-      router.push("/auth/billing-setup");
+      // After successful confirmation, redirect directly to sign-in.
+      // All new owners default to the FREE plan — billing setup is optional
+      // and can be done later from Settings.
+      const url = buildSignInRedirect({ message: "Email confirmed. Please sign in." });
+      navigateToSignIn(url, router);
     } catch (err: any) {
       setError(err.message || "Unable to confirm email");
     } finally {

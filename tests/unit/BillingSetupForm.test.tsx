@@ -45,7 +45,7 @@ beforeEach(() => {
 });
 
 describe("BillingSetupForm — backend unavailable (graceful degradation)", () => {
-  test("shows friendly unavailable message when setup intent fails", async () => {
+  test("shows friendly message when setup intent fails", async () => {
     mockCreateSetupIntent.mockResolvedValue({
       data: null,
       error: "Request failed (404)",
@@ -62,7 +62,7 @@ describe("BillingSetupForm — backend unavailable (graceful degradation)", () =
 
     await waitFor(() => {
       expect(
-        screen.getByText("Billing setup is temporarily unavailable."),
+        screen.getByText("Billing is not required for your current plan."),
       ).toBeInTheDocument();
     });
   });

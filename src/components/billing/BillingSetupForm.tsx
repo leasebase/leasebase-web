@@ -204,9 +204,9 @@ export function BillingSetupForm({
           <p className="mt-1 text-sm text-slate-500">{description}</p>
         </div>
         <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          <p className="font-medium">Billing setup is temporarily unavailable.</p>
+          <p className="font-medium">Billing is not required for your current plan.</p>
           <p className="mt-1 text-xs text-amber-600">
-            You can skip this step and add a payment method later from Settings.
+            You&apos;re on the Free plan. You can upgrade and add billing later from Settings.
           </p>
         </div>
         {onSkip && (
