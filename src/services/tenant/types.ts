@@ -46,8 +46,8 @@ export interface LeaseRow {
   start_date: string;
   end_date: string;
   deposit_amount: number | null;
-  /** Monthly rent in cents — from lease.rent_amount (added in enriched /me/leases endpoint). */
-  rent_amount: number | null;
+  /** Monthly rent in cents — from lease.rent_amount (added in enriched /me/leases endpoint). Absent on non-enriched responses. */
+  rent_amount?: number | null;
   status: "DRAFT" | "ASSIGNED" | "INVITED" | "ACKNOWLEDGED" | "ACTIVE" | "EXPIRED" | "EXTENDED" | "RENEWED" | "INACTIVE";
   created_at: string;
   updated_at?: string;
