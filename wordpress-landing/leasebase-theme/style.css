@@ -1345,6 +1345,262 @@ body.home footer.wp-block-template-part .wp-block-group {
   }
 }
 
+/* --- Contact Page --- */
+
+.lb-contact-hero {
+  text-align: center;
+  padding-bottom: 0 !important;
+}
+
+.lb-contact-hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--lb-dark);
+  margin-bottom: 16px;
+}
+
+.lb-contact-hero-sub {
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: clamp(1rem, 2.2vw, 1.15rem);
+  color: var(--lb-gray-500);
+  line-height: 1.6;
+}
+
+.lb-contact-layout-section {
+  padding-top: 40px !important;
+}
+
+.lb-contact-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 40px;
+  align-items: start;
+}
+
+/* --- Contact Form --- */
+
+.lb-contact-form-wrap {
+  background: var(--lb-white);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  padding: 36px 32px;
+  box-shadow: var(--lb-shadow-sm);
+}
+
+.lb-contact-form-heading {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--lb-dark);
+  margin: 0 0 6px;
+}
+
+.lb-contact-form-sub {
+  font-size: 0.95rem;
+  color: var(--lb-gray-500);
+  margin: 0 0 28px;
+}
+
+.lb-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lb-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lb-form-row--2col {
+  flex-direction: row;
+  gap: 16px;
+}
+
+.lb-form-row--2col .lb-form-field {
+  flex: 1;
+}
+
+.lb-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lb-form-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--lb-gray-700);
+}
+
+.lb-form-label span {
+  color: var(--lb-danger);
+  margin-left: 1px;
+}
+
+.lb-form-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-family: var(--lb-font);
+  color: var(--lb-dark);
+  background: var(--lb-white);
+  border: 1px solid var(--lb-gray-300);
+  border-radius: var(--lb-radius);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.lb-form-input:focus {
+  outline: none;
+  border-color: var(--lb-primary);
+  box-shadow: 0 0 0 3px rgba(24, 215, 240, 0.15);
+}
+
+.lb-form-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 16 16'%3E%3Cpath stroke='%2364748B' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.lb-form-textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+.lb-contact-status {
+  padding: 12px 16px;
+  border-radius: var(--lb-radius);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.lb-contact-status--success {
+  background: var(--lb-accent-light);
+  color: #166534;
+  border: 1px solid var(--lb-accent);
+}
+
+.lb-contact-status--error {
+  background: #FEF2F2;
+  color: #991B1B;
+  border: 1px solid #FECACA;
+}
+
+.lb-contact-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 32px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--lb-font);
+  color: var(--lb-white);
+  background: var(--lb-primary);
+  border: none;
+  border-radius: var(--lb-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.lb-contact-submit:hover:not(:disabled) {
+  background: var(--lb-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--lb-shadow);
+}
+
+.lb-contact-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* --- Contact Info Sidebar --- */
+
+.lb-contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lb-contact-info-card {
+  background: var(--lb-white);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  padding: 24px 20px;
+  box-shadow: var(--lb-shadow-sm);
+}
+
+.lb-contact-info-icon {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.lb-contact-info-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--lb-dark);
+  margin: 0 0 6px;
+}
+
+.lb-contact-info-body {
+  font-size: 0.9rem;
+  color: var(--lb-gray-500);
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.lb-contact-info-link {
+  font-size: 0.9rem;
+  color: var(--lb-primary-dark);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.lb-contact-info-link:hover {
+  text-decoration: underline;
+}
+
+.lb-contact-signup-btn {
+  display: inline-block;
+  margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+  .lb-contact-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .lb-contact-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .lb-contact-form-wrap {
+    padding: 24px 20px;
+  }
+
+  .lb-form-row--2col {
+    flex-direction: column;
+  }
+
+  .lb-contact-info {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .lb-hero-conversion {
     padding: 64px 20px 44px;
@@ -1366,5 +1622,648 @@ body.home footer.wp-block-template-part .wp-block-group {
 
   .lb-value-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   PRICING PAGE STYLES
+   ============================================================ */
+
+/* --- Pricing page scope — apply base styles on pricing page body --- */
+
+.lb-pricing-page {
+  font-family: var(--lb-font);
+  color: var(--lb-dark);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.lb-pricing-page .lb-section h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.lb-pricing-page .lb-section .lb-subtitle {
+  color: var(--lb-gray-500);
+  font-size: 1.125rem;
+  max-width: 640px;
+  margin: 0 auto 48px;
+}
+
+/* --- Pricing Hero --- */
+
+.lb-pricing-hero {
+  text-align: center;
+  padding: 88px 24px 0;
+  max-width: var(--lb-max-width);
+  margin: 0 auto;
+}
+
+.lb-pricing-hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--lb-dark);
+  margin-bottom: 16px;
+}
+
+.lb-pricing-hero .lb-hero-sub {
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  color: var(--lb-gray-500);
+  max-width: 640px;
+  margin: 0 auto 28px;
+  line-height: 1.6;
+}
+
+.lb-pricing-hero .wp-block-buttons {
+  justify-content: center;
+  gap: 12px;
+}
+
+.lb-pricing-hero .wp-block-button__link {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 13px 28px;
+  border-radius: var(--lb-radius);
+  transition: all 0.2s ease;
+}
+
+.lb-pricing-hero .wp-block-button:first-child .wp-block-button__link {
+  background: var(--lb-primary);
+  color: var(--lb-white);
+  border: none;
+}
+
+.lb-pricing-hero .wp-block-button:first-child .wp-block-button__link:hover {
+  background: var(--lb-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--lb-shadow);
+}
+
+.lb-pricing-hero .wp-block-button.is-style-outline .wp-block-button__link {
+  background: var(--lb-white);
+  color: var(--lb-gray-700);
+  border: 1px solid var(--lb-gray-300);
+}
+
+.lb-pricing-hero .wp-block-button.is-style-outline .wp-block-button__link:hover {
+  background: var(--lb-gray-50);
+}
+
+/* --- Pricing Cards --- */
+
+.lb-pricing-cards-section {
+  text-align: center;
+}
+
+.lb-pricing-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.lb-pricing-card {
+  background: var(--lb-white);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  padding: 36px 28px 32px;
+  text-align: left;
+  position: relative;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.lb-pricing-card:hover {
+  box-shadow: var(--lb-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.lb-pricing-card--popular {
+  border-color: var(--lb-primary);
+  border-width: 2px;
+  box-shadow: 0 4px 20px -4px rgba(24, 215, 240, 0.18);
+}
+
+.lb-pricing-popular-badge {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--lb-primary);
+  color: var(--lb-white);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 16px;
+  border-radius: 20px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.lb-pricing-card-header h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--lb-dark);
+  margin: 0 0 4px;
+}
+
+.lb-pricing-best-for {
+  font-size: 0.85rem;
+  color: var(--lb-gray-500);
+  margin: 0 0 16px;
+}
+
+.lb-pricing-card-price {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.lb-pricing-amount {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--lb-dark);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.lb-pricing-period {
+  font-size: 1rem;
+  color: var(--lb-gray-500);
+  font-weight: 500;
+}
+
+.lb-pricing-billing-note {
+  font-size: 0.82rem;
+  color: var(--lb-gray-500);
+  margin: 0 0 4px;
+}
+
+.lb-pricing-card-desc {
+  font-size: 0.95rem;
+  color: var(--lb-gray-500);
+  line-height: 1.55;
+  margin: 8px 0 20px;
+}
+
+.lb-pricing-card-features {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  flex: 1;
+}
+
+.lb-pricing-card-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.92rem;
+  color: var(--lb-gray-700);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--lb-gray-100);
+}
+
+.lb-pricing-card-features li:last-child {
+  border-bottom: none;
+}
+
+.lb-check-sm {
+  color: var(--lb-accent);
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+}
+
+.lb-pricing-card-cta {
+  display: block;
+  text-align: center;
+  padding: 12px 24px;
+  border-radius: var(--lb-radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: var(--lb-white);
+  color: var(--lb-gray-700);
+  border: 1px solid var(--lb-gray-300);
+}
+
+.lb-pricing-card-cta:hover {
+  background: var(--lb-gray-50);
+  color: var(--lb-gray-700);
+}
+
+.lb-pricing-card-cta--primary {
+  background: var(--lb-primary);
+  color: var(--lb-white);
+  border-color: var(--lb-primary);
+}
+
+.lb-pricing-card-cta--primary:hover {
+  background: var(--lb-primary-dark);
+  color: var(--lb-white);
+  border-color: var(--lb-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--lb-shadow);
+}
+
+.lb-pricing-contrast {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--lb-gray-500);
+  max-width: 640px;
+  margin: 36px auto 0;
+  line-height: 1.6;
+}
+
+/* --- Feature Comparison Grid --- */
+
+.lb-pricing-compare-section {
+  text-align: center;
+}
+
+.lb-compare-table {
+  max-width: 840px;
+  margin: 0 auto;
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  overflow: hidden;
+  background: var(--lb-white);
+}
+
+.lb-compare-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  background: var(--lb-gray-50);
+  border-bottom: 2px solid var(--lb-gray-200);
+}
+
+.lb-compare-header .lb-compare-feature,
+.lb-compare-header .lb-compare-plan {
+  padding: 14px 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--lb-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lb-compare-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  border-bottom: 1px solid var(--lb-gray-100);
+}
+
+.lb-compare-row:last-child {
+  border-bottom: none;
+}
+
+.lb-compare-row .lb-compare-feature {
+  padding: 12px 16px;
+  font-size: 0.92rem;
+  color: var(--lb-gray-700);
+  text-align: left;
+}
+
+.lb-compare-row .lb-compare-plan {
+  padding: 12px 16px;
+  font-size: 0.92rem;
+  text-align: center;
+  color: var(--lb-gray-500);
+}
+
+.lb-compare-yes {
+  color: var(--lb-accent);
+  font-weight: 700;
+}
+
+.lb-compare-no {
+  color: var(--lb-gray-300);
+}
+
+/* --- Connected Platform Section --- */
+
+.lb-pricing-platform {
+  text-align: center;
+}
+
+.lb-platform-cols {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.lb-platform-col {
+  background: var(--lb-white);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  padding: 36px 28px;
+  text-align: left;
+  transition: box-shadow 0.2s ease;
+}
+
+.lb-platform-col:hover {
+  box-shadow: var(--lb-shadow);
+}
+
+.lb-platform-col-icon {
+  font-size: 1.75rem;
+  margin-bottom: 12px;
+}
+
+.lb-platform-col h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--lb-dark);
+  margin: 0 0 14px;
+}
+
+.lb-platform-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lb-platform-col li {
+  position: relative;
+  padding: 6px 0 6px 20px;
+  font-size: 0.95rem;
+  color: var(--lb-gray-700);
+  line-height: 1.55;
+}
+
+.lb-platform-col li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--lb-accent);
+  font-weight: 700;
+}
+
+/* --- Why LeaseBase --- */
+
+.lb-pricing-why {
+  text-align: center;
+}
+
+.lb-why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: var(--lb-max-width);
+  margin: 48px auto 0;
+}
+
+.lb-why-card {
+  background: var(--lb-white);
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  padding: 32px 24px;
+  text-align: center;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.lb-why-card:hover {
+  box-shadow: var(--lb-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.lb-why-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: var(--lb-primary-light);
+  border-radius: var(--lb-radius);
+  font-size: 1.4rem;
+  margin-bottom: 16px;
+}
+
+.lb-why-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--lb-dark);
+  margin: 0 0 8px;
+}
+
+.lb-why-card p {
+  font-size: 0.92rem;
+  color: var(--lb-gray-500);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* --- FAQ --- */
+
+.lb-pricing-faq {
+  text-align: center;
+}
+
+.lb-faq-list {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.lb-faq-item {
+  border-bottom: 1px solid var(--lb-gray-200);
+}
+
+.lb-faq-item:first-child {
+  border-top: 1px solid var(--lb-gray-200);
+}
+
+.lb-faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--lb-dark);
+  cursor: pointer;
+  list-style: none;
+  transition: color 0.2s ease;
+}
+
+.lb-faq-question::-webkit-details-marker {
+  display: none;
+}
+
+.lb-faq-question::after {
+  content: "+";
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--lb-gray-500);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.lb-faq-item[open] .lb-faq-question::after {
+  content: "−";
+}
+
+.lb-faq-question:hover {
+  color: var(--lb-primary);
+}
+
+.lb-faq-answer {
+  padding: 0 0 18px;
+}
+
+.lb-faq-answer p {
+  font-size: 0.95rem;
+  color: var(--lb-gray-500);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.lb-faq-answer a {
+  color: var(--lb-primary);
+  text-decoration: underline;
+}
+
+.lb-faq-answer a:hover {
+  color: var(--lb-primary-dark);
+}
+
+/* --- Pricing Final CTA --- */
+
+.lb-pricing-final-cta {
+  text-align: center;
+}
+
+.lb-pricing-final-cta h2 {
+  margin-bottom: 12px;
+}
+
+.lb-pricing-final-cta .lb-subtitle {
+  margin-bottom: 36px;
+}
+
+.lb-pricing-final-cta .wp-block-buttons {
+  justify-content: center;
+  gap: 12px;
+}
+
+.lb-pricing-final-cta .wp-block-button:first-child .wp-block-button__link {
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 16px 40px;
+  border-radius: var(--lb-radius);
+  background: var(--lb-primary);
+  color: var(--lb-white);
+  transition: all 0.2s ease;
+}
+
+.lb-pricing-final-cta .wp-block-button:first-child .wp-block-button__link:hover {
+  background: var(--lb-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--lb-shadow);
+}
+
+.lb-pricing-final-cta .wp-block-button.is-style-outline .wp-block-button__link {
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 16px 40px;
+  border-radius: var(--lb-radius);
+  background: var(--lb-white);
+  color: var(--lb-gray-700);
+  border: 1px solid var(--lb-gray-300);
+  transition: all 0.2s ease;
+}
+
+.lb-pricing-final-cta .wp-block-button.is-style-outline .wp-block-button__link:hover {
+  background: var(--lb-gray-50);
+}
+
+/* --- Homepage Pricing CTA strip --- */
+
+.lb-home-pricing-cta {
+  text-align: center;
+  border: 1px solid var(--lb-gray-200);
+  border-radius: var(--lb-radius-lg);
+  padding: 40px 24px;
+  max-width: 720px;
+  margin: 0 auto;
+  background: var(--lb-white);
+}
+
+.lb-home-pricing-cta h2 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.lb-home-pricing-cta p {
+  color: var(--lb-gray-500);
+  font-size: 1rem;
+  margin: 0 0 20px;
+}
+
+.lb-home-pricing-cta .lb-nav-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  font-size: 0.95rem;
+}
+
+/* --- Pricing page responsive --- */
+
+@media (max-width: 960px) {
+  .lb-why-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .lb-pricing-hero {
+    padding: 64px 20px 0;
+  }
+
+  .lb-pricing-cards {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+
+  .lb-compare-table {
+    font-size: 0.85rem;
+    overflow-x: auto;
+    display: block;
+  }
+
+  .lb-compare-header,
+  .lb-compare-row {
+    min-width: 560px;
+  }
+
+  .lb-platform-cols {
+    grid-template-columns: 1fr;
+  }
+
+  .lb-why-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .lb-home-pricing-cta {
+    margin: 0 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lb-pricing-hero h1 {
+    font-size: 1.75rem;
   }
 }

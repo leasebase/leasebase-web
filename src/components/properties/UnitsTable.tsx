@@ -46,16 +46,6 @@ const columns: Column<UnitRow>[] = [
     ),
   },
   {
-    key: "rent_amount",
-    header: "Rent",
-    sortable: true,
-    render: (row) => (
-      <span className="text-slate-700 font-medium">
-        ${(row.rent_amount / 100).toLocaleString()}/mo
-      </span>
-    ),
-  },
-  {
     key: "status",
     header: "Status",
     render: (row) => (

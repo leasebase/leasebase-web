@@ -33,7 +33,6 @@ export interface UnitRow {
   bedrooms: number;
   bathrooms: number;
   square_feet: number | null;
-  rent_amount: number; // cents
   status: string;
   created_at: string;
   updated_at: string;
@@ -58,7 +57,6 @@ export interface CreateUnitDTO {
   bedrooms: number;
   bathrooms: number;
   squareFeet?: number;
-  rentAmount: number; // cents
   status?: string;
 }
 

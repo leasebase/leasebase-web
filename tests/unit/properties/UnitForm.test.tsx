@@ -15,7 +15,6 @@ const existingUnit: UnitRow = {
   bedrooms: 2,
   bathrooms: 1.5,
   square_feet: 850,
-  rent_amount: 150000, // $1,500
   status: "OCCUPIED",
   created_at: now,
   updated_at: now,
@@ -42,9 +41,12 @@ describe("UnitForm", () => {
   test("renders edit mode with initial values", () => {
     render(<UnitForm initial={existingUnit} onSubmit={mockSubmit} onCancel={mockCancel} />);
     expect(screen.getByLabelText("Unit Number / Name")).toHaveValue("101");
-    // Cents → dollars: 150000 → 1500
-    expect(screen.getByLabelText("Monthly Rent ($)")).toHaveValue(1500);
     expect(screen.getByText("Save Changes")).toBeInTheDocument();
+  });
+
+  test("does not render rent field (rent lives on the lease)", () => {
+    render(<UnitForm onSubmit={mockSubmit} onCancel={mockCancel} />);
+    expect(screen.queryByLabelText("Monthly Rent ($)")).not.toBeInTheDocument();
   });
 
   test("validates required unit number", async () => {
@@ -60,7 +62,7 @@ describe("UnitForm", () => {
     expect(mockSubmit).not.toHaveBeenCalled();
   });
 
-  test("submits valid form data with dollars → cents conversion", async () => {
+  test("submits valid form data", async () => {
     const user = userEvent.setup();
     render(<UnitForm onSubmit={mockSubmit} onCancel={mockCancel} />);
 
@@ -69,7 +71,6 @@ describe("UnitForm", () => {
     await user.type(screen.getByLabelText("Bedrooms"), "3");
     await user.clear(screen.getByLabelText("Bathrooms"));
     await user.type(screen.getByLabelText("Bathrooms"), "2");
-    await user.type(screen.getByLabelText("Monthly Rent ($)"), "2000");
 
     await user.click(screen.getByText("Add Unit"));
 
@@ -79,9 +80,10 @@ describe("UnitForm", () => {
           unitNumber: "301",
           bedrooms: 3,
           bathrooms: 2,
-          rentAmount: 200000, // $2,000 → 200000 cents
         }),
       );
+      // Rent is no longer on units
+      expect(mockSubmit.mock.calls[0][0]).not.toHaveProperty("rentAmount");
     });
   });
 
@@ -110,7 +112,6 @@ describe("UnitForm", () => {
     render(<UnitForm onSubmit={mockSubmit} onCancel={mockCancel} />);
 
     await user.type(screen.getByLabelText("Unit Number / Name"), "A1");
-    await user.type(screen.getByLabelText("Monthly Rent ($)"), "1000");
 
     await user.click(screen.getByText("Add Unit"));
 

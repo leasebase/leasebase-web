@@ -85,7 +85,6 @@ interface UnitRow {
   id: string;
   property_id: string;
   status: string;
-  rent_amount: number;
 }
 
 interface LeaseRow {
@@ -234,7 +233,7 @@ async function fetchPaymentsDomain(): Promise<DomainResult<PaymentRow[]>> {
 
 async function fetchLedgerDomain(): Promise<DomainResult<LedgerRow[]>> {
   try {
-    const data = await fetchAllPages<LedgerRow>("api/payments/ledger");
+    const data = await fetchAllPages<LedgerRow>("api/payments/charges");
     return { data, source: "live", error: null };
   } catch (e: any) {
     return { data: [], source: "unavailable", error: e?.message || "Failed to fetch ledger" };
@@ -685,14 +684,15 @@ export function computeVacancyReadiness(
     leasesResult.data.filter((l) => l.status === "ACTIVE").map((l) => l.unit_id)
   );
   const vacant = unitsResult.data.filter((u) => !activeLeaseUnitIds.has(u.id));
-  const readyToLease = vacant.filter((u) => u.rent_amount > 0).length;
-  const missingRent = vacant.filter((u) => u.rent_amount === 0).length;
+  // Rent now lives on the lease, not the unit. All vacant units are considered
+  // ready to lease — rent is set when creating the lease.
+  const readyToLease = vacant.length;
 
   return {
     vacantUnits: sourced(vacant.length, src),
     readyToLease: sourced(readyToLease, src),
-    missingRentConfig: sourced(missingRent, src),
-    missingSetup: sourced(missingRent, src), // same as missingRent for now
+    missingRentConfig: sourced(0, src),  // deprecated — rent is on the lease now
+    missingSetup: sourced(0, src),
   };
 }
 

@@ -17,7 +17,6 @@ interface FormErrors {
   unitNumber?: string;
   bedrooms?: string;
   bathrooms?: string;
-  rentAmount?: string;
   squareFeet?: string;
 }
 
@@ -26,7 +25,6 @@ function validate(data: CreateUnitDTO): FormErrors {
   if (!data.unitNumber.trim()) errors.unitNumber = "Unit number is required";
   if (data.bedrooms < 0) errors.bedrooms = "Must be 0 or more";
   if (data.bathrooms < 0) errors.bathrooms = "Must be 0 or more";
-  if (data.rentAmount < 0) errors.rentAmount = "Must be 0 or more";
   if (data.squareFeet != null && data.squareFeet < 0) errors.squareFeet = "Must be 0 or more";
   return errors;
 }
@@ -36,10 +34,6 @@ export function UnitForm({ initial, onSubmit, onCancel, submitLabel }: UnitFormP
   const [bedrooms, setBedrooms] = useState(initial?.bedrooms?.toString() ?? "0");
   const [bathrooms, setBathrooms] = useState(initial?.bathrooms?.toString() ?? "1");
   const [squareFeet, setSquareFeet] = useState(initial?.square_feet?.toString() ?? "");
-  // Convert cents to dollars for display
-  const [rentDollars, setRentDollars] = useState(
-    initial ? (initial.rent_amount / 100).toString() : "",
-  );
   const [status, setStatus] = useState(initial?.status ?? "AVAILABLE");
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -54,7 +48,6 @@ export function UnitForm({ initial, onSubmit, onCancel, submitLabel }: UnitFormP
       bedrooms: Number(bedrooms) || 0,
       bathrooms: Number(bathrooms) || 0,
       squareFeet: squareFeet.trim() ? Number(squareFeet) : undefined,
-      rentAmount: Math.round((Number(rentDollars) || 0) * 100), // dollars → cents
       status,
     };
 
@@ -109,27 +102,15 @@ export function UnitForm({ initial, onSubmit, onCancel, submitLabel }: UnitFormP
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Input
-          label="Square Feet"
-          type="number"
-          min={0}
-          placeholder="Optional"
-          value={squareFeet}
-          onChange={(e) => setSquareFeet(e.target.value)}
-          error={errors.squareFeet}
-        />
-        <Input
-          label="Monthly Rent ($)"
-          type="number"
-          min={0}
-          step={0.01}
-          placeholder="0.00"
-          value={rentDollars}
-          onChange={(e) => setRentDollars(e.target.value)}
-          error={errors.rentAmount}
-        />
-      </div>
+      <Input
+        label="Square Feet"
+        type="number"
+        min={0}
+        placeholder="Optional"
+        value={squareFeet}
+        onChange={(e) => setSquareFeet(e.target.value)}
+        error={errors.squareFeet}
+      />
 
       <Select
         label="Status"
