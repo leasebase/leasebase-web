@@ -4,9 +4,9 @@
   "settings": {
     "color": {
       "palette": [
-        {"slug": "primary", "name": "Primary", "color": "#18D7F0"},
+        {"slug": "primary", "name": "Primary", "color": "#2563eb"},
         {"slug": "secondary", "name": "Secondary", "color": "#0D1320"},
-        {"slug": "accent", "name": "Accent", "color": "#5EEA7A"},
+        {"slug": "accent", "name": "Accent", "color": "#22c55e"},
         {"slug": "background", "name": "Background", "color": "#FFFFFF"},
         {"slug": "surface", "name": "Surface", "color": "#F8FAFC"},
         {"slug": "text", "name": "Text", "color": "#0F172A"}
@@ -50,7 +50,7 @@
     "elements": {
       "button": {
         "border": {
-          "radius": "6px"
+          "radius": "8px"
         },
         "color": {
           "background": "var(--wp--preset--color--primary)",
