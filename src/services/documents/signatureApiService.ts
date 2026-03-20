@@ -135,3 +135,50 @@ export async function signRequest(
     body: JSON.stringify({ signerId }),
   });
 }
+
+// ── Phase 3: provider-backed signing ──────────────────────────────────────
+
+export interface SigningUrlResponse {
+  signUrl: string | null;
+  status: SignerStatus;
+  alreadySigned?: boolean;
+}
+
+/**
+ * Get a fresh signing URL for the authenticated tenant's signer slot.
+ * For provider-backed requests, fetches a fresh URL from the provider.
+ * For MANUAL requests, returns null (signing is done externally).
+ */
+export async function fetchSigningUrl(
+  requestId: string,
+): Promise<{ data: SigningUrlResponse }> {
+  return apiRequest<{ data: SigningUrlResponse }>({
+    path: `api/documents/signature-requests/${requestId}/signing-url`,
+  });
+}
+
+/**
+ * Create a provider-backed signature request.
+ * Requires signer emails. Subject and message are optional.
+ */
+export async function createProviderSignatureRequest(
+  documentId: string,
+  params: {
+    signers: Array<{
+      user_id: string;
+      signer_type?: "OWNER" | "TENANT" | "WITNESS";
+      email: string;
+      display_name?: string;
+      routing_order?: number;
+    }>;
+    subject?: string;
+    message?: string;
+  },
+): Promise<{ data: SignatureRequestRow }> {
+  return apiRequest<{ data: SignatureRequestRow }>({
+    path: `api/documents/documents/${documentId}/signature-requests`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...params, useProvider: true }),
+  });
+}
