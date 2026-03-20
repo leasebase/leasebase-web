@@ -7,6 +7,8 @@ import type { UnitRow } from "@/services/properties/types";
 
 const STATUS_VARIANTS: Record<string, BadgeVariant> = {
   OCCUPIED: "success",
+  VACANT: "info",
+  // Legacy: AVAILABLE was renamed to VACANT — keep fallback for in-flight data
   AVAILABLE: "info",
   MAINTENANCE: "warning",
   OFFLINE: "neutral",
@@ -60,7 +62,7 @@ const statusFilter: FilterConfig = {
   key: "status",
   label: "Status",
   options: [
-    { label: "Available", value: "AVAILABLE" },
+    { label: "Vacant", value: "VACANT" },
     { label: "Occupied", value: "OCCUPIED" },
     { label: "Maintenance", value: "MAINTENANCE" },
     { label: "Offline", value: "OFFLINE" },

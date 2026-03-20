@@ -61,8 +61,8 @@ export function computeTenantSetupStage(
   if (leaseSource === "unavailable" || !lease) return "no-lease";
   if (lease.status === "INACTIVE" || lease.status === "EXPIRED" || lease.status === "RENEWED") return "lease-ended";
   if (lease.status === "ACTIVE" || lease.status === "EXTENDED") return "active";
-  // DRAFT / ASSIGNED / INVITED / ACKNOWLEDGED — treat as no-lease (not yet started)
-  return "no-lease";
+  // DRAFT / ASSIGNED / INVITED / ACKNOWLEDGED — lease exists but not yet active
+  return "pending-activation";
 }
 
 /* ── Main orchestrator ── */

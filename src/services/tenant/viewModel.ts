@@ -153,6 +153,7 @@ function buildKpiHeader(data: TenantDashboardData): TenantKpiHeaderViewModel {
       paymentStatusLabel: "No active lease",
       leaseAddress: "—",
       leaseUnit: "—",
+      propertyName: "—",
       leaseDates: "—",
       leaseStatus: "—",
       source: data.sources.lease,
@@ -163,15 +164,26 @@ function buildKpiHeader(data: TenantDashboardData): TenantKpiHeaderViewModel {
   const dueDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
   const paymentStatus = computePaymentStatus(lease, data.payments);
 
+  // Resolve human-readable unit / property from enriched fields
+  const unitLabel = lease.unit_number ?? lease.unit_id;
+  const propertyLabel = lease.property_name ?? "";
+  const leaseAddress = propertyLabel
+    ? `Unit ${unitLabel}, ${propertyLabel}`
+    : `Unit ${unitLabel}`;
+
+  // Rent amount from enriched lease field (cents)
+  const rentCents = lease.rent_amount ?? 0;
+
   return {
-    rentAmount: "—",
-    rentAmountCents: 0,
+    rentAmount: rentCents > 0 ? fmtCurrency(rentCents) : "—",
+    rentAmountCents: rentCents,
     dueDate: fmtDate(dueDateStr),
     dueDateRaw: dueDateStr,
     paymentStatus,
     paymentStatusLabel: STATUS_LABELS[paymentStatus],
-    leaseAddress: lease.unit_id, // Phase 1: unit_id only (no property join)
-    leaseUnit: lease.unit_id,
+    leaseAddress,
+    leaseUnit: unitLabel,
+    propertyName: propertyLabel || "—",
     leaseDates: `${fmtMonthYear(lease.start_date)} – ${fmtMonthYear(lease.end_date)}`,
     leaseStatus: lease.status,
     source: data.sources.lease,

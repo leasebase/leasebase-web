@@ -76,13 +76,18 @@ export function TenantDashboard() {
 
   // Show progressive empty state for non-active setup stages
   if (data.setupStage !== "active") {
+    const isPendingActivation = data.setupStage === "pending-activation";
     return (
       <section className="space-y-6">
         <PageHeader
-          title="Tenant dashboard"
-          description="Check your rent status, lease details, and maintenance requests."
+          title={isPendingActivation ? "Your Home" : "Tenant dashboard"}
+          description={
+            isPendingActivation
+              ? "Your lease details and dashboard will be fully available once your lease is active."
+              : "Check your rent status, lease details, and maintenance requests."
+          }
         />
-        <TenantEmptyState stage={data.setupStage} />
+        <TenantEmptyState stage={data.setupStage} lease={data.lease} />
       </section>
     );
   }

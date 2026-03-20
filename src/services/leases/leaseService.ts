@@ -105,3 +105,26 @@ export async function renewLease(
     body: JSON.stringify(dto),
   });
 }
+
+/**
+ * Activate a lease that is in ACKNOWLEDGED status.
+ *
+ * Requirements (enforced server-side):
+ *   - Lease must be in ACKNOWLEDGED status.
+ *   - At least one lease document must be in EXECUTED or CONFIRMED_EXTERNAL status.
+ *
+ * On success, atomically transitions:
+ *   - Lease → ACTIVE
+ *   - All joined TenantProfile rows → ACTIVE
+ *   - Unit → OCCUPIED
+ */
+export async function activateLease(
+  id: string,
+): Promise<{ data: LeaseRow }> {
+  return apiRequest<{ data: LeaseRow }>({
+    path: `api/leases/${id}/activate`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{}",
+  });
+}

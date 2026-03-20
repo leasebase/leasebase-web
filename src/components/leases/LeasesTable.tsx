@@ -1,41 +1,87 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { DataTable, type Column, type FilterConfig } from "@/components/ui/DataTable";
 import { Badge, type BadgeVariant } from "@/components/ui/Badge";
 import type { LeaseRow, LeaseTenantRow } from "@/services/leases/types";
 import { TERM_TYPE_LABELS } from "@/services/leases/types";
 
+/* ── Helpers ── */
+
+/** Resolve the owner-facing display status (prefers backend-computed field). */
+function displayStatus(row: LeaseRow): string {
+  return row.display_status ?? row.status;
+}
+
+/** Badge variant keyed on lease-lifecycle display status. */
 function statusVariant(status: string): BadgeVariant {
   switch (status) {
     case "ACTIVE":
-    case "EXTENDED": return "success";
-    case "DRAFT":
-    case "ASSIGNED":
-    case "INVITED":
-    case "ACKNOWLEDGED": return "warning";
-    case "INACTIVE": return "danger";
-    case "EXPIRED":
-    case "RENEWED": return "neutral";
-    default: return "neutral";
+    case "EXTENDED":      return "success";
+    case "ACKNOWLEDGED":  return "info";   // tenant joined, awaiting document
+    case "DRAFT":         return "warning";
+    case "INACTIVE":      return "danger";
+    case "RENEWED":       return "neutral";
+    default:              return "neutral";
   }
 }
 
-/** Format tenant name as "F.LastName". For multiple tenants, comma-separate. */
-function formatTenantNames(tenants?: LeaseTenantRow[]): string {
-  if (!tenants || tenants.length === 0) return "Not assigned";
-  return tenants
-    .map((t) => {
-      const parts = t.name.trim().split(/\s+/);
-      if (parts.length < 2) return t.name;
-      return `${parts[0][0]}.${parts[parts.length - 1]}`;
-    })
-    .join(", ");
+/** Format a tenant name as "F.LastName". */
+function shortName(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length < 2) return name;
+  return `${parts[0][0]}.${parts[parts.length - 1]}`;
+}
+
+/**
+ * Render the Tenants cell.
+ *
+ * • True draft with no tenants → "Not assigned".
+ * • Has tenants → clickable name(s) linking to /app/tenants/:id.
+ * • Multiple tenants → first name + “+ N more” (all clickable).
+ */
+function renderTenants(row: LeaseRow): ReactNode {
+  const tenants = row.tenants;
+  if (!tenants || tenants.length === 0) {
+    return <span className="text-slate-400">Not assigned</span>;
+  }
+
+  const first = tenants[0];
+  const rest = tenants.slice(1);
+
+  return (
+    <span className="inline-flex flex-wrap items-center gap-x-1">
+      <Link
+        href={`/app/tenants/${first.id}`}
+        className="font-medium text-brand-600 hover:underline"
+      >
+        {shortName(first.name)}
+      </Link>
+      {rest.map((t) => (
+        <Link
+          key={t.id}
+          href={`/app/tenants/${t.id}`}
+          className="text-brand-600 hover:underline"
+          title={t.name}
+        >
+          +1
+        </Link>
+      ))}
+      {rest.length > 0 && (
+        <span className="text-xs text-slate-400">
+          (+{rest.length} more)
+        </span>
+      )}
+    </span>
+  );
 }
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
+
+/* ── Columns ── */
 
 const columns: Column<LeaseRow>[] = [
   {
@@ -55,19 +101,18 @@ const columns: Column<LeaseRow>[] = [
     key: "unit_number",
     header: "Unit",
     render: (row) => (
-      <span className="text-slate-600">
+      <Link
+        href={`/app/units/${row.unit_id}`}
+        className="font-medium text-brand-600 hover:underline"
+      >
         {row.unit_number ? `Unit ${row.unit_number}` : row.unit_id.slice(0, 8)}
-      </span>
+      </Link>
     ),
   },
   {
     key: "tenants",
     header: "Tenants",
-    render: (row) => (
-      <span className="text-slate-600">
-        {formatTenantNames(row.tenants)}
-      </span>
-    ),
+    render: renderTenants,
   },
   {
     key: "term_type",
@@ -79,11 +124,12 @@ const columns: Column<LeaseRow>[] = [
     ),
   },
   {
-    key: "status",
+    key: "display_status",
     header: "Status",
-    render: (row) => (
-      <Badge variant={statusVariant(row.status)}>{row.status}</Badge>
-    ),
+    render: (row) => {
+      const ds = displayStatus(row);
+      return <Badge variant={statusVariant(ds)}>{ds}</Badge>;
+    },
   },
   {
     key: "dates",
@@ -108,21 +154,22 @@ const columns: Column<LeaseRow>[] = [
   },
 ];
 
+/* ── Filter (lease-lifecycle only) ── */
+
 const statusFilter: FilterConfig = {
-  key: "status",
+  key: "display_status",
   label: "Status",
   options: [
-    { label: "Draft", value: "DRAFT" },
-    { label: "Assigned", value: "ASSIGNED" },
-    { label: "Invited", value: "INVITED" },
-    { label: "Acknowledged", value: "ACKNOWLEDGED" },
-    { label: "Active", value: "ACTIVE" },
-    { label: "Expired", value: "EXPIRED" },
-    { label: "Extended", value: "EXTENDED" },
-    { label: "Renewed", value: "RENEWED" },
-    { label: "Inactive", value: "INACTIVE" },
+    { label: "Draft",         value: "DRAFT" },
+    { label: "Acknowledged",  value: "ACKNOWLEDGED" },
+    { label: "Active",        value: "ACTIVE" },
+    { label: "Inactive",      value: "INACTIVE" },
+    { label: "Extended",      value: "EXTENDED" },
+    { label: "Renewed",       value: "RENEWED" },
   ],
 };
+
+/* ── Component ── */
 
 interface LeasesTableProps {
   leases: LeaseRow[];
