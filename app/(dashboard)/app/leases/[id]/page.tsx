@@ -27,7 +27,12 @@ import {
 import { InviteTenantModal } from "@/components/invitations/InviteTenantModal";
 import { LeaseForm } from "@/components/leases/LeaseForm";
 import { LeaseDetailSkeleton } from "@/components/leases/LeaseDetailSkeleton";
-import { Mail, RefreshCw, CheckCircle2, AlertCircle } from "lucide-react";
+import { Mail, RefreshCw, CheckCircle2, AlertCircle, FileCheck, Upload } from "lucide-react";
+import {
+  fetchLeaseDocuments,
+  confirmLeaseDocument,
+  type DocumentRow,
+} from "@/services/documents/documentApiService";
 
 /* ── Helpers ── */
 
@@ -219,6 +224,137 @@ function OverviewPanel({
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/* ── Documents Panel ── */
+
+const DOC_STATUS_LABELS: Record<string, string> = {
+  UPLOADED: "Uploaded",
+  EXECUTED: "Executed",
+  CONFIRMED_EXTERNAL: "Confirmed on file",
+};
+
+const DOC_STATUS_VARIANTS: Record<string, "success" | "info" | "warning" | "neutral"> = {
+  UPLOADED: "warning",
+  EXECUTED: "success",
+  CONFIRMED_EXTERNAL: "success",
+};
+
+function DocumentsPanel({
+  leaseId,
+  isAcknowledged,
+  onDocumentConfirmed,
+}: {
+  leaseId: string;
+  isAcknowledged: boolean;
+  onDocumentConfirmed: () => void;
+}) {
+  const [docs, setDocs] = useState<DocumentRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchLeaseDocuments(leaseId)
+      .then((res) => { if (!cancelled) setDocs(res.data); })
+      .catch(() => { if (!cancelled) setError("Failed to load documents"); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [leaseId]);
+
+  const handleConfirm = async (docId: string, status: "EXECUTED" | "CONFIRMED_EXTERNAL") => {
+    setConfirmingId(docId);
+    setConfirmError(null);
+    try {
+      const result = await confirmLeaseDocument(docId, status);
+      setDocs((prev) => prev.map((d) => d.id === docId ? result.data : d));
+      onDocumentConfirmed();
+    } catch (e: any) {
+      setConfirmError(e.message || "Failed to confirm document");
+    } finally {
+      setConfirmingId(null);
+    }
+  };
+
+  if (loading) return <p className="text-sm text-slate-400">Loading documents…</p>;
+  if (error) return <p className="text-sm text-red-600">{error}</p>;
+
+  return (
+    <div className="space-y-4">
+      {isAcknowledged && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <p className="font-medium flex items-center gap-1.5">
+            <FileCheck size={15} />
+            Document confirmation required before activation
+          </p>
+          <p className="mt-1 text-xs">
+            Upload the executed lease document and mark it as <strong>Confirmed on file</strong> or
+            <strong> Executed</strong>. Once confirmed, use the <strong>Activate Lease</strong>
+            action on the Overview tab.
+          </p>
+        </div>
+      )}
+
+      {confirmError && (
+        <p className="text-xs text-red-600 rounded border border-red-200 bg-red-50 px-3 py-2">
+          {confirmError}
+        </p>
+      )}
+
+      {docs.length === 0 ? (
+        <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
+          <Upload size={24} className="mx-auto mb-2 text-slate-300" />
+          <p className="text-sm text-slate-500">No documents yet.</p>
+          <p className="text-xs text-slate-400 mt-1">
+            Upload the signed lease using the button below, then confirm its status.
+          </p>
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {docs.map((doc) => (
+            <li
+              key={doc.id}
+              className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4"
+            >
+              <div>
+                <p className="text-sm font-medium text-slate-900">{doc.name}</p>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  {new Date(doc.created_at).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge variant={DOC_STATUS_VARIANTS[doc.status] ?? "neutral"}>
+                  {DOC_STATUS_LABELS[doc.status] ?? doc.status}
+                </Badge>
+                {doc.status === "UPLOADED" && isAcknowledged && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    loading={confirmingId === doc.id}
+                    onClick={() => handleConfirm(doc.id, "CONFIRMED_EXTERNAL")}
+                    icon={<CheckCircle2 size={13} />}
+                  >
+                    Confirm on file
+                  </Button>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p className="text-xs text-slate-400">
+        To upload, use the API directly:
+        {" "}
+        <code className="font-mono bg-slate-100 px-1 rounded">POST /api/documents/upload</code>
+        {" "}with{" "}
+        <code className="font-mono bg-slate-100 px-1 rounded">relatedType=LEASE</code>.
+        E-sign integration coming soon.
+      </p>
     </div>
   );
 }
@@ -421,6 +557,20 @@ function LeaseDetailContent() {
         id: "edit",
         label: "Edit",
         content: <EditPanel lease={lease} onSaved={handleSaved} />,
+      },
+      {
+        id: "documents",
+        label: "Documents",
+        content: (
+          <DocumentsPanel
+            leaseId={lease.id}
+            isAcknowledged={lease.status === "ACKNOWLEDGED"}
+            onDocumentConfirmed={() => {
+              // After confirming a document, clear any activate error so owner can retry
+              setActivateError(null);
+            }}
+          />
+        ),
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
