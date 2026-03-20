@@ -97,12 +97,15 @@ export const LEASE_STATUSES = [
 export type LeaseStatus = (typeof LEASE_STATUSES)[number];
 
 /**
- * Owner-facing lease lifecycle statuses only.
- * Tenant onboarding states (ASSIGNED/INVITED/ACKNOWLEDGED) and EXPIRED
- * are not surfaced — they map to DRAFT / INACTIVE respectively.
+ * Owner-facing lease lifecycle statuses.
+ * ACKNOWLEDGED is now surfaced to the owner so they can take action
+ * (upload/confirm document → activate tenancy).
+ * ASSIGNED/INVITED still map to DRAFT on the backend display_status.
+ * EXPIRED maps to INACTIVE.
  */
 export const LEASE_DISPLAY_STATUSES = [
   "DRAFT",
+  "ACKNOWLEDGED",
   "ACTIVE",
   "INACTIVE",
   "EXTENDED",

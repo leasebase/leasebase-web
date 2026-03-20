@@ -205,7 +205,10 @@ export function InviteTenantModal({ open, onClose, onSuccess, propertyUnit }: In
                   </option>
                   {units.map((u) => (
                     <option key={u.id} value={u.id}>
-                      Unit {u.unit_number}{u.status === "OCCUPIED" ? " (occupied)" : ""}
+                      Unit {u.unit_number}
+                      {u.status === "OCCUPIED" ? " (occupied)" : ""}
+                      {(u.status === "VACANT" || u.status === "AVAILABLE") ? " (vacant)" : ""}
+                      {u.status === "MAINTENANCE" ? " (maintenance)" : ""}
                     </option>
                   ))}
                 </select>

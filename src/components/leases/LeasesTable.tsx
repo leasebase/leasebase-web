@@ -14,15 +14,16 @@ function displayStatus(row: LeaseRow): string {
   return row.display_status ?? row.status;
 }
 
-/** Badge variant keyed on lease-lifecycle display status only. */
+/** Badge variant keyed on lease-lifecycle display status. */
 function statusVariant(status: string): BadgeVariant {
   switch (status) {
     case "ACTIVE":
-    case "EXTENDED":  return "success";
-    case "DRAFT":     return "warning";
-    case "INACTIVE":  return "danger";
-    case "RENEWED":   return "neutral";
-    default:          return "neutral";
+    case "EXTENDED":      return "success";
+    case "ACKNOWLEDGED":  return "info";   // tenant joined, awaiting document
+    case "DRAFT":         return "warning";
+    case "INACTIVE":      return "danger";
+    case "RENEWED":       return "neutral";
+    default:              return "neutral";
   }
 }
 
@@ -159,11 +160,12 @@ const statusFilter: FilterConfig = {
   key: "display_status",
   label: "Status",
   options: [
-    { label: "Draft",    value: "DRAFT" },
-    { label: "Active",   value: "ACTIVE" },
-    { label: "Inactive", value: "INACTIVE" },
-    { label: "Extended", value: "EXTENDED" },
-    { label: "Renewed",  value: "RENEWED" },
+    { label: "Draft",         value: "DRAFT" },
+    { label: "Acknowledged",  value: "ACKNOWLEDGED" },
+    { label: "Active",        value: "ACTIVE" },
+    { label: "Inactive",      value: "INACTIVE" },
+    { label: "Extended",      value: "EXTENDED" },
+    { label: "Renewed",       value: "RENEWED" },
   ],
 };
 
