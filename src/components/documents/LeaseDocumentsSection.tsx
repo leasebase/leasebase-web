@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { FileText, Upload, CheckCircle, Download, AlertCircle } from "lucide-react";
+import { FileText, Upload, CheckCircle, Download, AlertCircle, Zap, PenLine } from "lucide-react";
 import {
   fetchLeaseDocuments,
   fetchLeaseExecutionStatus,
@@ -13,6 +13,8 @@ import {
   type LeaseExecutionStatus,
 } from "@/services/documents/documentApiService";
 import { DocumentUploadModal } from "./DocumentUploadModal";
+import { LeaseGenerateDocModal } from "./LeaseGenerateDocModal";
+import { SignatureRequestPanel } from "./SignatureRequestPanel";
 
 interface LeaseDocumentsSectionProps {
   leaseId: string;
@@ -43,6 +45,8 @@ export function LeaseDocumentsSection({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [generateOpen, setGenerateOpen] = useState(false);
+  const [signaturesDocId, setSignaturesDocId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -106,13 +110,23 @@ export function LeaseDocumentsSection({
           )}
         </div>
         {isOwner && (
-          <button
-            onClick={() => setUploadOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded border border-slate-700 px-2.5 py-1 text-xs text-slate-300 hover:bg-slate-800 transition-colors"
-          >
-            <Upload size={12} />
-            Upload
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setGenerateOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded border border-indigo-700/60 px-2.5 py-1 text-xs text-indigo-300 hover:bg-indigo-900/30 transition-colors"
+              title="Generate from template"
+            >
+              <Zap size={12} />
+              Generate
+            </button>
+            <button
+              onClick={() => setUploadOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded border border-slate-700 px-2.5 py-1 text-xs text-slate-300 hover:bg-slate-800 transition-colors"
+            >
+              <Upload size={12} />
+              Upload
+            </button>
+          </div>
         )}
       </div>
 
@@ -133,12 +147,21 @@ export function LeaseDocumentsSection({
           <div className="text-center py-4">
             <p className="text-xs text-slate-500">No documents yet.</p>
             {isOwner && (
-              <button
-                onClick={() => setUploadOpen(true)}
-                className="mt-1 text-xs text-indigo-400 underline hover:text-indigo-300"
-              >
-                Upload lease agreement
-              </button>
+              <div className="mt-2 flex justify-center gap-3">
+                <button
+                  onClick={() => setGenerateOpen(true)}
+                  className="text-xs text-indigo-400 underline hover:text-indigo-300"
+                >
+                  Generate from template
+                </button>
+                <span className="text-xs text-slate-600">or</span>
+                <button
+                  onClick={() => setUploadOpen(true)}
+                  className="text-xs text-slate-400 underline hover:text-slate-300"
+                >
+                  Upload manually
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -155,45 +178,64 @@ export function LeaseDocumentsSection({
                 doc.status !== "ARCHIVED";
 
               return (
-                <div
-                  key={doc.id}
-                  className="flex items-center gap-2 rounded border border-slate-800/60 bg-slate-900/50 px-3 py-2 text-xs"
-                >
-                  <FileText size={12} className="shrink-0 text-slate-500" />
+                <div key={doc.id} className="space-y-1">
+                  {/* Doc row */}
+                  <div className="flex items-center gap-2 rounded border border-slate-800/60 bg-slate-900/50 px-3 py-2 text-xs">
+                    <FileText size={12} className="shrink-0 text-slate-500" />
 
-                  <span className="flex-1 truncate text-slate-200 font-medium">
-                    {doc.title}
-                  </span>
+                    <span className="flex-1 truncate text-slate-200 font-medium">
+                      {doc.title}
+                    </span>
 
-                  <span className="shrink-0 text-slate-500">
-                    {DOCUMENT_STATUS_LABELS[doc.status] ?? doc.status}
-                  </span>
+                    <span className="shrink-0 text-slate-500">
+                      {DOCUMENT_STATUS_LABELS[doc.status] ?? doc.status}
+                    </span>
 
-                  {/* Download */}
-                  <button
-                    onClick={() => handleDownload(doc)}
-                    disabled={busy}
-                    className="text-slate-400 hover:text-slate-200 disabled:opacity-40"
-                    title="Download"
-                  >
-                    <Download size={12} />
-                  </button>
-
-                  {/* Mark verified external */}
-                  {canVerify && (
+                    {/* Download */}
                     <button
-                      onClick={() => handleMarkVerified(doc)}
+                      onClick={() => handleDownload(doc)}
                       disabled={busy}
-                      className="text-slate-400 hover:text-emerald-400 disabled:opacity-40"
-                      title="Mark Verified External — activates lease"
+                      className="text-slate-400 hover:text-slate-200 disabled:opacity-40"
+                      title="Download"
                     >
-                      <CheckCircle size={12} />
+                      <Download size={12} />
                     </button>
-                  )}
 
-                  {/* Verified indicator */}
-                  {isActivatable && (
-                    <CheckCircle size={12} className="shrink-0 text-emerald-400" />
+                    {/* Mark verified external */}
+                    {canVerify && (
+                      <button
+                        onClick={() => handleMarkVerified(doc)}
+                        disabled={busy}
+                        className="text-slate-400 hover:text-emerald-400 disabled:opacity-40"
+                        title="Mark Verified External — activates lease"
+                      >
+                        <CheckCircle size={12} />
+                      </button>
+                    )}
+
+                    {/* Signature requests toggle */}
+                    {isOwner && doc.category === "LEASE_AGREEMENT" && (
+                      <button
+                        onClick={() => setSignaturesDocId(signaturesDocId === doc.id ? null : doc.id)}
+                        className="text-slate-400 hover:text-indigo-400"
+                        title="Signature requests"
+                      >
+                        <PenLine size={12} />
+                      </button>
+                    )}
+
+                    {/* Verified indicator */}
+                    {isActivatable && (
+                      <CheckCircle size={12} className="shrink-0 text-emerald-400" />
+                    )}
+                  </div>
+
+                  {/* Inline signature panel */}
+                  {signaturesDocId === doc.id && (
+                    <SignatureRequestPanel
+                      documentId={doc.id}
+                      isOwner={isOwner}
+                    />
                   )}
                 </div>
               );
@@ -209,6 +251,15 @@ export function LeaseDocumentsSection({
           relatedId={leaseId}
           onClose={() => setUploadOpen(false)}
           onSuccess={() => { setUploadOpen(false); load(); }}
+        />
+      )}
+
+      {/* Generate from template modal */}
+      {generateOpen && (
+        <LeaseGenerateDocModal
+          leaseId={leaseId}
+          onClose={() => setGenerateOpen(false)}
+          onGenerated={() => { setGenerateOpen(false); load(); }}
         />
       )}
     </div>
