@@ -107,7 +107,7 @@ describe("UnitForm", () => {
     expect(mockCancel).toHaveBeenCalledTimes(1);
   });
 
-  test("status defaults to AVAILABLE for new units", async () => {
+  test("status defaults to VACANT for new units", async () => {
     const user = userEvent.setup();
     render(<UnitForm onSubmit={mockSubmit} onCancel={mockCancel} />);
 
@@ -117,7 +117,7 @@ describe("UnitForm", () => {
 
     await waitFor(() => {
       expect(mockSubmit).toHaveBeenCalledWith(
-        expect.objectContaining({ status: "AVAILABLE" }),
+        expect.objectContaining({ status: "VACANT" }),
       );
     });
   });

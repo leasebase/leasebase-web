@@ -136,8 +136,9 @@ describe("LeasesTable", () => {
     render(<LeasesTable leases={leases} />);
     const select = screen.getByLabelText("Status") as HTMLSelectElement;
     const optionValues = Array.from(select.options).map((o) => o.value);
-    // Expected: "", DRAFT, ACTIVE, INACTIVE, EXTENDED, RENEWED
+    // Expected: "", DRAFT, ACKNOWLEDGED, ACTIVE, INACTIVE, EXTENDED, RENEWED
     expect(optionValues).toContain("DRAFT");
+    expect(optionValues).toContain("ACKNOWLEDGED");
     expect(optionValues).toContain("ACTIVE");
     expect(optionValues).toContain("INACTIVE");
     expect(optionValues).toContain("EXTENDED");
@@ -145,7 +146,6 @@ describe("LeasesTable", () => {
     // Must NOT contain tenant-lifecycle statuses
     expect(optionValues).not.toContain("ASSIGNED");
     expect(optionValues).not.toContain("INVITED");
-    expect(optionValues).not.toContain("ACKNOWLEDGED");
     expect(optionValues).not.toContain("JOINED");
     expect(optionValues).not.toContain("EXPIRED");
   });
