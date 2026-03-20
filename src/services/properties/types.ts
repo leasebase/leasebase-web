@@ -85,8 +85,14 @@ export interface PropertyListItem extends PropertyRow {
 
 /* ── Unit status constants ── */
 
+/**
+ * Canonical unit status vocabulary.
+ * VACANT replaces the previous AVAILABLE value to match business language.
+ * Both labels are kept here as a comment for backward-compat awareness:
+ *   AVAILABLE (legacy, renamed to VACANT via migration 002_unit_status_normalization)
+ */
 export const UNIT_STATUSES = [
-  "AVAILABLE",
+  "VACANT",
   "OCCUPIED",
   "MAINTENANCE",
   "OFFLINE",

@@ -34,7 +34,7 @@ export function UnitForm({ initial, onSubmit, onCancel, submitLabel }: UnitFormP
   const [bedrooms, setBedrooms] = useState(initial?.bedrooms?.toString() ?? "0");
   const [bathrooms, setBathrooms] = useState(initial?.bathrooms?.toString() ?? "1");
   const [squareFeet, setSquareFeet] = useState(initial?.square_feet?.toString() ?? "");
-  const [status, setStatus] = useState(initial?.status ?? "AVAILABLE");
+  const [status, setStatus] = useState(initial?.status ?? "VACANT");
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -117,7 +117,7 @@ export function UnitForm({ initial, onSubmit, onCancel, submitLabel }: UnitFormP
         value={status}
         onChange={(e) => setStatus(e.target.value)}
       >
-        <option value="AVAILABLE">Available</option>
+        <option value="VACANT">Vacant</option>
         <option value="OCCUPIED">Occupied</option>
         <option value="MAINTENANCE">Maintenance</option>
         <option value="OFFLINE">Offline</option>

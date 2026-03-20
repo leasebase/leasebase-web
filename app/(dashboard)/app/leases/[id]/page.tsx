@@ -16,6 +16,7 @@ import {
   updateLease,
   terminateLease,
   renewLease,
+  activateLease,
 } from "@/services/leases/leaseService";
 import type { LeaseRow, CreateLeaseDTO, RenewLeaseDTO } from "@/services/leases/types";
 import {
@@ -26,7 +27,7 @@ import {
 import { InviteTenantModal } from "@/components/invitations/InviteTenantModal";
 import { LeaseForm } from "@/components/leases/LeaseForm";
 import { LeaseDetailSkeleton } from "@/components/leases/LeaseDetailSkeleton";
-import { Mail, RefreshCw } from "lucide-react";
+import { Mail, RefreshCw, CheckCircle2, AlertCircle } from "lucide-react";
 
 /* ── Helpers ── */
 
@@ -34,11 +35,12 @@ import { Mail, RefreshCw } from "lucide-react";
 function statusVariant(status: string): BadgeVariant {
   switch (status) {
     case "ACTIVE":
-    case "EXTENDED":  return "success";
-    case "DRAFT":     return "warning";
-    case "INACTIVE":  return "danger";
-    case "RENEWED":   return "neutral";
-    default:          return "neutral";
+    case "EXTENDED":      return "success";
+    case "ACKNOWLEDGED":  return "info";
+    case "DRAFT":         return "warning";
+    case "INACTIVE":      return "danger";
+    case "RENEWED":       return "neutral";
+    default:              return "neutral";
   }
 }
 
@@ -61,24 +63,31 @@ function OverviewPanel({
   lease,
   onTerminate,
   onRenew,
+  onActivate,
   onInviteTenant,
   onResendInvite,
   pendingInvitation,
   resendLoading,
+  activateLoading,
+  activateError,
 }: {
   lease: LeaseRow;
   onTerminate: () => void;
   onRenew: () => void;
+  onActivate: () => void;
   onInviteTenant: () => void;
   onResendInvite: () => void;
   pendingInvitation: TenantInvitation | null;
   resendLoading: boolean;
+  activateLoading: boolean;
+  activateError: string | null;
 }) {
   const hasTenants = lease.tenants && lease.tenants.length > 0;
   const showInvite = lease.status === "DRAFT" && !hasTenants;
   const showResend =
     ["ASSIGNED", "INVITED"].includes(lease.status) &&
     pendingInvitation != null;
+  const showActivate = lease.status === "ACKNOWLEDGED";
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -149,16 +158,16 @@ function OverviewPanel({
       </div>
 
       {/* Status-dependent actions */}
-      <div className="flex items-center gap-3 pt-2">
+      <div className="flex flex-col gap-3 pt-2">
         {lease.status === "ACTIVE" && (
-          <>
+          <div className="flex items-center gap-3">
             <Button variant="danger" size="sm" onClick={onTerminate}>
               Terminate
             </Button>
             <Button variant="secondary" size="sm" onClick={onRenew}>
               Renew
             </Button>
-          </>
+          </div>
         )}
         {showInvite && (
           <Button
@@ -180,6 +189,34 @@ function OverviewPanel({
           >
             Re-send Invite
           </Button>
+        )}
+        {showActivate && (
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 space-y-3">
+            <div className="flex items-start gap-2">
+              <AlertCircle size={16} className="mt-0.5 text-blue-600 shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-blue-900">Tenant has accepted — activate tenancy</p>
+                <p className="text-xs text-blue-700 mt-1">
+                  The tenant has joined. Upload the signed lease document below and confirm it,
+                  then click <strong>Activate Lease</strong> to make the unit occupied and the tenant active.
+                </p>
+              </div>
+            </div>
+            {activateError && (
+              <p className="text-xs text-red-600 rounded border border-red-200 bg-red-50 px-3 py-2">
+                {activateError}
+              </p>
+            )}
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onActivate}
+              loading={activateLoading}
+              icon={<CheckCircle2 size={14} />}
+            >
+              Activate Lease
+            </Button>
+          </div>
         )}
       </div>
     </div>
@@ -240,6 +277,8 @@ function LeaseDetailContent() {
   const [resendSuccess, setResendSuccess] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [activateLoading, setActivateLoading] = useState(false);
+  const [activateError, setActivateError] = useState<string | null>(null);
 
   // Renew form state
   const [renewStartDate, setRenewStartDate] = useState("");
@@ -308,6 +347,25 @@ function LeaseDetailContent() {
     }
   };
 
+  const handleActivate = async () => {
+    setActivateLoading(true);
+    setActivateError(null);
+    try {
+      const result = await activateLease(id);
+      setLease(result.data);
+    } catch (e: any) {
+      const msg = e.message || "Failed to activate lease";
+      // Surface documentation requirement hint clearly
+      setActivateError(
+        msg.includes("DOCUMENTATION_REQUIRED") || msg.includes("documentation")
+          ? "A confirmed or executed lease document is required before activation. Upload the signed lease and confirm it first."
+          : msg,
+      );
+    } finally {
+      setActivateLoading(false);
+    }
+  };
+
   const handleInviteSuccess = () => {
     setShowInviteModal(false);
     // Re-fetch lease and invitations to reflect new state.
@@ -348,13 +406,14 @@ function LeaseDetailContent() {
           <OverviewPanel
             lease={lease}
             onTerminate={() => setShowTerminate(true)}
-            onRenew={() => {
-              setShowRenew(true);
-            }}
+            onRenew={() => setShowRenew(true)}
+            onActivate={handleActivate}
             onInviteTenant={() => setShowInviteModal(true)}
             onResendInvite={handleResendInvite}
             pendingInvitation={pendingInvitation}
             resendLoading={resendLoading}
+            activateLoading={activateLoading}
+            activateError={activateError}
           />
         ),
       },
@@ -365,7 +424,7 @@ function LeaseDetailContent() {
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lease, pendingInvitation, resendLoading]);
+  }, [lease, pendingInvitation, resendLoading, activateLoading, activateError]);
 
   if (isLoading) return <LeaseDetailSkeleton />;
 
