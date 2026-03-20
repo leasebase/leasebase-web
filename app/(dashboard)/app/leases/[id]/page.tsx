@@ -231,13 +231,27 @@ function OverviewPanel({
 /* ── Documents Panel ── */
 
 const DOC_STATUS_LABELS: Record<string, string> = {
+  // Phase 1 vocabulary
+  DRAFT: "Draft",
   UPLOADED: "Uploaded",
+  PENDING_TENANT_SIGNATURE: "Pending Signature",
+  FULLY_EXECUTED: "Fully Executed",
+  VERIFIED_EXTERNAL: "Verified on file",
+  ARCHIVED: "Archived",
+  // Legacy vocabulary (backward compat for pre-migration rows)
   EXECUTED: "Executed",
   CONFIRMED_EXTERNAL: "Confirmed on file",
 };
 
 const DOC_STATUS_VARIANTS: Record<string, "success" | "info" | "warning" | "neutral"> = {
+  // Phase 1
+  FULLY_EXECUTED: "success",
+  VERIFIED_EXTERNAL: "success",
   UPLOADED: "warning",
+  DRAFT: "neutral",
+  PENDING_TENANT_SIGNATURE: "warning",
+  ARCHIVED: "neutral",
+  // Legacy
   EXECUTED: "success",
   CONFIRMED_EXTERNAL: "success",
 };
@@ -321,7 +335,7 @@ function DocumentsPanel({
               className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4"
             >
               <div>
-                <p className="text-sm font-medium text-slate-900">{doc.name}</p>
+                <p className="text-sm font-medium text-slate-900">{doc.title}</p>
                 <p className="text-xs text-slate-400 mt-0.5">
                   {new Date(doc.created_at).toLocaleDateString()}
                 </p>
