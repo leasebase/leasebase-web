@@ -11,7 +11,7 @@ export interface AppNavItem {
 }
 
 /** Logical sidebar sections. */
-export type NavGroupKey = "overview" | "portfolio" | "operations" | "intelligence" | "account";
+export type NavGroupKey = "overview" | "portfolio" | "operations" | "intelligence";
 
 export interface NavGroup {
   key: NavGroupKey;
@@ -24,7 +24,6 @@ const groupMeta: Record<NavGroupKey, string> = {
   portfolio:     "Portfolio",
   operations:    "Operations",
   intelligence:  "Intelligence",
-  account:       "Account",
 };
 
 export const appNavItems: AppNavItem[] = [
@@ -50,9 +49,8 @@ export const appNavItems: AppNavItem[] = [
   { path: "/app/reports", label: "Reports", icon: "reports", personas: ["owner"], group: "intelligence" },
   { path: "/app/admin/growth", label: "Growth", icon: "growth", personas: ["owner"], group: "intelligence" },
 
-  // ── Account ──
-  { path: "/app/profile", label: "Profile", icon: "profile", personas: ["owner", "tenant"], group: "account" },
-  { path: "/app/settings", label: "Settings", icon: "settings", personas: ["owner", "tenant"], group: "account" },
+  // Phase 3: Profile + Settings moved to avatar dropdown (AppHeader).
+  // They are no longer sidebar nav items.
 ];
 
 export function filterNavForPersona(persona: Persona | undefined | null): AppNavItem[] {
@@ -66,7 +64,7 @@ export function filterNavForPersona(persona: Persona | undefined | null): AppNav
  */
 export function groupNavForPersona(persona: Persona | undefined | null): NavGroup[] {
   const flat = filterNavForPersona(persona);
-  const order: NavGroupKey[] = ["overview", "portfolio", "operations", "intelligence", "account"];
+  const order: NavGroupKey[] = ["overview", "portfolio", "operations", "intelligence"];
 
   return order
     .map((key) => ({

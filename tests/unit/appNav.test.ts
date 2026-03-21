@@ -63,11 +63,11 @@ describe("filterNavForPersona", () => {
     }
   });
 
-  test("Profile and Settings are in the left nav (account group)", () => {
+  test("Profile and Settings are NOT in the sidebar (they live in avatar dropdown)", () => {
     for (const persona of ["owner", "tenant"] as const) {
       const labels = filterNavForPersona(persona).map((i) => i.label);
-      expect(labels).toContain("Profile");
-      expect(labels).toContain("Settings");
+      expect(labels).not.toContain("Profile");
+      expect(labels).not.toContain("Settings");
     }
   });
 
@@ -93,14 +93,11 @@ describe("groupNavForPersona", () => {
     }
   });
 
-  test("account group contains Profile and Settings", () => {
+  test("no account group exists (Profile/Settings moved to avatar)", () => {
     for (const persona of ["owner", "tenant"] as const) {
       const groups = groupNavForPersona(persona);
-      const account = groups.find((g) => g.key === "account");
-      expect(account).toBeDefined();
-      const labels = account!.items.map((i) => i.label);
-      expect(labels).toContain("Profile");
-      expect(labels).toContain("Settings");
+      const keys = groups.map((g) => g.key as string);
+      expect(keys).not.toContain("account");
     }
   });
 

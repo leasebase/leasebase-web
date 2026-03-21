@@ -11,6 +11,7 @@ import {
   LogOut,
   Command,
   Settings,
+  User,
 } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { Avatar } from "@/components/ui/Avatar";
@@ -34,6 +35,12 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
   };
 
   const userMenuItems: DropdownMenuItem[] = [
+    {
+      id: "profile",
+      label: "Profile",
+      icon: <User size={14} />,
+      onClick: () => router.push("/app/profile"),
+    },
     {
       id: "settings",
       label: "Settings",
