@@ -35,6 +35,12 @@ export interface LeaseRow {
   lease_terms: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
+  // Phase 1 activation metadata
+  activation_mode?: ActivationMode | null;
+  document_requirement_status?: DocumentRequirementStatus | null;
+  tenant_signature_required?: boolean | null;
+  owner_attested_signed_at?: string | null;
+  owner_attested_by_user_id?: string | null;
   // Enrichment (from cross-schema JOINs)
   property_name?: string;
   unit_number?: string;
@@ -52,6 +58,7 @@ export interface CreateLeaseDTO {
   rentAmount: number;            // cents — canonical contract rent
   securityDeposit?: number;
   leaseTerms?: Record<string, unknown>;
+  activationMode?: ActivationMode;
 }
 
 export type UpdateLeaseDTO = Partial<CreateLeaseDTO>;
@@ -131,3 +138,27 @@ export const TERM_TYPE_LABELS: Record<string, string> = {
   TWELVE_MONTH: "12 Months",
   CUSTOM: "Custom",
 };
+
+/* ── Phase 1 Activation ── */
+
+export const ACTIVATION_MODES = [
+  "EXISTING_SIGNED_UPLOAD",
+  "OWNER_ATTESTED_NO_DOCUMENT",
+  "PLATFORM_ESIGN",
+] as const;
+
+export type ActivationMode = (typeof ACTIVATION_MODES)[number];
+
+export const ACTIVATION_MODE_LABELS: Record<ActivationMode, string> = {
+  EXISTING_SIGNED_UPLOAD: "Upload existing signed lease",
+  OWNER_ATTESTED_NO_DOCUMENT: "Skip document for now",
+  PLATFORM_ESIGN: "Create & send for e-signature",
+};
+
+export const DOCUMENT_REQUIREMENT_STATUSES = [
+  "REQUIRED",
+  "WAIVED",
+  "SATISFIED",
+] as const;
+
+export type DocumentRequirementStatus = (typeof DOCUMENT_REQUIREMENT_STATUSES)[number];

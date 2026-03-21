@@ -52,6 +52,9 @@ jest.mock("lucide-react", () => {
     FilePlus: icon("FilePlus"),
     CheckCircle: icon("CheckCircle"),
     Mail: icon("Mail"),
+    Upload: icon("Upload"),
+    FileCheck: icon("FileCheck"),
+    AlertTriangle: icon("AlertTriangle"),
   };
 });
 
@@ -218,7 +221,7 @@ describe("Lease Management Integration", () => {
       CreatePage = mod.default;
     });
 
-    test("submit calls createLease with correct DTO", async () => {
+    test("submit through activation path calls createLease with activationMode", async () => {
       mockCreateLease.mockResolvedValueOnce({ data: { id: "new-lease" } });
       const user = userEvent.setup();
 
@@ -228,16 +231,24 @@ describe("Lease Management Integration", () => {
         expect(screen.getByText("Sunset")).toBeInTheDocument();
       });
 
-      // Select property
+      // Step 1: Fill lease form
       await user.selectOptions(screen.getByLabelText(/property/i), "p1");
       await waitFor(() => expect(screen.getByText("Unit 101")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/unit/i), "u1");
       await user.type(screen.getByLabelText(/start date/i), "2026-01-01");
+      await user.click(screen.getByRole("button", { name: /continue/i }));
 
-      await user.click(screen.getByRole("button", { name: /create lease/i }));
+      // Step 2: Activation path — choose "Upload existing signed lease"
+      await waitFor(() => {
+        expect(screen.getByText('Activation Path')).toBeInTheDocument();
+      });
+      await user.click(screen.getByText(/upload existing signed lease/i));
 
       await waitFor(() => {
         expect(mockCreateLease).toHaveBeenCalledTimes(1);
+        expect(mockCreateLease).toHaveBeenCalledWith(
+          expect.objectContaining({ activationMode: "EXISTING_SIGNED_UPLOAD" }),
+        );
       });
     });
 
@@ -250,19 +261,22 @@ describe("Lease Management Integration", () => {
       render(<CreatePage />);
       await waitFor(() => expect(screen.getByText("Sunset")).toBeInTheDocument());
 
+      // Step 1
       await user.selectOptions(screen.getByLabelText(/property/i), "p1");
       await waitFor(() => expect(screen.getByText("Unit 101")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/unit/i), "u1");
       await user.type(screen.getByLabelText(/start date/i), "2026-01-01");
+      await user.click(screen.getByRole("button", { name: /continue/i }));
 
-      await user.click(screen.getByRole("button", { name: /create lease/i }));
+      // Step 2: Choose activation path
+      await waitFor(() => expect(screen.getByText('Activation Path')).toBeInTheDocument());
+      await user.click(screen.getByText(/upload existing signed lease/i));
 
-      // After lease creation, the invite step is shown
+      // Step 3: Invite step appears
       await waitFor(() => {
         expect(screen.getByRole("button", { name: /skip for now/i })).toBeInTheDocument();
       });
 
-      // Click "Skip for now" to proceed to the lease detail page
       await user.click(screen.getByRole("button", { name: /skip for now/i }));
 
       await waitFor(() => {
@@ -270,22 +284,26 @@ describe("Lease Management Integration", () => {
       });
     });
 
-    test("server error displays error banner", async () => {
+    test("server error on lease creation displays error banner in activation step", async () => {
       mockCreateLease.mockRejectedValueOnce(new Error("Unit already has an active lease"));
       const user = userEvent.setup();
 
       render(<CreatePage />);
       await waitFor(() => expect(screen.getByText("Sunset")).toBeInTheDocument());
 
+      // Step 1
       await user.selectOptions(screen.getByLabelText(/property/i), "p1");
       await waitFor(() => expect(screen.getByText("Unit 101")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/unit/i), "u1");
       await user.type(screen.getByLabelText(/start date/i), "2026-01-01");
+      await user.click(screen.getByRole("button", { name: /continue/i }));
 
-      await user.click(screen.getByRole("button", { name: /create lease/i }));
+      // Step 2: Choose activation path (triggers createLease which fails)
+      await waitFor(() => expect(screen.getByText('Activation Path')).toBeInTheDocument());
+      await user.click(screen.getByText(/upload existing signed lease/i));
 
       await waitFor(() => {
-        expect(screen.getByRole("alert")).toHaveTextContent("Unit already has an active lease");
+        expect(screen.getByText(/unit already has an active lease/i)).toBeInTheDocument();
       });
     });
 
