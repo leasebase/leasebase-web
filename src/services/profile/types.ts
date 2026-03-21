@@ -100,6 +100,10 @@ export interface NotificationPreferences {
   lease_updates: boolean;
   maintenance_updates: boolean;
   general_announcements: boolean;
+  /** Phase 2: preferred communication channel (canonical source). */
+  communication_preference: string | null;
+  /** Phase 2: day of month for rent reminders (canonical source). */
+  preferred_payment_day: number | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -112,4 +116,6 @@ export interface NotificationPreferencesUpdatePayload {
   lease_updates?: boolean;
   maintenance_updates?: boolean;
   general_announcements?: boolean;
+  communication_preference?: string | null;
+  preferred_payment_day?: number | null;
 }
