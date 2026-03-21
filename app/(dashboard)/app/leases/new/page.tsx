@@ -13,9 +13,9 @@ import {
   createInvitation,
   InvitationApiError,
 } from "@/services/invitations/invitationApiService";
-import type { CreateLeaseDTO, LeaseRow } from "@/services/leases/types";
+import type { CreateLeaseDTO, LeaseRow, ActivationMode } from "@/services/leases/types";
 import { authStore } from "@/lib/auth/store";
-import { CheckCircle, Mail } from "lucide-react";
+import { CheckCircle, Mail, Upload, FileCheck, AlertTriangle } from "lucide-react";
 
 // ── Friendly messages for invitation conflict codes ─────────────────
 const INVITE_ERROR_MESSAGES: Record<string, string> = {
@@ -168,15 +168,103 @@ function InviteStep({ lease, onDone }: InviteStepProps) {
   );
 }
 
-// ── Main page ───────────────────────────────────────────────────
+// ── Step 2: Activation Path ────────────────────────────────────────────
+interface ActivationPathStepProps {
+  onSelect: (mode: ActivationMode) => void;
+}
 
-type Step = "lease" | "invite";
+function ActivationPathStep({ onSelect }: ActivationPathStepProps) {
+  const [attested, setAttested] = useState(false);
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-base font-semibold text-slate-900">Activation Path</h3>
+        <p className="mt-1 text-sm text-slate-500">
+          How will this lease be activated? Choose the document handling approach.
+        </p>
+      </div>
+
+      {/* Option 1: Upload existing signed lease */}
+      <button
+        type="button"
+        onClick={() => onSelect("EXISTING_SIGNED_UPLOAD")}
+        className="flex w-full items-start gap-3 rounded-lg border border-slate-200 bg-white p-4 text-left hover:border-brand-300 hover:bg-brand-50/30 transition-colors"
+      >
+        <Upload size={20} className="mt-0.5 shrink-0 text-brand-500" />
+        <div>
+          <p className="text-sm font-medium text-slate-900">Upload existing signed lease</p>
+          <p className="mt-0.5 text-xs text-slate-500">
+            I have a signed lease document (PDF) to upload. The lease will activate
+            after I upload and confirm the document.
+          </p>
+        </div>
+      </button>
+
+      {/* Option 2: Skip document for now */}
+      <div className="rounded-lg border border-slate-200 bg-white p-4">
+        <div className="flex items-start gap-3">
+          <FileCheck size={20} className="mt-0.5 shrink-0 text-amber-500" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-slate-900">Skip document for now</p>
+            <p className="mt-0.5 text-xs text-slate-500">
+              The lease will activate automatically when the tenant accepts the invitation.
+              You can upload a lease document later.
+            </p>
+
+            {/* Attestation checkbox */}
+            <label className="mt-3 flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={attested}
+                onChange={(e) => setAttested(e.target.checked)}
+                className="mt-0.5 rounded border-slate-300 text-brand-500 focus:ring-brand-500"
+              />
+              <span className="text-xs text-slate-600">
+                I confirm that tenant signature is not required in-platform at this time.
+                I understand the lease will activate without an uploaded document.
+              </span>
+            </label>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              className="mt-3"
+              disabled={!attested}
+              onClick={() => onSelect("OWNER_ATTESTED_NO_DOCUMENT")}
+            >
+              Continue without document
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Future: e-sign (disabled) */}
+      <div className="flex items-start gap-3 rounded-lg border border-slate-100 bg-slate-50 p-4 opacity-50">
+        <AlertTriangle size={20} className="mt-0.5 shrink-0 text-slate-400" />
+        <div>
+          <p className="text-sm font-medium text-slate-400">Create & send for e-signature</p>
+          <p className="mt-0.5 text-xs text-slate-400">
+            Coming soon — generate a lease from a template and send for digital signature.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main page ───────────────────────────────────────────────────────────
+
+type Step = "lease" | "activation" | "invite";
 
 export default function CreateLeasePage() {
   const router = useRouter();
   const { user } = authStore();
   const [step, setStep] = useState<Step>("lease");
   const [createdLease, setCreatedLease] = useState<LeaseRow | null>(null);
+  const [pendingLeaseData, setPendingLeaseData] = useState<CreateLeaseDTO | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
 
   // Only owner can create leases
   if (user?.persona !== "owner") {
@@ -187,16 +275,37 @@ export default function CreateLeasePage() {
     );
   }
 
-  const handleLeaseSubmit = async (data: CreateLeaseDTO) => {
-    const result = await createLease(data);
-    setCreatedLease(result.data);
-    setStep("invite");
-    track("first_action_taken", { type: "lease" });
-    track("lease_created", { leaseId: result.data.id });
+  const handleLeaseFormSubmit = async (data: CreateLeaseDTO) => {
+    // Don't create yet — save form data and move to activation path
+    setPendingLeaseData(data);
+    setStep("activation");
+  };
+
+  const handleActivationSelect = async (mode: ActivationMode) => {
+    if (!pendingLeaseData) return;
+    setCreating(true);
+    setCreateError(null);
+    try {
+      const result = await createLease({ ...pendingLeaseData, activationMode: mode });
+      setCreatedLease(result.data);
+      setStep("invite");
+      track("first_action_taken", { type: "lease" });
+      track("lease_created", { leaseId: result.data.id, activationMode: mode });
+    } catch (err: any) {
+      setCreateError(err?.message || "Failed to create lease.");
+    } finally {
+      setCreating(false);
+    }
   };
 
   const handleInviteDone = () => {
     router.push("/app/leases");
+  };
+
+  const stepDescriptions: Record<Step, string> = {
+    lease: "Create a new lease agreement — select property, unit, and terms.",
+    activation: "Choose how this lease will be activated.",
+    invite: "Lease created. Invite the tenant or skip to finish.",
   };
 
   return (
@@ -210,40 +319,38 @@ export default function CreateLeasePage() {
       />
       <PageHeader
         title="Create Lease"
-        description={
-          step === "lease"
-            ? "Create a new lease agreement — select property, unit, and terms."
-            : "Lease created. Invite the tenant or skip to finish."
-        }
+        description={stepDescriptions[step]}
       />
 
       {/* Step indicator */}
       <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
-        <span
-          className={`font-medium ${
-            step === "lease" ? "text-blue-600" : "text-slate-400"
-          }`}
-        >
-          1. Lease details
-        </span>
+        <span className={`font-medium ${step === "lease" ? "text-blue-600" : "text-slate-400"}`}>1. Lease details</span>
         <span className="text-slate-300">/</span>
-        <span
-          className={`font-medium ${
-            step === "invite" ? "text-blue-600" : "text-slate-400"
-          }`}
-        >
-          2. Invite tenant
-        </span>
+        <span className={`font-medium ${step === "activation" ? "text-blue-600" : "text-slate-400"}`}>2. Activation path</span>
+        <span className="text-slate-300">/</span>
+        <span className={`font-medium ${step === "invite" ? "text-blue-600" : "text-slate-400"}`}>3. Invite tenant</span>
       </div>
 
       <div className="mt-6 max-w-2xl">
         <div className="rounded-lg border border-slate-200 bg-white p-6">
           {step === "lease" && (
             <LeaseForm
-              onSubmit={handleLeaseSubmit}
+              onSubmit={handleLeaseFormSubmit}
               onCancel={() => router.push("/app/leases")}
-              submitLabel="Create Lease & Continue"
+              submitLabel="Continue"
             />
+          )}
+          {step === "activation" && (
+            <>
+              {createError && (
+                <div className="mb-4 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-xs text-red-700">{createError}</div>
+              )}
+              {creating ? (
+                <p className="text-sm text-slate-500">Creating lease…</p>
+              ) : (
+                <ActivationPathStep onSelect={handleActivationSelect} />
+              )}
+            </>
           )}
           {step === "invite" && createdLease && (
             <InviteStep lease={createdLease} onDone={handleInviteDone} />
