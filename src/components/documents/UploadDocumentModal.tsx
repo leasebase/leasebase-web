@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -41,20 +41,63 @@ export function UploadDocumentModal({ open, onClose, onSuccess }: Props) {
   const [relatedId, setRelatedId] = useState("");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
 
   const reset = useCallback(() => {
     setFile(null); setTitle(""); setDescription(""); setCategory("OWNER_UPLOAD");
-    setRelatedType("GENERAL"); setRelatedId(""); setError(null);
+    setRelatedType("GENERAL"); setRelatedId(""); setError(null); setDragOver(false);
   }, []);
 
   const handleClose = useCallback(() => { reset(); onClose(); }, [reset, onClose]);
 
-  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0] || null;
+  // ── Shared file selection logic ────────────────────────────────────────────
+  const selectFile = useCallback((f: File) => {
     setFile(f);
-    if (f && !title) setTitle(f.name.replace(/\.[^.]+$/, ""));
+    setError(null);
+    if (!title) setTitle(f.name.replace(/\.[^.]+$/, ""));
   }, [title]);
 
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) selectFile(f);
+  }, [selectFile]);
+
+  // ── Drag-and-drop handlers ─────────────────────────────────────────────────
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(false);
+    const f = e.dataTransfer?.files?.[0];
+    if (f) selectFile(f);
+  }, [selectFile]);
+
+  // ── Global drop prevention ─────────────────────────────────────────────────
+  // Prevent browser from opening dropped files anywhere in the document
+  // while the modal is open.
+  useEffect(() => {
+    if (!open) return;
+    const prevent = (e: DragEvent) => { e.preventDefault(); e.stopPropagation(); };
+    document.addEventListener("dragover", prevent);
+    document.addEventListener("drop", prevent);
+    return () => {
+      document.removeEventListener("dragover", prevent);
+      document.removeEventListener("drop", prevent);
+    };
+  }, [open]);
+
+  // ── Upload handler ─────────────────────────────────────────────────────────
   const handleUpload = useCallback(async () => {
     if (!file || !title.trim()) return;
     setUploading(true); setError(null);
@@ -79,7 +122,7 @@ export function UploadDocumentModal({ open, onClose, onSuccess }: Props) {
   return (
     <Modal open={open} onClose={handleClose} title="Upload Document">
       <div className="space-y-4">
-        {/* File picker */}
+        {/* ── Drop zone / file picker ── */}
         <div>
           <input ref={fileRef} type="file" className="hidden" onChange={handleFileChange} accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt,.csv,.xls,.xlsx" />
           {file ? (
@@ -93,10 +136,18 @@ export function UploadDocumentModal({ open, onClose, onSuccess }: Props) {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-white px-4 py-8 text-sm text-slate-500 hover:border-brand-400 hover:text-brand-600 transition-colors"
+              onDragOver={handleDragOver}
+              onDragEnter={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 text-sm transition-colors ${
+                dragOver
+                  ? "border-brand-500 bg-brand-50 text-brand-600"
+                  : "border-slate-300 bg-white text-slate-500 hover:border-brand-400 hover:text-brand-600"
+              }`}
             >
               <Upload size={20} />
-              <span>Choose a file or drag & drop</span>
+              <span>{dragOver ? "Drop file here" : "Choose a file or drag & drop"}</span>
             </button>
           )}
         </div>

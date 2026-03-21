@@ -57,6 +57,7 @@ function OwnerDocuments() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const loadDocs = useCallback(async () => {
     try {
@@ -91,9 +92,11 @@ function OwnerDocuments() {
     }
   }, []);
 
-  const handleUploadSuccess = useCallback(() => {
+  const handleUploadSuccess = useCallback((doc: DocumentRow) => {
     setUploadOpen(false);
+    setSuccessMsg(`"${doc.title}" uploaded successfully.`);
     loadDocs();
+    setTimeout(() => setSuccessMsg(null), 4000);
   }, [loadDocs]);
 
   if (loading) {
@@ -125,7 +128,16 @@ function OwnerDocuments() {
 
   return (
     <>
-      <div className="mt-6 space-y-2">
+      {/* Header with upload button */}
+      <div className="mt-4 flex justify-end">
+        <Button variant="primary" icon={<Plus size={16} />} onClick={() => setUploadOpen(true)}>Upload Document</Button>
+      </div>
+
+      {successMsg && (
+        <div className="mt-3 rounded-md border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-700">{successMsg}</div>
+      )}
+
+      <div className="mt-4 space-y-2">
         {docs.map((doc) => {
           const menuItems: DropdownMenuItem[] = [
             { id: "download", label: "Download", icon: <Download size={14} />, onClick: () => handleDownload(doc.id) },
@@ -250,7 +262,6 @@ function TenantDocuments() {
 export default function DocumentsPage() {
   const { user } = authStore();
   const isOwner = user?.persona === "owner";
-  const [uploadOpen, setUploadOpen] = useState(false);
 
   return (
     <>
@@ -259,17 +270,9 @@ export default function DocumentsPage() {
         description={isOwner
           ? "Upload, manage, and organize documents — leases, notices, and receipts."
           : "View lease documents, notices, and receipts."}
-        actions={isOwner ? <Button variant="primary" icon={<Plus size={16} />} onClick={() => setUploadOpen(true)}>Upload Document</Button> : undefined}
       />
 
-      {isOwner ? (
-        <>
-          <OwnerDocuments />
-          <UploadDocumentModal open={uploadOpen} onClose={() => setUploadOpen(false)} onSuccess={() => { setUploadOpen(false); window.location.reload(); }} />
-        </>
-      ) : (
-        <TenantDocuments />
-      )}
+      {isOwner ? <OwnerDocuments /> : <TenantDocuments />}
     </>
   );
 }
