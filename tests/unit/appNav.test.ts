@@ -63,10 +63,11 @@ describe("filterNavForPersona", () => {
     }
   });
 
-  test("Settings is NOT in the left nav (belongs in user dropdown)", () => {
+  test("Profile and Settings are in the left nav (account group)", () => {
     for (const persona of ["owner", "tenant"] as const) {
       const labels = filterNavForPersona(persona).map((i) => i.label);
-      expect(labels).not.toContain("Settings");
+      expect(labels).toContain("Profile");
+      expect(labels).toContain("Settings");
     }
   });
 
@@ -92,13 +93,14 @@ describe("groupNavForPersona", () => {
     }
   });
 
-  test("system group is not present (Settings moved to header)", () => {
+  test("account group contains Profile and Settings", () => {
     for (const persona of ["owner", "tenant"] as const) {
       const groups = groupNavForPersona(persona);
-      // Cast to string[] because "system" was removed from NavGroupKey;
-      // this asserts the old key never appears at runtime either.
-      const keys = groups.map((g) => g.key as string);
-      expect(keys).not.toContain("system");
+      const account = groups.find((g) => g.key === "account");
+      expect(account).toBeDefined();
+      const labels = account!.items.map((i) => i.label);
+      expect(labels).toContain("Profile");
+      expect(labels).toContain("Settings");
     }
   });
 
