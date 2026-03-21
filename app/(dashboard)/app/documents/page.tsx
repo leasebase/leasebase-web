@@ -139,8 +139,9 @@ function OwnerDocuments() {
 
       <div className="mt-4 space-y-2">
         {docs.map((doc) => {
+          const isDownloadable = doc.status !== "DRAFT";
           const menuItems: DropdownMenuItem[] = [
-            { id: "download", label: "Download", icon: <Download size={14} />, onClick: () => handleDownload(doc.id) },
+            ...(isDownloadable ? [{ id: "download", label: "Download", icon: <Download size={14} />, onClick: () => handleDownload(doc.id) }] : []),
             { id: "archive", label: "Archive", icon: <Archive size={14} />, danger: true, onClick: () => handleArchive(doc.id) },
           ];
 

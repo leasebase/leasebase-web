@@ -116,6 +116,8 @@ export async function fetchDocuments(params: {
   relatedId?: string;
   category?: DocumentCategory;
   status?: DocumentStatus;
+  /** Exclude DRAFT documents (orphaned from failed uploads). Default: true. */
+  excludeDraft?: boolean;
   page?: number;
   limit?: number;
 }): Promise<PaginatedDocuments> {
@@ -126,7 +128,12 @@ export async function fetchDocuments(params: {
   if (params.status) q.set("status", params.status);
   q.set("page", String(params.page ?? 1));
   q.set("limit", String(params.limit ?? 20));
-  return apiRequest<PaginatedDocuments>({ path: `api/documents?${q}` });
+  const result = await apiRequest<PaginatedDocuments>({ path: `api/documents?${q}` });
+  // Filter out DRAFT documents (orphaned from failed uploads) unless explicitly included
+  if (params.excludeDraft !== false) {
+    result.data = result.data.filter((d) => d.status !== "DRAFT");
+  }
+  return result;
 }
 
 /** Convenience wrapper: list documents for a specific lease */
@@ -214,15 +221,27 @@ export async function uploadDocument(params: {
     mimeType: params.file.type || "application/octet-stream",
   });
 
-  // Placeholder mode: if backend returned a non-http URL (no S3 bucket configured),
-  // skip the S3 PUT step and complete directly. The document record exists in DRAFT
-  // and will transition to UPLOADED without actual file storage.
+  // Placeholder mode: backend returned non-http URL (no S3 bucket configured).
+  // Skip S3 PUT and complete directly — document exists without actual file storage.
   const isPlaceholder = !uploadUrl.startsWith("http");
 
   if (!isPlaceholder) {
-    const s3Res = await putFileToS3(uploadUrl, params.file);
+    let s3Res: Response;
+    try {
+      s3Res = await putFileToS3(uploadUrl, params.file);
+    } catch (fetchErr) {
+      // Fetch itself failed — likely CSP, CORS, or network error.
+      // Clean up the orphaned DRAFT record.
+      try { await archiveDocument(doc.id); } catch { /* best-effort cleanup */ }
+      throw new Error(
+        "File upload was blocked by the browser. This is usually a security policy issue. " +
+        "Please contact your administrator.",
+      );
+    }
     if (!s3Res.ok) {
-      throw new Error(`File upload failed (${s3Res.status}). Please try again.`);
+      // S3 rejected the upload — clean up the DRAFT.
+      try { await archiveDocument(doc.id); } catch { /* best-effort cleanup */ }
+      throw new Error(`File upload failed (HTTP ${s3Res.status}). Please try again.`);
     }
   }
 
