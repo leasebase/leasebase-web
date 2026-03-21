@@ -241,11 +241,17 @@ function TenantDocuments() {
         <div key={doc.id} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-4">
           <FileText size={20} className="shrink-0 text-slate-400" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-slate-900 truncate">{doc.name}</p>
+            <p className="text-sm font-medium text-slate-900 truncate">{doc.title || doc.name || "Untitled"}</p>
             <p className="text-xs text-slate-400">
-              {doc.related_type} · {formatDate(doc.created_at)}
+              {CATEGORY_LABELS[doc.category || ""] || doc.category || doc.related_type}
+              {" · "}{formatDate(doc.created_at)}
             </p>
           </div>
+          {doc.status && (
+            <Badge variant={STATUS_VARIANTS[doc.status] || "neutral"}>
+              {DOCUMENT_STATUS_LABELS[doc.status as DocumentStatus] || doc.status}
+            </Badge>
+          )}
           <Button variant="ghost" size="sm" icon={<Download size={14} />} onClick={() => handleDownload(doc.id)}>
             Download
           </Button>

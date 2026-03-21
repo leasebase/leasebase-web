@@ -290,8 +290,8 @@ function buildMaintenanceWidget(data: TenantDashboardData): TenantMaintenanceWid
 function buildDocumentsWidget(data: TenantDashboardData): TenantDocumentsWidgetViewModel {
   const documents = (data.documents ?? []).slice(0, 5).map((d) => ({
     id: d.id,
-    name: d.name,
-    mimeType: d.mime_type,
+    name: d.title || d.name || "Untitled",
+    mimeType: d.mime_type || "",
     date: fmtShortDate(d.created_at),
   }));
 
