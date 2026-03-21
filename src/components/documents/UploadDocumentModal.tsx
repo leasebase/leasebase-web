@@ -50,8 +50,14 @@ export function UploadDocumentModal({ open, onClose, onSuccess }: Props) {
 
   const handleClose = useCallback(() => { reset(); onClose(); }, [reset, onClose]);
 
-  // ── Shared file selection logic ────────────────────────────────────────────
+  // ── Shared file selection logic ──────────────────────────────────────────
+  const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+
   const selectFile = useCallback((f: File) => {
+    if (f.size > MAX_FILE_SIZE) {
+      setError(`File is too large (${(f.size / 1024 / 1024).toFixed(1)} MB). Maximum size is 25 MB.`);
+      return;
+    }
     setFile(f);
     setError(null);
     if (!title) setTitle(f.name.replace(/\.[^.]+$/, ""));

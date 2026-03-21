@@ -118,8 +118,13 @@ export interface DocumentRow {
   organization_id: string;
   related_type: string;
   related_id: string;
-  name: string;
-  mime_type: string;
+  /** Phase 1: canonical title (replaces legacy 'name' column). */
+  title: string;
+  /** Legacy column — may be null for Phase 1 uploads. Use 'title' for display. */
+  name?: string;
+  category?: string;
+  status?: string;
+  mime_type?: string;
   created_by_user_id: string;
   created_at: string;
   updated_at: string;
