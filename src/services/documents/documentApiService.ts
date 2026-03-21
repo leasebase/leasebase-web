@@ -169,15 +169,17 @@ export async function requestUploadUrl(params: {
 
 /**
  * Step 2 of upload: PUT file bytes directly to the presigned S3 URL.
- * Returns the fetch response; caller should check .ok.
+ * The contentType MUST match what was used when generating the presigned URL,
+ * otherwise S3 returns 403 (signature mismatch).
  */
 export async function putFileToS3(
   presignedUrl: string,
   file: File,
+  contentType: string,
 ): Promise<Response> {
   return fetch(presignedUrl, {
     method: "PUT",
-    headers: { "Content-Type": file.type },
+    headers: { "Content-Type": contentType },
     body: file,
   });
 }
@@ -225,10 +227,14 @@ export async function uploadDocument(params: {
   // Skip S3 PUT and complete directly — document exists without actual file storage.
   const isPlaceholder = !uploadUrl.startsWith("http");
 
+  // Use the exact mimeType that was signed into the presigned URL.
+  // file.type can differ from what we sent to upload-url (empty for some file types).
+  const signedMimeType = params.file.type || "application/octet-stream";
+
   if (!isPlaceholder) {
     let s3Res: Response;
     try {
-      s3Res = await putFileToS3(uploadUrl, params.file);
+      s3Res = await putFileToS3(uploadUrl, params.file, signedMimeType);
     } catch (fetchErr) {
       // Fetch itself failed — likely CSP, CORS, or network error.
       // Clean up the orphaned DRAFT record.
