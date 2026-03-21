@@ -45,7 +45,7 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
               "style-src 'self' 'unsafe-inline'",
-              `connect-src 'self' ${apiOrigin} https://*.amazoncognito.com https://api.stripe.com https://*.stripe.com https://*.i.posthog.com`,
+            `connect-src 'self' ${apiOrigin} https://*.amazoncognito.com https://api.stripe.com https://*.stripe.com https://*.i.posthog.com https://*.s3.amazonaws.com https://*.s3.us-west-2.amazonaws.com https://*.s3.us-east-1.amazonaws.com`,
               "img-src 'self' data: blob: https://*.stripe.com",
               "font-src 'self'",
               "frame-src 'self' https://js.stripe.com",

@@ -214,9 +214,16 @@ export async function uploadDocument(params: {
     mimeType: params.file.type || "application/octet-stream",
   });
 
-  const s3Res = await putFileToS3(uploadUrl, params.file);
-  if (!s3Res.ok) {
-    throw new Error(`S3 upload failed: ${s3Res.status} ${s3Res.statusText}`);
+  // Placeholder mode: if backend returned a non-http URL (no S3 bucket configured),
+  // skip the S3 PUT step and complete directly. The document record exists in DRAFT
+  // and will transition to UPLOADED without actual file storage.
+  const isPlaceholder = !uploadUrl.startsWith("http");
+
+  if (!isPlaceholder) {
+    const s3Res = await putFileToS3(uploadUrl, params.file);
+    if (!s3Res.ok) {
+      throw new Error(`File upload failed (${s3Res.status}). Please try again.`);
+    }
   }
 
   const { data: finalDoc } = await completeUpload({
