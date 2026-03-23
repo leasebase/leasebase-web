@@ -41,6 +41,7 @@ export interface LeaseRow {
   tenant_signature_required?: boolean | null;
   owner_attested_signed_at?: string | null;
   owner_attested_by_user_id?: string | null;
+  template_id?: string | null;
   // Enrichment (from cross-schema JOINs)
   property_name?: string;
   unit_number?: string;
@@ -59,6 +60,7 @@ export interface CreateLeaseDTO {
   securityDeposit?: number;
   leaseTerms?: Record<string, unknown>;
   activationMode?: ActivationMode;
+  templateId?: string;
 }
 
 export type UpdateLeaseDTO = Partial<CreateLeaseDTO>;
@@ -142,6 +144,9 @@ export const TERM_TYPE_LABELS: Record<string, string> = {
 /* ── Phase 1 Activation ── */
 
 export const ACTIVATION_MODES = [
+  "NEW_LEASE",
+  "EXISTING_LEASE",
+  // Legacy Phase 1 (backward compat)
   "EXISTING_SIGNED_UPLOAD",
   "OWNER_ATTESTED_NO_DOCUMENT",
   "PLATFORM_ESIGN",
@@ -150,6 +155,8 @@ export const ACTIVATION_MODES = [
 export type ActivationMode = (typeof ACTIVATION_MODES)[number];
 
 export const ACTIVATION_MODE_LABELS: Record<ActivationMode, string> = {
+  NEW_LEASE: "New lease",
+  EXISTING_LEASE: "Existing lease",
   EXISTING_SIGNED_UPLOAD: "Upload existing signed lease",
   OWNER_ATTESTED_NO_DOCUMENT: "Skip document for now",
   PLATFORM_ESIGN: "Create & send for e-signature",
