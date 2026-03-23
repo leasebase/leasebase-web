@@ -27,7 +27,8 @@ import {
 import { InviteTenantModal } from "@/components/invitations/InviteTenantModal";
 import { LeaseForm } from "@/components/leases/LeaseForm";
 import { LeaseDetailSkeleton } from "@/components/leases/LeaseDetailSkeleton";
-import { Mail, RefreshCw, CheckCircle2, AlertCircle, FileCheck, Upload } from "lucide-react";
+import { DocumentUploadModal } from "@/components/documents/DocumentUploadModal";
+import { Mail, RefreshCw, CheckCircle2, AlertCircle, FileCheck, Upload, Paperclip } from "lucide-react";
 import {
   fetchLeaseDocuments,
   confirmLeaseDocument,
@@ -270,15 +271,20 @@ function DocumentsPanel({
   const [error, setError] = useState<string | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [showUpload, setShowUpload] = useState(false);
+  const [loadKey, setLoadKey] = useState(0);
+
+  const loadDocs = useCallback(() => {
+    setLoading(true);
+    fetchLeaseDocuments(leaseId)
+      .then((res) => setDocs(res.data))
+      .catch(() => setError("Failed to load documents"))
+      .finally(() => setLoading(false));
+  }, [leaseId]);
 
   useEffect(() => {
-    let cancelled = false;
-    fetchLeaseDocuments(leaseId)
-      .then((res) => { if (!cancelled) setDocs(res.data); })
-      .catch(() => { if (!cancelled) setError("Failed to load documents"); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
-  }, [leaseId]);
+    loadDocs();
+  }, [loadDocs, loadKey]);
 
   const handleConfirm = async (docId: string, status: "EXECUTED" | "CONFIRMED_EXTERNAL") => {
     setConfirmingId(docId);
@@ -321,54 +327,78 @@ function DocumentsPanel({
 
       {docs.length === 0 ? (
         <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
-          <Upload size={24} className="mx-auto mb-2 text-slate-300" />
-          <p className="text-sm text-slate-500">No documents yet.</p>
+          <Paperclip size={24} className="mx-auto mb-2 text-slate-300" />
+          <p className="text-sm text-slate-500">No documents attached yet.</p>
           <p className="text-xs text-slate-400 mt-1">
-            Upload the signed lease using the button below, then confirm its status.
+            Attach a signed lease or related document to keep everything in one place.
           </p>
+          <Button
+            variant="primary"
+            size="sm"
+            className="mt-4"
+            onClick={() => setShowUpload(true)}
+            icon={<Paperclip size={14} />}
+          >
+            Attach document
+          </Button>
         </div>
       ) : (
-        <ul className="space-y-2">
-          {docs.map((doc) => (
-            <li
-              key={doc.id}
-              className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4"
+        <>
+          <div className="flex justify-end">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowUpload(true)}
+              icon={<Paperclip size={14} />}
             >
-              <div>
-                <p className="text-sm font-medium text-slate-900">{doc.title}</p>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  {new Date(doc.created_at).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge variant={DOC_STATUS_VARIANTS[doc.status] ?? "neutral"}>
-                  {DOC_STATUS_LABELS[doc.status] ?? doc.status}
-                </Badge>
-                {doc.status === "UPLOADED" && isAcknowledged && (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    loading={confirmingId === doc.id}
-                    onClick={() => handleConfirm(doc.id, "CONFIRMED_EXTERNAL")}
-                    icon={<CheckCircle2 size={13} />}
-                  >
-                    Confirm on file
-                  </Button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
+              Attach document
+            </Button>
+          </div>
+          <ul className="space-y-2">
+            {docs.map((doc) => (
+              <li
+                key={doc.id}
+                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4"
+              >
+                <div>
+                  <p className="text-sm font-medium text-slate-900">{doc.title}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {new Date(doc.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge variant={DOC_STATUS_VARIANTS[doc.status] ?? "neutral"}>
+                    {DOC_STATUS_LABELS[doc.status] ?? doc.status}
+                  </Badge>
+                  {doc.status === "UPLOADED" && isAcknowledged && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      loading={confirmingId === doc.id}
+                      onClick={() => handleConfirm(doc.id, "CONFIRMED_EXTERNAL")}
+                      icon={<CheckCircle2 size={13} />}
+                    >
+                      Confirm on file
+                    </Button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
 
-      <p className="text-xs text-slate-400">
-        To upload, use the API directly:
-        {" "}
-        <code className="font-mono bg-slate-100 px-1 rounded">POST /api/documents/upload</code>
-        {" "}with{" "}
-        <code className="font-mono bg-slate-100 px-1 rounded">relatedType=LEASE</code>.
-        E-sign integration coming soon.
-      </p>
+      {showUpload && (
+        <DocumentUploadModal
+          relatedType="LEASE"
+          relatedId={leaseId}
+          onClose={() => setShowUpload(false)}
+          onSuccess={() => {
+            setShowUpload(false);
+            setLoadKey((k) => k + 1);
+          }}
+        />
+      )}
     </div>
   );
 }
