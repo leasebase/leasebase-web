@@ -11,6 +11,24 @@
 import { apiRequest } from "@/lib/api/client";
 import type { DomainResult, PaymentRow, CheckoutResult } from "../types";
 
+/** Pre-flight readiness check result */
+export interface PreflightResult {
+  ready: boolean;
+  issues: string[];
+}
+
+/** Check if payment is possible before showing the form */
+export async function checkPaymentReadiness(): Promise<DomainResult<PreflightResult | null>> {
+  try {
+    const res = await apiRequest<{ data: PreflightResult }>({
+      path: "api/payments/checkout/preflight",
+    });
+    return { data: res.data, source: "live", error: null };
+  } catch (e: any) {
+    return { data: null, source: "unavailable", error: e?.message || "Failed to check payment readiness" };
+  }
+}
+
 /** Response shape from POST /checkout/create-intent */
 export interface PaymentIntentResult {
   clientSecret: string;

@@ -13,6 +13,7 @@ import { fetchTenantProfile } from "@/services/tenant/adapters/profileAdapter";
 import { fetchTenantLease } from "@/services/tenant/adapters/leaseAdapter";
 import {
   createPaymentIntent,
+  checkPaymentReadiness,
   fetchTenantCharges,
   fetchTenantPayments,
   type TenantChargeRow,
@@ -42,6 +43,7 @@ export default function Page() {
   const [pageState, setPageState] = useState<PageState>("loading");
   const [error, setError] = useState<string | null>(null);
   const [paymentUnavailable, setPaymentUnavailable] = useState(false);
+  const [unavailableReason, setUnavailableReason] = useState<string | null>(null);
 
   // PaymentIntent state for embedded form
   const [intentData, setIntentData] = useState<PaymentIntentResult | null>(null);
@@ -71,6 +73,23 @@ export default function Page() {
           setProcessingPayment(processing ?? null);
 
           setPageState(leaseResult.data ? "summary" : "no-lease");
+
+          // Pre-flight readiness check — disable Pay button early if issues found
+          if (leaseResult.data) {
+            const preflight = await checkPaymentReadiness();
+            if (cancelled) return;
+            if (preflight.data && !preflight.data.ready) {
+              setPaymentUnavailable(true);
+              const issues = preflight.data.issues;
+              if (issues.includes("NO_PAYMENT_ACCOUNT")) {
+                setUnavailableReason("The property owner has not enabled payments yet.");
+              } else if (issues.includes("NO_RENT_CONFIGURED")) {
+                setUnavailableReason("Rent is not configured for your lease.");
+              } else if (issues.includes("STRIPE_NOT_CONFIGURED")) {
+                setUnavailableReason("Payment system is not available.");
+              }
+            }
+          }
         } else {
           setPageState("no-lease");
         }
@@ -295,7 +314,14 @@ export default function Page() {
                 </div>
               </dl>
 
-              {error && (
+              {unavailableReason && paymentUnavailable && (
+                <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                  <AlertCircle size={14} className="mt-0.5 shrink-0" />
+                  {unavailableReason}
+                </div>
+              )}
+
+              {error && !unavailableReason && (
                 <div className="mt-4 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
                   <AlertCircle size={14} className="mt-0.5 shrink-0" />
                   {error}
