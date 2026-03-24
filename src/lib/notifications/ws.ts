@@ -29,6 +29,7 @@ class NotificationWebSocket {
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private intentionalClose = false;
   private _connected = false;
+  private _wsDisabledLogged = false;
 
   /** Whether the WebSocket is currently connected and authenticated. */
   get connected(): boolean {
@@ -38,8 +39,20 @@ class NotificationWebSocket {
   /**
    * Connect to the notification-service WebSocket.
    * Safe to call multiple times — reconnects with the new token.
+   *
+   * Respects the NEXT_PUBLIC_ENABLE_WEBSOCKET env var.  When the flag is
+   * absent or not "true", connection is skipped entirely and the caller
+   * falls back to HTTP polling.  This prevents noisy CSP / connection
+   * errors in environments where the WebSocket infra path is not yet wired.
    */
   connect(accessToken: string): void {
+    if (process.env.NEXT_PUBLIC_ENABLE_WEBSOCKET !== 'true') {
+      if (!this._wsDisabledLogged) {
+        console.info('[notifications] WebSocket disabled — using HTTP polling fallback');
+        this._wsDisabledLogged = true;
+      }
+      return;
+    }
     this.token = accessToken;
     this.intentionalClose = false;
     this.doConnect();
