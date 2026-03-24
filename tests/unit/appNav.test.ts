@@ -19,7 +19,13 @@ describe("filterNavForPersona", () => {
     expect(labels).toContain("Maintenance");
     expect(labels).toContain("Documents");
     expect(labels).toContain("Payments");
-    expect(labels).toContain("Reports");
+  });
+
+  test("owner does NOT see hidden Intelligence items (Reports, Growth)", () => {
+    const items = filterNavForPersona("owner");
+    const labels = items.map((i) => i.label);
+    expect(labels).not.toContain("Reports");
+    expect(labels).not.toContain("Growth");
   });
 
   test("tenant does not see owner-only sections", () => {
@@ -75,6 +81,13 @@ describe("filterNavForPersona", () => {
     for (const persona of ["owner", "tenant"] as const) {
       const items = filterNavForPersona(persona);
       expect(items.filter((i) => i.isFuture)).toHaveLength(0);
+    }
+  });
+
+  test("hidden items are excluded", () => {
+    for (const persona of ["owner", "tenant"] as const) {
+      const items = filterNavForPersona(persona);
+      expect(items.filter((i) => i.hidden)).toHaveLength(0);
     }
   });
 
