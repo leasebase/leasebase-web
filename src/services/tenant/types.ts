@@ -151,11 +151,6 @@ export interface DocumentRow {
   updated_at: string;
 }
 
-export interface CheckoutResult {
-  checkoutUrl: string;
-  sessionId: string;
-}
-
 export interface PaymentMethodRow {
   id: string;
   type: string;
