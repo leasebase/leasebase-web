@@ -53,6 +53,9 @@ jest.mock("lucide-react", () => {
     CheckCircle: icon("CheckCircle"),
     Info: icon("Info"),
     X: icon("X"),
+    MoreVertical: icon("MoreVertical"),
+    Pencil: icon("Pencil"),
+    ArrowLeft: icon("ArrowLeft"),
   };
 });
 
@@ -213,7 +216,7 @@ describe("Owner Portfolio Integration", () => {
       PropertyDetailPage = mod.default;
     });
 
-    test("loads property detail with Overview/Units/Edit tabs", async () => {
+    test("loads property detail with Overview/Units tabs and overflow menu", async () => {
       mockFetchProperty.mockResolvedValueOnce({ data: property1 });
       mockFetchUnitsForProperty.mockResolvedValueOnce({
         data: [unit1, unit2],
@@ -230,10 +233,12 @@ describe("Owner Portfolio Integration", () => {
       // Breadcrumb
       expect(screen.getByText("Properties")).toBeInTheDocument();
 
-      // Tabs present
+      // Content tabs present (Edit is no longer a tab)
       expect(screen.getByText("Overview")).toBeInTheDocument();
       expect(screen.getByText("Units (2)")).toBeInTheDocument();
-      expect(screen.getByText("Edit")).toBeInTheDocument();
+
+      // Edit moved to overflow menu
+      expect(screen.getByLabelText("Property actions")).toBeInTheDocument();
     });
 
     test("Units tab shows units table with data", async () => {
