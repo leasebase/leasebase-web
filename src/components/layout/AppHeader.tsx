@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -20,6 +20,9 @@ import { DropdownMenu, type DropdownMenuItem } from "@/components/ui/DropdownMen
 import { Logo } from "@/components/Logo";
 import { useAppShell } from "./AppShell";
 import { apiRequest } from "@/lib/api/client";
+import { notificationWs } from "@/lib/notifications/ws";
+import { useToast } from "@/components/ui/Toast";
+import { getAccessToken } from "@/lib/auth/tokens";
 
 /* ─── AppHeader ─── */
 
@@ -27,13 +30,15 @@ export interface AppHeaderProps {
   onOpenCommandPalette?: () => void;
 }
 
-const POLL_INTERVAL = 60_000; // 60 seconds
+const POLL_INTERVAL = 60_000; // 60 seconds (fallback when WS disconnected)
 
 export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
   const router = useRouter();
   const { user } = authStore();
   const { mobileOpen, setMobileOpen, hamburgerRef } = useAppShell();
   const [unreadCount, setUnreadCount] = useState(0);
+  const { toast } = useToast();
+  const wsConnected = useRef(false);
 
   const fetchUnread = useCallback(async () => {
     try {
@@ -44,9 +49,50 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
     } catch { /* silent */ }
   }, []);
 
+  // ── WebSocket: connect on mount, subscribe to events ─────────────────
   useEffect(() => {
-    fetchUnread();
-    const id = setInterval(fetchUnread, POLL_INTERVAL);
+    const token = getAccessToken();
+    if (token) {
+      notificationWs.connect(token);
+    }
+
+    const unsubs: (() => void)[] = [];
+
+    unsubs.push(notificationWs.on('connected', () => {
+      wsConnected.current = true;
+    }));
+
+    unsubs.push(notificationWs.on('disconnected', () => {
+      wsConnected.current = false;
+    }));
+
+    unsubs.push(notificationWs.on('notification.unread_count_updated', (msg: any) => {
+      if (typeof msg.count === 'number') {
+        setUnreadCount(msg.count);
+      }
+    }));
+
+    unsubs.push(notificationWs.on('notification.created', (msg: any) => {
+      const n = msg.notification;
+      if (n?.title) {
+        toast('info', n.title);
+      }
+    }));
+
+    return () => {
+      unsubs.forEach((fn) => fn());
+      notificationWs.disconnect();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Polling fallback: only when WS is not connected ─────────────────
+  useEffect(() => {
+    fetchUnread(); // initial fetch regardless
+    const id = setInterval(() => {
+      if (!wsConnected.current) {
+        fetchUnread();
+      }
+    }, POLL_INTERVAL);
     return () => clearInterval(id);
   }, [fetchUnread]);
 
