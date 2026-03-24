@@ -11,7 +11,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Tabs, type TabItem } from "@/components/ui/Tabs";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { DoorOpen, Plus } from "lucide-react";
+import { DoorOpen, Plus, MoreVertical, Pencil, ArrowLeft } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchProperty, fetchUnitsForProperty, updateProperty, createUnit } from "@/services/properties/propertyService";
 import type { PropertyRow, UnitRow, CreatePropertyDTO, CreateUnitDTO } from "@/services/properties/types";
@@ -19,6 +19,7 @@ import { PropertyForm } from "@/components/properties/PropertyForm";
 import { UnitForm } from "@/components/properties/UnitForm";
 import { UnitsTable } from "@/components/properties/UnitsTable";
 import { PropertyDetailSkeleton } from "@/components/properties/PropertyDetailSkeleton";
+import { DropdownMenu } from "@/components/ui/DropdownMenu";
 
 /* ── Owner tab panels ── */
 
@@ -159,6 +160,7 @@ function OwnerPropertyDetail() {
   const [units, setUnits] = useState<UnitRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pageMode, setPageMode] = useState<"view" | "edit">("view");
 
   const loadData = async () => {
     try {
@@ -211,11 +213,6 @@ function OwnerPropertyDetail() {
           />
         ),
       },
-      {
-        id: "edit",
-        label: "Edit",
-        content: <OwnerEditPanel property={property} onSaved={handlePropertySaved} />,
-      },
     ];
   }, [property, units]);
 
@@ -246,8 +243,41 @@ function OwnerPropertyDetail() {
       <PageHeader
         title={property.name}
         description={`${property.address_line1}, ${property.city}, ${property.state} ${property.postal_code}`}
+        actions={
+          <DropdownMenu
+            trigger={
+              <button
+                className="rounded-md border border-slate-200 bg-white p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors"
+                aria-label="Property actions"
+              >
+                <MoreVertical size={16} />
+              </button>
+            }
+            items={[
+              {
+                id: "edit",
+                label: "Edit property",
+                icon: <Pencil size={14} />,
+                onClick: () => setPageMode("edit"),
+              },
+            ]}
+          />
+        }
       />
-      <Tabs items={tabs} defaultActiveId="overview" className="mt-6" />
+
+      {pageMode === "edit" ? (
+        <div className="mt-6">
+          <button
+            onClick={() => setPageMode("view")}
+            className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+          >
+            <ArrowLeft size={14} /> Back
+          </button>
+          <OwnerEditPanel property={property} onSaved={handlePropertySaved} />
+        </div>
+      ) : (
+        <Tabs items={tabs} defaultActiveId="overview" className="mt-6" />
+      )}
     </>
   );
 }

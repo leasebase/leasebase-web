@@ -28,12 +28,13 @@ import { InviteTenantModal } from "@/components/invitations/InviteTenantModal";
 import { LeaseForm } from "@/components/leases/LeaseForm";
 import { LeaseDetailSkeleton } from "@/components/leases/LeaseDetailSkeleton";
 import { DocumentUploadModal } from "@/components/documents/DocumentUploadModal";
-import { Mail, RefreshCw, CheckCircle2, AlertCircle, FileCheck, Upload, Paperclip } from "lucide-react";
+import { Mail, RefreshCw, CheckCircle2, AlertCircle, FileCheck, Upload, Paperclip, MoreVertical, Pencil, ArrowLeft } from "lucide-react";
 import {
   fetchLeaseDocuments,
   confirmLeaseDocument,
   type DocumentRow,
 } from "@/services/documents/documentApiService";
+import { DropdownMenu } from "@/components/ui/DropdownMenu";
 
 /* ── Helpers ── */
 
@@ -459,6 +460,7 @@ function LeaseDetailContent() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [activateLoading, setActivateLoading] = useState(false);
   const [activateError, setActivateError] = useState<string | null>(null);
+  const [pageMode, setPageMode] = useState<"view" | "edit">("view");
 
   // Renew form state
   const [renewStartDate, setRenewStartDate] = useState("");
@@ -598,11 +600,6 @@ function LeaseDetailContent() {
         ),
       },
       {
-        id: "edit",
-        label: "Edit",
-        content: <EditPanel lease={lease} onSaved={handleSaved} />,
-      },
-      {
         id: "documents",
         label: "Documents",
         content: (
@@ -658,8 +655,43 @@ function LeaseDetailContent() {
         ]}
         className="mb-4"
       />
-      <PageHeader title={title} />
-      <Tabs items={tabs} defaultActiveId="overview" className="mt-6" />
+      <PageHeader
+        title={title}
+        actions={
+          <DropdownMenu
+            trigger={
+              <button
+                className="rounded-md border border-slate-200 bg-white p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors"
+                aria-label="Lease actions"
+              >
+                <MoreVertical size={16} />
+              </button>
+            }
+            items={[
+              {
+                id: "edit",
+                label: "Edit lease",
+                icon: <Pencil size={14} />,
+                onClick: () => setPageMode("edit"),
+              },
+            ]}
+          />
+        }
+      />
+
+      {pageMode === "edit" ? (
+        <div className="mt-6">
+          <button
+            onClick={() => setPageMode("view")}
+            className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+          >
+            <ArrowLeft size={14} /> Back
+          </button>
+          <EditPanel lease={lease} onSaved={handleSaved} />
+        </div>
+      ) : (
+        <Tabs items={tabs} defaultActiveId="overview" className="mt-6" />
+      )}
 
       {/* Terminate confirmation modal */}
       <Modal
