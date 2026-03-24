@@ -21,6 +21,8 @@
     "docs:preview": "DOCS_PREVIEW_ONLY=true npx tsx docs-engine/analyzeRepo.ts"
   },
   "dependencies": {
+    "@stripe/connect-js": "^3.3.34",
+    "@stripe/react-connect-js": "^3.3.33",
     "@stripe/react-stripe-js": "^5.6.1",
     "@stripe/stripe-js": "^8.10.0",
     "aws-amplify": "^6.16.2",
