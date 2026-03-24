@@ -118,7 +118,7 @@ export default function Page() {
           <EmptyState
             icon={<Banknote size={48} strokeWidth={1.5} />}
             title="No active lease found"
-            description="You need an active lease before you can make a payment. Contact your property manager if you believe this is an error."
+            description="You need an active lease before you can make a payment. Contact your property owner if you believe this is an error."
           />
         ) : (
           <Card>
@@ -161,7 +161,13 @@ export default function Page() {
                   <div className="flex justify-between">
                     <dt className="text-slate-400">Billing Period</dt>
                     <dd className="text-slate-900">
-                      {new Date(currentCharge.billing_period + "T00:00:00").toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                      {(() => {
+                        const raw = currentCharge.billing_period;
+                        // Normalize: strip any time/tz suffix so we always parse a plain date
+                        const dateOnly = raw.length > 10 ? raw.slice(0, 10) : raw;
+                        const d = new Date(dateOnly + "T00:00:00");
+                        return isNaN(d.getTime()) ? "—" : d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+                      })()}
                     </dd>
                   </div>
                 )}

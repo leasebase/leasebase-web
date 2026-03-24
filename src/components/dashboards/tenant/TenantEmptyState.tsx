@@ -24,10 +24,10 @@ const LEASE_STATUS_LABELS: Record<string, string> = {
 
 /** Next-step guidance per pre-active status. */
 const NEXT_STEP_BY_STATUS: Record<string, string> = {
-  DRAFT:        "Your property manager is finishing preparing your lease. No action needed from you yet.",
-  ASSIGNED:     "Your property manager is reviewing the lease details. You'll receive an invitation to review and sign soon.",
-  INVITED:      "Your property manager has sent the lease for your review. Check your email for next steps, or contact them directly.",
-  ACKNOWLEDGED: "You've acknowledged the lease. Your property manager is finalizing activation. You'll see your full dashboard once it's active.",
+  DRAFT:        "Your property owner is finishing preparing your lease. No action needed from you yet.",
+  ASSIGNED:     "Your property owner is reviewing the lease details. You'll receive an invitation to review and sign soon.",
+  INVITED:      "Your property owner has sent the lease for your review. Check your email for next steps, or contact them directly.",
+  ACKNOWLEDGED: "You've acknowledged the lease. Your property owner is finalizing activation. You'll see your full dashboard once it's active.",
 };
 
 export function TenantEmptyState({ stage, lease }: TenantEmptyStateProps) {
@@ -38,7 +38,7 @@ export function TenantEmptyState({ stage, lease }: TenantEmptyStateProps) {
     const propertyName = lease.property_name;
     const unitNumber   = lease.unit_number;
     const statusLabel  = LEASE_STATUS_LABELS[lease.status] ?? lease.status;
-    const nextStep     = NEXT_STEP_BY_STATUS[lease.status] ?? "Your property manager is finalizing the details.";
+    const nextStep     = NEXT_STEP_BY_STATUS[lease.status] ?? "Your property owner is finalizing the details.";
     const hasAddress   = lease.property_address;
 
     return (
@@ -109,10 +109,10 @@ export function TenantEmptyState({ stage, lease }: TenantEmptyStateProps) {
         <Home size={44} strokeWidth={1.5} className="mx-auto mb-4 text-slate-400" />
         <h2 className="text-xl font-semibold text-slate-100">Your lease is being finalized</h2>
         <p className="mt-2 text-sm text-slate-400">
-          Your property manager is setting up your lease. Once it&apos;s active, you&apos;ll see your full dashboard here.
+          Your property owner is setting up your lease. Once it&apos;s active, you&apos;ll see your full dashboard here.
         </p>
         <p className="mt-4 text-sm text-slate-500">
-          Questions? Reach out to your property manager directly.
+          Questions? Reach out to your property owner directly.
         </p>
       </div>
     );
@@ -130,7 +130,7 @@ export function TenantEmptyState({ stage, lease }: TenantEmptyStateProps) {
         </p>
         <p className="mt-4 rounded-lg border border-amber-800/50 bg-amber-950/30 px-4 py-3 text-xs text-amber-300">
           If you just accepted an invitation, try refreshing in a moment.
-          If this continues, contact your property manager for help.
+          If this continues, contact your property owner for help.
         </p>
       </div>
     );
@@ -142,7 +142,7 @@ export function TenantEmptyState({ stage, lease }: TenantEmptyStateProps) {
         <Home size={48} strokeWidth={1.5} className="mx-auto mb-4 text-slate-400" />
         <h2 className="text-xl font-semibold text-slate-100">Your lease is being set up</h2>
         <p className="mt-2 text-sm text-slate-400">
-          Your account is ready, and your property manager is finalizing your lease details.
+          Your account is ready, and your property owner is finalizing your lease details.
           Once your lease is active, you&apos;ll see your rent, payment history, and more right here.
         </p>
       </div>
@@ -156,7 +156,7 @@ export function TenantEmptyState({ stage, lease }: TenantEmptyStateProps) {
       <h2 className="text-xl font-semibold text-slate-100">Your lease has ended</h2>
       <p className="mt-2 text-sm text-slate-400">
         Your lease is no longer active. If you&apos;re expecting a renewal, please contact your
-        property manager. Some features may be limited until a new lease is set up.
+        property owner. Some features may be limited until a new lease is set up.
       </p>
       {lease && (lease.property_name || lease.unit_number) && (
         <div className="mt-5 rounded-lg border border-slate-800 bg-slate-900/70 p-4 text-left text-sm">
