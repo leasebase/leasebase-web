@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { UserX, UserCheck, FileText, CreditCard, Wrench } from "lucide-react";
+import { UserX, UserCheck, FileText, CreditCard, Wrench, AlertTriangle } from "lucide-react";
 import {
   fetchTenant, deactivateTenant, reactivateTenant,
   fetchTenantLeases, fetchTenantPayments, fetchTenantMaintenance,
@@ -39,6 +39,7 @@ function OwnerTenantDetail() {
   const [payments, setPayments] = useState<PaymentHistoryRow[]>([]);
   const [maintenance, setMaintenance] = useState<MaintenanceHistoryRow[]>([]);
   const [tabLoading, setTabLoading] = useState(false);
+  const [tabError, setTabError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,11 +58,16 @@ function OwnerTenantDetail() {
     if (activeTab === "profile" || !tenant) return;
     let cancelled = false;
     setTabLoading(true);
+    setTabError(null);
     const promise =
       activeTab === "leases" ? fetchTenantLeases(id).then((r) => !cancelled && setLeases(r.data))
       : activeTab === "payments" ? fetchTenantPayments(id).then((r) => !cancelled && setPayments(r.data))
       : fetchTenantMaintenance(id).then((r) => !cancelled && setMaintenance(r.data));
-    promise.catch(() => {}).finally(() => !cancelled && setTabLoading(false));
+    promise
+      .catch((err) => {
+        if (!cancelled) setTabError(err?.message || `Failed to load ${activeTab} data`);
+      })
+      .finally(() => !cancelled && setTabLoading(false));
     return () => { cancelled = true; };
   }, [activeTab, id, tenant]);
 
@@ -159,7 +165,14 @@ function OwnerTenantDetail() {
           </div>
         )}
 
-        {activeTab === "leases" && (
+        {tabError && !tabLoading && (
+          <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertTriangle size={16} className="shrink-0" />
+            Unable to load {activeTab} data. Please try again.
+          </div>
+        )}
+
+        {activeTab === "leases" && !tabError && (
           tabLoading ? <Skeleton variant="text" className="h-20 w-full rounded-lg" /> :
           leases.length === 0 ? <EmptyState icon={<FileText size={36} strokeWidth={1.5} />} title="No lease history" description="This tenant has no leases on record." /> : (
             <div className="space-y-2">
@@ -181,7 +194,7 @@ function OwnerTenantDetail() {
           )
         )}
 
-        {activeTab === "payments" && (
+        {activeTab === "payments" && !tabError && (
           tabLoading ? <Skeleton variant="text" className="h-20 w-full rounded-lg" /> :
           payments.length === 0 ? <EmptyState icon={<CreditCard size={36} strokeWidth={1.5} />} title="No payment history" description="No payments found for this tenant." /> : (
             <div className="space-y-2">
@@ -198,7 +211,7 @@ function OwnerTenantDetail() {
           )
         )}
 
-        {activeTab === "maintenance" && (
+        {activeTab === "maintenance" && !tabError && (
           tabLoading ? <Skeleton variant="text" className="h-20 w-full rounded-lg" /> :
           maintenance.length === 0 ? <EmptyState icon={<Wrench size={36} strokeWidth={1.5} />} title="No maintenance requests" description="No work orders found for this tenant." /> : (
             <div className="space-y-2">
