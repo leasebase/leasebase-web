@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -216,7 +217,11 @@ function OwnerTenantDetail() {
           maintenance.length === 0 ? <EmptyState icon={<Wrench size={36} strokeWidth={1.5} />} title="No maintenance requests" description="No work orders found for this tenant." /> : (
             <div className="space-y-2">
               {maintenance.map((m) => (
-                <div key={m.id} className="rounded-lg border border-slate-200 bg-white p-4">
+                <Link
+                  key={m.id}
+                  href={`/app/maintenance/${m.id}`}
+                  className="block rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                >
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-slate-900">{m.category}</p>
@@ -227,7 +232,7 @@ function OwnerTenantDetail() {
                       <p className="text-xs text-slate-500 mt-1">{m.priority} · {new Date(m.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )
