@@ -26,6 +26,7 @@ jest.mock("@/services/maintenance/maintenanceApiService", () => ({
   assignMaintenanceWorkOrder: (...args: any[]) => mockAssign(...args),
   cancelMaintenanceWorkOrder: jest.fn(),
   uploadMaintenanceAttachment: jest.fn(),
+  fetchVendors: jest.fn().mockResolvedValue({ data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } }),
 }));
 
 jest.mock("next/navigation", () => ({
