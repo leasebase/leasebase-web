@@ -9,6 +9,7 @@ import { Bell } from "lucide-react";
 import Link from "next/link";
 import { fetchTenantNotifications, markNotificationRead } from "@/services/tenant/adapters/notificationAdapter";
 import type { NotificationRow } from "@/services/tenant/types";
+import { notificationWs } from "@/lib/notifications/ws";
 
 /* ── Category filter helpers ────────────────────────────────────────────── */
 
@@ -73,6 +74,20 @@ export default function Page() {
     }
     load();
     return () => { cancelled = true; };
+  }, []);
+
+  // Real-time: prepend new notifications from WebSocket
+  useEffect(() => {
+    const unsub = notificationWs.on('notification.created', (msg: any) => {
+      const n = msg.notification as NotificationRow | undefined;
+      if (!n) return;
+      setNotifications((prev) => {
+        // Deduplicate by id
+        if (prev.some((existing) => existing.id === n.id)) return prev;
+        return [n, ...prev];
+      });
+    });
+    return unsub;
   }, []);
 
   const handleMarkRead = useCallback(async (id: string) => {
