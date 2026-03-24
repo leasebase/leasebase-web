@@ -57,11 +57,18 @@ export async function fetchTenantCharges(): Promise<DomainResult<TenantChargeRow
   }
 }
 
+/** Error code returned alongside DomainResult for checkout failures. */
+export type CheckoutErrorCode = "NO_PAYMENT_ACCOUNT" | "NO_RENT_CONFIGURED" | "ALREADY_PAID" | "PAYMENT_IN_PROGRESS" | "STRIPE_NOT_CONFIGURED" | null;
+
+export interface CheckoutDomainResult extends DomainResult<CheckoutResult | null> {
+  errorCode: CheckoutErrorCode;
+}
+
 /** Create a Stripe Checkout Session for rent payment */
 export async function createCheckoutSession(
   returnUrl: string,
   cancelUrl: string,
-): Promise<DomainResult<CheckoutResult | null>> {
+): Promise<CheckoutDomainResult> {
   try {
     const res = await apiRequest<{ data: CheckoutResult }>({
       path: "api/payments/checkout",
@@ -69,12 +76,27 @@ export async function createCheckoutSession(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ returnUrl, cancelUrl }),
     });
-    return { data: res.data, source: "live", error: null };
+    return { data: res.data, source: "live", error: null, errorCode: null };
   } catch (e: any) {
+    // Extract error code from backend response if available.
+    // apiRequest throws Error with body.error.message as the message.
+    // We parse the error code from a structured checkout error response.
+    let errorCode: CheckoutErrorCode = null;
+    const msg: string = e?.message || "";
+    if (msg.includes("not enabled payments") || msg.includes("not set up payments")) {
+      errorCode = "NO_PAYMENT_ACCOUNT";
+    } else if (msg.includes("not configured for this lease")) {
+      errorCode = "NO_RENT_CONFIGURED";
+    } else if (msg.includes("already been paid")) {
+      errorCode = "ALREADY_PAID";
+    } else if (msg.includes("already in progress")) {
+      errorCode = "PAYMENT_IN_PROGRESS";
+    }
     return {
       data: null,
       source: "unavailable",
       error: e?.message || "Failed to create checkout session",
+      errorCode,
     };
   }
 }
