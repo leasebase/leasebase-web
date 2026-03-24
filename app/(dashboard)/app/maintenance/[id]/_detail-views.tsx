@@ -17,9 +17,11 @@ import {
   postMaintenanceComment,
   updateMaintenanceStatus,
   assignMaintenanceWorkOrder,
+  fetchVendors,
   type MaintenanceWorkOrder,
   type MaintenanceAttachment,
   type TimelineEntry,
+  type Vendor,
 } from "@/services/maintenance/maintenanceApiService";
 import {
   fetchMaintenanceDetail,
@@ -163,6 +165,7 @@ function TimelineIcon({ eventType }: { eventType: string }) {
     case "CREATED": return <Wrench size={14} className="text-brand-500" />;
     case "STATUS_CHANGED": return <ArrowRight size={14} className="text-blue-500" />;
     case "ASSIGNED": return <User size={14} className="text-purple-500" />;
+    case "VENDOR_ASSIGNED": return <User size={14} className="text-purple-600" />;
     case "COMMENT_ADDED": return <MessageSquare size={14} className="text-slate-500" />;
     case "ATTACHMENT_ADDED": return <Paperclip size={14} className="text-emerald-500" />;
     default: return <Clock size={14} className="text-slate-400" />;
@@ -179,6 +182,10 @@ function timelineLabel(entry: { event_type: string; actor_name: string; metadata
     case "ASSIGNED": {
       const name = (entry.metadata.assigneeName as string) || "someone";
       return `${entry.actor_name} assigned to ${name}`;
+    }
+    case "VENDOR_ASSIGNED": {
+      const vName = (entry.metadata.assigneeName as string) || "a vendor";
+      return `${entry.actor_name} assigned to vendor: ${vName}`;
     }
     case "COMMENT_ADDED": return entry.actor_name;
     case "ATTACHMENT_ADDED": {
@@ -361,24 +368,35 @@ export function ManagerMaintenanceDetail() {
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
-  const [assigneeType, setAssigneeType] = useState<"self" | "external">("self");
+  const [assigneeType, setAssigneeType] = useState<"self" | "external" | "vendor">("self");
   const [externalName, setExternalName] = useState("");
+  const [selectedVendorId, setSelectedVendorId] = useState("");
+  const [vendors, setVendors] = useState<Vendor[]>([]);
   const [assigning, setAssigning] = useState(false);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const [detailRes, timelineRes, attachRes] = await Promise.all([
+      const [detailRes, timelineRes, attachRes, vendorsRes] = await Promise.all([
         fetchManagerDetail(id), fetchManagerTimeline(id), fetchManagerAttachments(id),
+        fetchVendors({ limit: 100 }),
       ]);
       setItem(detailRes.data);
       setTimeline(timelineRes.data);
       setAttachments(attachRes.data);
+      setVendors(vendorsRes.data);
       if (detailRes.data.assignee_name) {
-        const isSelf = detailRes.data.assignee_id === user?.id;
-        setAssigneeType(isSelf ? "self" : "external");
-        if (!isSelf) setExternalName(detailRes.data.assignee_name || "");
+        const wo = detailRes.data as any;
+        if (wo.vendor_id) {
+          setAssigneeType("vendor");
+          setSelectedVendorId(wo.vendor_id);
+        } else if (detailRes.data.assignee_id === user?.id) {
+          setAssigneeType("self");
+        } else {
+          setAssigneeType("external");
+          setExternalName(detailRes.data.assignee_name || "");
+        }
       }
     } catch (e: any) { setError(e?.message || "Failed to load work order"); }
     finally { setIsLoading(false); }
@@ -414,6 +432,9 @@ export function ManagerMaintenanceDetail() {
     try {
       if (assigneeType === "self") {
         await assignMaintenanceWorkOrder(id, { assigneeId: user?.id, assigneeName: user?.name || "Owner", assigneeType: "self" });
+      } else if (assigneeType === "vendor") {
+        if (!selectedVendorId) { setAssigning(false); return; }
+        await assignMaintenanceWorkOrder(id, { vendorId: selectedVendorId, assigneeType: "vendor" });
       } else {
         const name = externalName.trim();
         if (!name) { setAssigning(false); return; }
@@ -476,15 +497,23 @@ export function ManagerMaintenanceDetail() {
               </p>
             )}
             <div className="flex items-center gap-2 flex-wrap">
-              <select value={assigneeType} onChange={(e) => setAssigneeType(e.target.value as "self" | "external")}
+              <select value={assigneeType} onChange={(e) => setAssigneeType(e.target.value as "self" | "external" | "vendor")}
                 className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Assignee type">
                 <option value="self">Self (me)</option>
                 <option value="external">External contractor</option>
+                {vendors.length > 0 && <option value="vendor">Vendor</option>}
               </select>
               {assigneeType === "external" && (
                 <input type="text" value={externalName} onChange={(e) => setExternalName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAssign()} placeholder="Contractor name…" aria-label="External contractor name"
                   className="w-48 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+              )}
+              {assigneeType === "vendor" && (
+                <select value={selectedVendorId} onChange={(e) => setSelectedVendorId(e.target.value)}
+                  className="w-56 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Select vendor">
+                  <option value="">Select vendor…</option>
+                  {vendors.map((v) => <option key={v.id} value={v.id}>{v.name}{v.is_preferred ? " ★" : ""}{v.specialty ? ` (${v.specialty})` : ""}</option>)}
+                </select>
               )}
               <Button variant="secondary" size="sm" icon={<UserPlus size={14} />} loading={assigning} onClick={handleAssign}>Assign</Button>
             </div>

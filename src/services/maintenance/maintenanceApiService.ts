@@ -84,6 +84,21 @@ export interface TimelineEntry {
   created_at: string;
 }
 
+export interface Vendor {
+  id: string;
+  organization_id: string;
+  name: string;
+  company: string | null;
+  email: string | null;
+  phone: string | null;
+  specialty: string | null;
+  notes: string | null;
+  is_preferred: boolean;
+  status: "ACTIVE" | "ARCHIVED";
+  created_at: string;
+  updated_at: string;
+}
+
 /** Server-side aggregated counts by status from GET /api/maintenance/stats. */
 export interface MaintenanceStats {
   submitted: number;
@@ -161,10 +176,10 @@ export async function updateMaintenanceStatus(
   });
 }
 
-/** Assign a work order. Requires OWNER. v2: supports name + type. */
+/** Assign a work order. Requires OWNER. v3: supports vendor assignment. */
 export async function assignMaintenanceWorkOrder(
   id: string,
-  assignment: { assigneeId?: string; assigneeName?: string; assigneeType?: "self" | "external" },
+  assignment: { assigneeId?: string; assigneeName?: string; assigneeType?: "self" | "external" | "vendor"; vendorId?: string },
 ): Promise<{ data: MaintenanceWorkOrder }> {
   return apiRequest<{ data: MaintenanceWorkOrder }>({
     path: `api/maintenance/${id}/assign`,
@@ -209,6 +224,60 @@ export async function fetchMaintenanceTimeline(
   id: string,
 ): Promise<{ data: TimelineEntry[] }> {
   return apiRequest<{ data: TimelineEntry[] }>({ path: `api/maintenance/${id}/timeline` });
+}
+
+/* ── Vendor API ── */
+
+/** Fetch vendors for the org. Requires OWNER. */
+export async function fetchVendors(
+  filters: { specialty?: string; status?: string; search?: string; page?: number; limit?: number } = {},
+): Promise<PaginatedResponse<Vendor>> {
+  const params = new URLSearchParams();
+  if (filters.specialty) params.set("specialty", filters.specialty);
+  if (filters.status) params.set("status", filters.status);
+  if (filters.search) params.set("search", filters.search);
+  if (filters.page) params.set("page", String(filters.page));
+  if (filters.limit) params.set("limit", String(filters.limit));
+  const qs = params.toString();
+  return apiRequest<PaginatedResponse<Vendor>>({ path: qs ? `api/maintenance/vendors?${qs}` : "api/maintenance/vendors" });
+}
+
+/** Fetch a single vendor. */
+export async function fetchVendor(id: string): Promise<{ data: Vendor }> {
+  return apiRequest<{ data: Vendor }>({ path: `api/maintenance/vendors/${id}` });
+}
+
+/** Create a vendor. */
+export async function createVendor(
+  vendor: { name: string; company?: string; email?: string; phone?: string; specialty?: string; notes?: string; isPreferred?: boolean },
+): Promise<{ data: Vendor }> {
+  return apiRequest<{ data: Vendor }>({
+    path: "api/maintenance/vendors",
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(vendor),
+  });
+}
+
+/** Update a vendor. */
+export async function updateVendor(
+  id: string,
+  fields: Partial<{ name: string; company: string | null; email: string | null; phone: string | null; specialty: string | null; notes: string | null; isPreferred: boolean }>,
+): Promise<{ data: Vendor }> {
+  return apiRequest<{ data: Vendor }>({
+    path: `api/maintenance/vendors/${id}`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(fields),
+  });
+}
+
+/** Archive (soft-delete) a vendor. */
+export async function archiveVendor(id: string): Promise<{ data: Vendor }> {
+  return apiRequest<{ data: Vendor }>({
+    path: `api/maintenance/vendors/${id}`,
+    method: "DELETE",
+  });
 }
 
 /** Update work order fields. Requires OWNER. */
