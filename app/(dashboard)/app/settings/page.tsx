@@ -4,11 +4,12 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Modal } from "@/components/ui/Modal";
-import { Pencil, Check, X, Palette, CreditCard, Plus, Bell, ChevronRight } from "lucide-react";
+import { Pencil, Check, X, Palette, CreditCard, Plus, Bell, ChevronRight, Zap, ExternalLink, CheckCircle, Loader2 } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchUserSettings, updateUserSettings } from "@/services/settings/adapters";
 import type { UserSettings } from "@/services/settings/types";
@@ -17,6 +18,12 @@ import {
   type BillingStatus,
 } from "@/services/owner/adapters/billingAdapter";
 import { BillingSetupForm } from "@/components/billing/BillingSetupForm";
+import {
+  fetchConnectStatus,
+  startOnboarding,
+  getDashboardLink,
+  type ConnectStatus,
+} from "@/services/payments/ownerPaymentAdapter";
 
 /**
  * Settings page — application behavior, appearance, billing.
@@ -47,6 +54,12 @@ export default function SettingsPage() {
   const [billingError, setBillingError] = useState<string | null>(null);
   const [billingModalOpen, setBillingModalOpen] = useState(false);
 
+  // Stripe Connect onboarding state
+  const [connectStatus, setConnectStatus] = useState<ConnectStatus | null>(null);
+  const [connectLoading, setConnectLoading] = useState(isOwner);
+  const [connectError, setConnectError] = useState<string | null>(null);
+  const [connectActionLoading, setConnectActionLoading] = useState(false);
+
   // Load settings
   useEffect(() => {
     let cancelled = false;
@@ -68,10 +81,42 @@ export default function SettingsPage() {
     setBillingLoading(false);
   }, []);
 
+  // Load Stripe Connect status
+  const loadConnectStatus = useCallback(async () => {
+    setConnectLoading(true); setConnectError(null);
+    const result = await fetchConnectStatus();
+    setConnectStatus(result.data);
+    if (result.error) setConnectError(result.error);
+    setConnectLoading(false);
+  }, []);
+
   useEffect(() => {
     if (!isOwner) return;
     loadBillingStatus();
-  }, [isOwner, loadBillingStatus]);
+    loadConnectStatus();
+  }, [isOwner, loadBillingStatus, loadConnectStatus]);
+
+  const handleStartOnboarding = useCallback(async () => {
+    setConnectActionLoading(true); setConnectError(null);
+    const result = await startOnboarding();
+    if (result.data?.url) {
+      window.location.href = result.data.url;
+    } else {
+      setConnectError(result.error || "Failed to start payment setup");
+    }
+    setConnectActionLoading(false);
+  }, []);
+
+  const handleOpenDashboard = useCallback(async () => {
+    setConnectActionLoading(true); setConnectError(null);
+    const result = await getDashboardLink();
+    if (result.data?.url) {
+      window.open(result.data.url, "_blank");
+    } else {
+      setConnectError(result.error || "Failed to open Stripe dashboard");
+    }
+    setConnectActionLoading(false);
+  }, []);
 
   const startEditAppearance = useCallback(() => {
     setThemeMode(settings?.theme_mode ?? "system");
@@ -181,6 +226,94 @@ export default function SettingsPage() {
             </CardBody>
           </Card>
         </Link>
+
+        {/* ── Accept Payments (Stripe Connect) ── */}
+        {isOwner && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Zap size={14} className="text-slate-500" />
+                  <h2 className="text-sm font-semibold text-slate-900">Accept Payments</h2>
+                </div>
+                {!connectLoading && connectStatus?.status === "ACTIVE" && (
+                  <Badge variant="success">Active</Badge>
+                )}
+              </div>
+            </CardHeader>
+            <CardBody>
+              {connectLoading ? (
+                <div className="space-y-3"><Skeleton variant="text" className="h-4 w-48" /><Skeleton variant="text" className="h-4 w-36" /></div>
+              ) : connectError && !connectStatus ? (
+                <p className="text-xs text-slate-400">Could not load payment setup status.</p>
+              ) : connectStatus?.status === "ACTIVE" ? (
+                <div>
+                  <div className="mb-3 flex items-start gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2">
+                    <CheckCircle size={14} className="mt-0.5 shrink-0 text-emerald-600" />
+                    <p className="text-sm text-emerald-800">Payments are enabled. Tenants can pay rent through your portal.</p>
+                  </div>
+                  <dl className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <dt className="text-slate-400">Charges</dt>
+                      <dd className="text-slate-900">{connectStatus.charges_enabled ? "Enabled" : "Disabled"}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-slate-400">Payouts</dt>
+                      <dd className="text-slate-900">{connectStatus.payouts_enabled ? "Enabled" : "Disabled"}</dd>
+                    </div>
+                  </dl>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-3"
+                    onClick={handleOpenDashboard}
+                    loading={connectActionLoading}
+                    icon={<ExternalLink size={14} />}
+                  >
+                    Open Stripe Dashboard
+                  </Button>
+                </div>
+              ) : connectStatus?.status === "NOT_STARTED" || !connectStatus ? (
+                <div>
+                  <p className="text-sm text-slate-500">
+                    Set up Stripe to accept rent payments from your tenants. This takes a few minutes.
+                  </p>
+                  {connectError && <p className="mt-2 text-xs text-red-600">{connectError}</p>}
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="mt-3"
+                    onClick={handleStartOnboarding}
+                    loading={connectActionLoading}
+                    icon={<Zap size={14} />}
+                  >
+                    Enable Payments
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <div className="mb-3 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+                    <Loader2 size={14} className="mt-0.5 shrink-0 animate-spin text-amber-600" />
+                    <p className="text-sm text-amber-800">
+                      Payment setup is in progress. Complete the remaining steps with Stripe to start accepting payments.
+                    </p>
+                  </div>
+                  {connectError && <p className="mt-2 text-xs text-red-600">{connectError}</p>}
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="mt-3"
+                    onClick={handleStartOnboarding}
+                    loading={connectActionLoading}
+                    icon={<Zap size={14} />}
+                  >
+                    Continue Setup
+                  </Button>
+                </div>
+              )}
+            </CardBody>
+          </Card>
+        )}
 
         {/* ── Owner Billing ── */}
         {isOwner && (
