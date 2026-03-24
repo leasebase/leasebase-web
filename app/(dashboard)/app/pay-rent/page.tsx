@@ -37,6 +37,7 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paymentUnavailable, setPaymentUnavailable] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -85,6 +86,10 @@ export default function Page() {
         window.location.href = result.data.checkoutUrl;
       } else {
         setError(result.error || "Failed to create checkout session");
+        // Lock the button for non-retryable conditions
+        if (result.errorCode === "NO_PAYMENT_ACCOUNT" || result.errorCode === "NO_RENT_CONFIGURED") {
+          setPaymentUnavailable(true);
+        }
       }
     } catch {
       setError("An unexpected error occurred");
@@ -217,12 +222,13 @@ export default function Page() {
                 className="mt-6 w-full"
                 onClick={handlePayRent}
                 loading={isCheckingOut}
-                disabled={lease.status !== "ACTIVE" || chargeIsPaid || hasProcessing}
+                disabled={lease.status !== "ACTIVE" || chargeIsPaid || hasProcessing || paymentUnavailable}
                 icon={<Banknote size={16} />}
               >
                 {isCheckingOut ? "Redirecting to checkout…" :
                  chargeIsPaid ? "Paid" :
                  hasProcessing ? "Processing…" :
+                 paymentUnavailable ? "Payments unavailable" :
                  `Pay ${amountFormatted}`}
               </Button>
 
