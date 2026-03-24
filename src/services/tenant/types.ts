@@ -113,6 +113,27 @@ export interface WorkOrderCommentRow {
   created_at: string;
 }
 
+export interface WorkOrderAttachmentRow {
+  id: string;
+  work_order_id: string;
+  file_url: string;
+  file_type: string;
+  file_name: string;
+  uploaded_by_user_id: string;
+  uploader_name: string;
+  created_at: string;
+}
+
+export interface TimelineEntryRow {
+  id: string;
+  type: "event" | "comment";
+  event_type: string;
+  actor_user_id: string;
+  actor_name: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
 export interface DocumentRow {
   id: string;
   organization_id: string;
