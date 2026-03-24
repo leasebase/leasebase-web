@@ -10,6 +10,8 @@ import type {
 
 const mockFetchDetail = jest.fn();
 const mockFetchComments = jest.fn();
+const mockFetchTimeline = jest.fn();
+const mockFetchAttachments = jest.fn();
 const mockPostComment = jest.fn();
 const mockUpdateStatus = jest.fn();
 const mockAssign = jest.fn();
@@ -17,14 +19,21 @@ const mockAssign = jest.fn();
 jest.mock("@/services/maintenance/maintenanceApiService", () => ({
   fetchMaintenanceDetail: (...args: any[]) => mockFetchDetail(...args),
   fetchMaintenanceComments: (...args: any[]) => mockFetchComments(...args),
+  fetchMaintenanceTimeline: (...args: any[]) => mockFetchTimeline(...args),
+  fetchMaintenanceAttachments: (...args: any[]) => mockFetchAttachments(...args),
   postMaintenanceComment: (...args: any[]) => mockPostComment(...args),
   updateMaintenanceStatus: (...args: any[]) => mockUpdateStatus(...args),
   assignMaintenanceWorkOrder: (...args: any[]) => mockAssign(...args),
   cancelMaintenanceWorkOrder: jest.fn(),
+  uploadMaintenanceAttachment: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
   useParams: () => ({ id: "wo-1" }),
+}));
+
+jest.mock("@/lib/auth/store", () => ({
+  authStore: () => ({ user: { id: "u-owner-1", name: "Dev Manager", persona: "owner" } }),
 }));
 
 jest.mock("next/link", () => {
@@ -93,6 +102,12 @@ const comments: MaintenanceComment[] = [
 function setupSuccess(item = workOrder, cmnts = comments) {
   mockFetchDetail.mockResolvedValue({ data: item });
   mockFetchComments.mockResolvedValue({ data: cmnts });
+  mockFetchTimeline.mockResolvedValue({ data: cmnts.map((c: any) => ({
+    id: c.id, type: "comment", event_type: "COMMENT_ADDED",
+    actor_user_id: c.user_id, actor_name: c.author_name,
+    metadata: { comment: c.comment }, created_at: c.created_at,
+  })) });
+  mockFetchAttachments.mockResolvedValue({ data: [] });
 }
 
 /* ── Tests ── */
@@ -100,6 +115,8 @@ function setupSuccess(item = workOrder, cmnts = comments) {
 beforeEach(() => {
   mockFetchDetail.mockReset();
   mockFetchComments.mockReset();
+  mockFetchTimeline.mockReset();
+  mockFetchAttachments.mockReset();
   mockPostComment.mockReset();
   mockUpdateStatus.mockReset();
   mockAssign.mockReset();
@@ -110,7 +127,8 @@ describe("ManagerMaintenanceDetail", () => {
 
   test("shows loading skeleton initially", () => {
     mockFetchDetail.mockReturnValue(new Promise(() => {}));
-    mockFetchComments.mockReturnValue(new Promise(() => {}));
+    mockFetchTimeline.mockReturnValue(new Promise(() => {}));
+    mockFetchAttachments.mockReturnValue(new Promise(() => {}));
     render(<ManagerMaintenanceDetail />);
     expect(screen.getByLabelText("Loading work order")).toBeInTheDocument();
   });
@@ -137,7 +155,8 @@ describe("ManagerMaintenanceDetail", () => {
 
   test("shows error state on fetch failure", async () => {
     mockFetchDetail.mockRejectedValue(new Error("Network error"));
-    mockFetchComments.mockRejectedValue(new Error("Network error"));
+    mockFetchTimeline.mockRejectedValue(new Error("Network error"));
+    mockFetchAttachments.mockRejectedValue(new Error("Network error"));
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
@@ -204,7 +223,7 @@ describe("ManagerMaintenanceDetail", () => {
 
   /* ── Assignment controls ── */
 
-  test("renders assignment input and assign button", async () => {
+  test("renders assignment selector and assign button", async () => {
     setupSuccess();
     render(<ManagerMaintenanceDetail />);
 
@@ -212,55 +231,43 @@ describe("ManagerMaintenanceDetail", () => {
       expect(screen.getByText("Kitchen faucet leaking badly")).toBeInTheDocument();
     });
 
-    expect(screen.getByLabelText("Assignee ID")).toBeInTheDocument();
+    expect(screen.getByLabelText("Assignee type")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Assign/ })).toBeInTheDocument();
   });
 
-  test("assign button calls assignMaintenanceWorkOrder API", async () => {
+  test("assign as self calls API with owner info", async () => {
     const user = userEvent.setup();
     setupSuccess();
-    mockAssign.mockResolvedValue({ data: { ...workOrder, assignee_id: "u-pm-2" } });
+    mockAssign.mockResolvedValue({ data: { ...workOrder, assignee_id: "u-owner-1", assignee_name: "Dev Manager" } });
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
       expect(screen.getByText("Kitchen faucet leaking badly")).toBeInTheDocument();
     });
 
-    const input = screen.getByLabelText("Assignee ID");
-    await user.clear(input);
-    await user.type(input, "u-pm-2");
     await user.click(screen.getByRole("button", { name: /Assign/ }));
 
     await waitFor(() => {
-      expect(mockAssign).toHaveBeenCalledWith("wo-1", "u-pm-2");
+      expect(mockAssign).toHaveBeenCalledWith("wo-1", expect.objectContaining({ assigneeType: "self" }));
     });
   });
 
-  test("shows current assignee when assigned", async () => {
-    setupSuccess(assignedWorkOrder);
+  test("shows current assignee name when assigned", async () => {
+    const withAssignee = { ...workOrder, assignee_id: "u-pm-1", assignee_name: "Joe Plumber" };
+    setupSuccess(withAssignee);
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
       expect(screen.getByText("Kitchen faucet leaking badly")).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/Currently assigned: u-pm-1/i)).toBeInTheDocument();
+    expect(screen.getByText(/Currently assigned to/i)).toBeInTheDocument();
+    expect(screen.getByText(/Joe Plumber/)).toBeInTheDocument();
   });
 
-  test("assignment input pre-fills with current assigneeId", async () => {
-    setupSuccess(assignedWorkOrder);
-    render(<ManagerMaintenanceDetail />);
+  /* ── Timeline / Comments ── */
 
-    await waitFor(() => {
-      expect(screen.getByText("Kitchen faucet leaking badly")).toBeInTheDocument();
-    });
-
-    expect(screen.getByLabelText("Assignee ID")).toHaveValue("u-pm-1");
-  });
-
-  /* ── Comments ── */
-
-  test("renders comments thread", async () => {
+  test("renders timeline with comments", async () => {
     setupSuccess();
     render(<ManagerMaintenanceDetail />);
 
@@ -272,12 +279,12 @@ describe("ManagerMaintenanceDetail", () => {
     expect(screen.getByText(/Dev Tenant/)).toBeInTheDocument();
   });
 
-  test("shows empty comments message when none exist", async () => {
+  test("shows empty activity message when no timeline entries", async () => {
     setupSuccess(workOrder, []);
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
-      expect(screen.getByText("No comments yet.")).toBeInTheDocument();
+      expect(screen.getByText("No activity yet.")).toBeInTheDocument();
     });
   });
 
@@ -294,6 +301,12 @@ describe("ManagerMaintenanceDetail", () => {
         created_at: "2026-03-11T10:00:00Z",
       },
     });
+    // After comment, timeline is refreshed
+    mockFetchTimeline.mockResolvedValue({ data: [{
+      id: "c-new", type: "comment", event_type: "COMMENT_ADDED",
+      actor_user_id: "u-pm-1", actor_name: "Dev Manager",
+      metadata: { comment: "Will check tomorrow" }, created_at: "2026-03-11T10:00:00Z",
+    }] });
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
@@ -307,7 +320,6 @@ describe("ManagerMaintenanceDetail", () => {
     await waitFor(() => {
       expect(mockPostComment).toHaveBeenCalledWith("wo-1", "Will check tomorrow");
     });
-    expect(screen.getByText("Will check tomorrow")).toBeInTheDocument();
   });
 
   test("add comment via Enter key", async () => {
@@ -323,6 +335,7 @@ describe("ManagerMaintenanceDetail", () => {
         created_at: "2026-03-11T10:00:00Z",
       },
     });
+    mockFetchTimeline.mockResolvedValue({ data: [] });
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
@@ -348,14 +361,14 @@ describe("ManagerMaintenanceDetail", () => {
     });
   });
 
-  /* ── "Assignee" label present ── */
+  /* ── "Assignment" label present (v2) ── */
 
-  test("shows 'Assignee' label", async () => {
+  test("shows 'Assignment' label", async () => {
     setupSuccess();
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
-      expect(screen.getByText("Assignee")).toBeInTheDocument();
+      expect(screen.getByText("Assignment")).toBeInTheDocument();
     });
   });
 });

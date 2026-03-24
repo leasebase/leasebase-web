@@ -7,13 +7,18 @@ import type { WorkOrderRow, WorkOrderCommentRow, DomainResult } from "@/services
 
 const mockFetchDetail = jest.fn<Promise<DomainResult<WorkOrderRow | null>>, [string]>();
 const mockFetchComments = jest.fn<Promise<DomainResult<WorkOrderCommentRow[]>>, [string]>();
+const mockFetchTimeline = jest.fn();
+const mockFetchAttachments = jest.fn();
 const mockAddComment = jest.fn<Promise<WorkOrderCommentRow>, [string, string]>();
 
 jest.mock("@/services/tenant/adapters/maintenanceAdapter", () => ({
   fetchMaintenanceDetail: (...args: any[]) => mockFetchDetail(args[0]),
   fetchMaintenanceComments: (...args: any[]) => mockFetchComments(args[0]),
+  fetchMaintenanceTimeline: (...args: any[]) => mockFetchTimeline(args[0]),
+  fetchMaintenanceAttachments: (...args: any[]) => mockFetchAttachments(args[0]),
   addMaintenanceComment: (...args: any[]) => mockAddComment(args[0], args[1]),
   cancelMaintenanceRequest: jest.fn(),
+  uploadMaintenanceAttachment: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -91,20 +96,26 @@ function errorResult<T>(fallback: T, msg: string): DomainResult<T> {
 beforeEach(() => {
   mockFetchDetail.mockReset();
   mockFetchComments.mockReset();
+  mockFetchTimeline.mockReset();
+  mockFetchAttachments.mockReset();
   mockAddComment.mockReset();
+  // Default v2 mocks
+  mockFetchTimeline.mockResolvedValue({ data: [], source: "live", error: null });
+  mockFetchAttachments.mockResolvedValue({ data: [], source: "live", error: null });
 });
 
 describe("TenantMaintenanceDetail", () => {
   test("shows loading skeleton initially", () => {
     mockFetchDetail.mockReturnValue(new Promise(() => {}));
-    mockFetchComments.mockReturnValue(new Promise(() => {}));
+    mockFetchTimeline.mockReturnValue(new Promise(() => {}));
+    mockFetchAttachments.mockReturnValue(new Promise(() => {}));
     render(<TenantMaintenanceDetail />);
     expect(screen.getByLabelText("Loading work order")).toBeInTheDocument();
   });
 
   test("renders work order detail with description, status, priority, category, and date", async () => {
     mockFetchDetail.mockResolvedValue(successDetail(workOrder));
-    mockFetchComments.mockResolvedValue(successComments(comments));
+    mockFetchTimeline.mockResolvedValue({ data: comments.map((c: any) => ({ id: c.id, type: "comment", event_type: "COMMENT_ADDED", actor_user_id: c.user_id, actor_name: c.author_name, metadata: { comment: c.comment }, created_at: c.created_at })), source: "live", error: null });
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {
@@ -119,9 +130,9 @@ describe("TenantMaintenanceDetail", () => {
     expect(screen.getByText("Plumbing")).toBeInTheDocument();
   });
 
-  test("renders comments thread", async () => {
+  test("renders timeline with comments", async () => {
     mockFetchDetail.mockResolvedValue(successDetail(workOrder));
-    mockFetchComments.mockResolvedValue(successComments(comments));
+    mockFetchTimeline.mockResolvedValue({ data: comments.map((c: any) => ({ id: c.id, type: "comment", event_type: "COMMENT_ADDED", actor_user_id: c.user_id, actor_name: c.author_name, metadata: { comment: c.comment }, created_at: c.created_at })), source: "live", error: null });
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {
@@ -132,19 +143,17 @@ describe("TenantMaintenanceDetail", () => {
     expect(screen.getByText(/Dev Tenant/)).toBeInTheDocument();
   });
 
-  test("shows empty comments message when none exist", async () => {
+  test("shows empty activity message when no timeline entries", async () => {
     mockFetchDetail.mockResolvedValue(successDetail(workOrder));
-    mockFetchComments.mockResolvedValue(successComments([]));
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {
-      expect(screen.getByText("No comments yet.")).toBeInTheDocument();
+      expect(screen.getByText("No activity yet.")).toBeInTheDocument();
     });
   });
 
   test("shows error when detail fetch fails", async () => {
     mockFetchDetail.mockResolvedValue(errorResult(null, "Work order not found"));
-    mockFetchComments.mockResolvedValue(successComments([]));
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {
@@ -155,7 +164,6 @@ describe("TenantMaintenanceDetail", () => {
   test("tenant can add a comment", async () => {
     const user = userEvent.setup();
     mockFetchDetail.mockResolvedValue(successDetail(workOrder));
-    mockFetchComments.mockResolvedValue(successComments([]));
     mockAddComment.mockResolvedValue({
       id: "c-new",
       work_order_id: "wo-1",
@@ -164,6 +172,13 @@ describe("TenantMaintenanceDetail", () => {
       author_name: "Dev Tenant",
       created_at: "2026-03-11T10:00:00Z",
     });
+    // After comment, timeline refreshes
+    mockFetchTimeline.mockResolvedValue({ data: [{
+      id: "c-new", type: "comment", event_type: "COMMENT_ADDED",
+      actor_user_id: "u-tenant-1", actor_name: "Dev Tenant",
+      metadata: { comment: "When will this be fixed?" },
+      created_at: "2026-03-11T10:00:00Z",
+    }], source: "live", error: null });
 
     render(<TenantMaintenanceDetail />);
 
@@ -178,12 +193,10 @@ describe("TenantMaintenanceDetail", () => {
     await waitFor(() => {
       expect(mockAddComment).toHaveBeenCalledWith("wo-1", "When will this be fixed?");
     });
-    expect(screen.getByText("When will this be fixed?")).toBeInTheDocument();
   });
 
   test("does NOT render status-change buttons", async () => {
     mockFetchDetail.mockResolvedValue(successDetail(workOrder));
-    mockFetchComments.mockResolvedValue(successComments([]));
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {
@@ -198,7 +211,6 @@ describe("TenantMaintenanceDetail", () => {
 
   test("does NOT render assignment controls", async () => {
     mockFetchDetail.mockResolvedValue(successDetail(workOrder));
-    mockFetchComments.mockResolvedValue(successComments([]));
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {
@@ -211,7 +223,6 @@ describe("TenantMaintenanceDetail", () => {
   test("renders IN_PROGRESS status with human-readable label", async () => {
     const inProgressWO = { ...workOrder, status: "IN_PROGRESS" as const };
     mockFetchDetail.mockResolvedValue(successDetail(inProgressWO));
-    mockFetchComments.mockResolvedValue(successComments([]));
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {

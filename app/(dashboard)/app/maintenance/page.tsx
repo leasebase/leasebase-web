@@ -128,11 +128,15 @@ function TenantMaintenancePage() {
           <div className="space-y-3">
             {requests.map((wo) => (
               <Link key={wo.id} href={`/app/maintenance/${wo.id}`}
-                className="block rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-200">
+                className="block rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-slate-300">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-slate-900 truncate">{wo.description}</p>
-                    <p className="mt-1 text-xs text-slate-400">{wo.category} · {new Date(wo.created_at).toLocaleDateString()}</p>
+                    <p className="text-sm font-medium text-slate-900 truncate">{wo.title || wo.description}</p>
+                    {wo.title && <p className="text-xs text-slate-600 truncate mt-0.5">{wo.description}</p>}
+                    <p className="mt-1 text-xs text-slate-400">
+                      {wo.request_number ? `${wo.request_number} · ` : ""}{wo.category} · {new Date(wo.created_at).toLocaleDateString()}
+                      <span className="ml-2 text-slate-300">Updated {new Date(wo.updated_at).toLocaleDateString()}</span>
+                    </p>
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <Badge variant={PRIORITY_VARIANTS[wo.priority] || "neutral"}>{wo.priority}</Badge>

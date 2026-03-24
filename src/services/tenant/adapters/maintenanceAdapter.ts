@@ -13,7 +13,7 @@
  */
 
 import { apiRequest } from "@/lib/api/client";
-import type { DomainResult, WorkOrderRow, WorkOrderCommentRow } from "../types";
+import type { DomainResult, WorkOrderRow, WorkOrderCommentRow, WorkOrderAttachmentRow, TimelineEntryRow } from "../types";
 
 interface PaginatedResponse<T> {
   data: T[];
@@ -113,4 +113,46 @@ export async function addMaintenanceComment(
     body: JSON.stringify({ comment }),
   });
   return res.data;
+}
+
+/** Get attachments for a work order — LIVE. */
+export async function fetchMaintenanceAttachments(
+  workOrderId: string
+): Promise<DomainResult<WorkOrderAttachmentRow[]>> {
+  try {
+    const res = await apiRequest<{ data: WorkOrderAttachmentRow[] }>({
+      path: `api/maintenance/${workOrderId}/attachments`,
+    });
+    return { data: res.data, source: "live", error: null };
+  } catch (e: any) {
+    return { data: [], source: "unavailable", error: e?.message || "Failed to fetch attachments" };
+  }
+}
+
+/** Upload an attachment to a work order — LIVE. */
+export async function uploadMaintenanceAttachment(
+  workOrderId: string,
+  attachment: { fileUrl: string; fileType: string; fileName: string }
+): Promise<WorkOrderAttachmentRow> {
+  const res = await apiRequest<{ data: WorkOrderAttachmentRow }>({
+    path: `api/maintenance/${workOrderId}/attachments`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(attachment),
+  });
+  return res.data;
+}
+
+/** Get timeline for a work order — LIVE. */
+export async function fetchMaintenanceTimeline(
+  workOrderId: string
+): Promise<DomainResult<TimelineEntryRow[]>> {
+  try {
+    const res = await apiRequest<{ data: TimelineEntryRow[] }>({
+      path: `api/maintenance/${workOrderId}/timeline`,
+    });
+    return { data: res.data, source: "live", error: null };
+  } catch (e: any) {
+    return { data: [], source: "unavailable", error: e?.message || "Failed to fetch timeline" };
+  }
 }

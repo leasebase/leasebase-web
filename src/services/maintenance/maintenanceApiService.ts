@@ -63,6 +63,27 @@ export interface MaintenanceComment {
   created_at: string;
 }
 
+export interface MaintenanceAttachment {
+  id: string;
+  work_order_id: string;
+  file_url: string;
+  file_type: string;
+  file_name: string;
+  uploaded_by_user_id: string;
+  uploader_name: string;
+  created_at: string;
+}
+
+export interface TimelineEntry {
+  id: string;
+  type: "event" | "comment";
+  event_type: string;
+  actor_user_id: string;
+  actor_name: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
 /** Server-side aggregated counts by status from GET /api/maintenance/stats. */
 export interface MaintenanceStats {
   submitted: number;
@@ -140,16 +161,16 @@ export async function updateMaintenanceStatus(
   });
 }
 
-/** Assign a work order. Requires OWNER. */
+/** Assign a work order. Requires OWNER. v2: supports name + type. */
 export async function assignMaintenanceWorkOrder(
   id: string,
-  assigneeId: string,
+  assignment: { assigneeId?: string; assigneeName?: string; assigneeType?: "self" | "external" },
 ): Promise<{ data: MaintenanceWorkOrder }> {
   return apiRequest<{ data: MaintenanceWorkOrder }>({
     path: `api/maintenance/${id}/assign`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ assigneeId }),
+    body: JSON.stringify(assignment),
   });
 }
 
@@ -161,6 +182,33 @@ export async function cancelMaintenanceWorkOrder(
     path: `api/maintenance/${id}/cancel`,
     method: "POST",
   });
+}
+
+/** Fetch attachments for a work order. */
+export async function fetchMaintenanceAttachments(
+  id: string,
+): Promise<{ data: MaintenanceAttachment[] }> {
+  return apiRequest<{ data: MaintenanceAttachment[] }>({ path: `api/maintenance/${id}/attachments` });
+}
+
+/** Upload an attachment to a work order. */
+export async function uploadMaintenanceAttachment(
+  id: string,
+  attachment: { fileUrl: string; fileType: string; fileName: string },
+): Promise<{ data: MaintenanceAttachment }> {
+  return apiRequest<{ data: MaintenanceAttachment }>({
+    path: `api/maintenance/${id}/attachments`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(attachment),
+  });
+}
+
+/** Fetch the unified timeline for a work order. */
+export async function fetchMaintenanceTimeline(
+  id: string,
+): Promise<{ data: TimelineEntry[] }> {
+  return apiRequest<{ data: TimelineEntry[] }>({ path: `api/maintenance/${id}/timeline` });
 }
 
 /** Update work order fields. Requires OWNER. */
