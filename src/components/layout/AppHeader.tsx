@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -18,6 +19,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { DropdownMenu, type DropdownMenuItem } from "@/components/ui/DropdownMenu";
 import { Logo } from "@/components/Logo";
 import { useAppShell } from "./AppShell";
+import { apiRequest } from "@/lib/api/client";
 
 /* ─── AppHeader ─── */
 
@@ -25,10 +27,28 @@ export interface AppHeaderProps {
   onOpenCommandPalette?: () => void;
 }
 
+const POLL_INTERVAL = 60_000; // 60 seconds
+
 export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
   const router = useRouter();
   const { user } = authStore();
   const { mobileOpen, setMobileOpen, hamburgerRef } = useAppShell();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchUnread = useCallback(async () => {
+    try {
+      const res = await apiRequest<{ data: { count: number } }>({
+        path: "api/notifications/unread-count",
+      });
+      setUnreadCount(res.data?.count ?? 0);
+    } catch { /* silent */ }
+  }, []);
+
+  useEffect(() => {
+    fetchUnread();
+    const id = setInterval(fetchUnread, POLL_INTERVAL);
+    return () => clearInterval(id);
+  }, [fetchUnread]);
 
   const handleLogout = () => {
     authStore.getState().logout("manual");
@@ -122,10 +142,15 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
 
           <Link
             href="/app/notifications"
-            className="rounded-full p-2 text-slate-500 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
-            aria-label="Notifications"
+            className="relative rounded-full p-2 text-slate-500 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
+            aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
           >
             <Bell size={18} />
+            {unreadCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
           </Link>
 
           <DropdownMenu
