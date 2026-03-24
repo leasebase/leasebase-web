@@ -166,11 +166,11 @@ describe("loadMe", () => {
     expect(authStore.getState().user?.email).toBe("a@b.co");
   });
 
-  test("loadMe sends ID token (not access token) as Bearer", async () => {
+  test("loadMe sends access token (same token type as apiRequest) as Bearer", async () => {
     authStore.setState({
       mode: "cognito",
-      accessToken: "access-tok-should-not-be-sent",
-      idToken: "id-tok-should-be-sent",
+      accessToken: "access-tok-should-be-sent",
+      idToken: "id-tok-should-not-be-sent",
       expiresAt: Date.now() + 60_000,
       status: "initializing",
     });
@@ -190,10 +190,13 @@ describe("loadMe", () => {
 
     await authStore.getState().loadMe("bootstrap");
 
-    // Verify the ID token was sent, not the access token
+    // Verify the ACCESS token was sent — same token type as apiRequest().
+    // This ensures /me validates the same token that subsequent API calls
+    // will use.  If the access token lacks custom:role, we discover it at
+    // bootstrap rather than later when background fetches fail.
     const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
     const headers = fetchCall[1]?.headers as Headers;
-    expect(headers.get("Authorization")).toBe("Bearer id-tok-should-be-sent");
+    expect(headers.get("Authorization")).toBe("Bearer access-tok-should-be-sent");
   });
 
   test("loadMe('bootstrap') with network error does not throw", async () => {

@@ -2,14 +2,15 @@
  * Tests for src/lib/api/client.ts — apiRequest
  *
  * Covers:
- * - 401 triggers logout (clears auth state)
+ * - 401 without logoutOn401 does NOT clear auth state (throws ApiAuthError)
+ * - 401 with logoutOn401=true clears auth state
  * - 403 throws but does NOT trigger logout (user stays authenticated)
  * - 200 returns parsed JSON body
  * - Non-auth error (e.g. 500) throws with backend message
  * - Anonymous requests skip auth headers
  */
 
-import { apiRequest } from "@/lib/api/client";
+import { apiRequest, ApiAuthError } from "@/lib/api/client";
 import { authStore } from "@/lib/auth/store";
 
 jest.mock("@/lib/apiBase", () => ({
@@ -36,11 +37,11 @@ beforeEach(() => {
 });
 
 /* ------------------------------------------------------------------ */
-/*  401 — triggers logout                                              */
+/*  401 — default: does NOT clear auth state                            */
 /* ------------------------------------------------------------------ */
 
-describe("apiRequest 401 handling", () => {
-  test("401 calls logout and throws", async () => {
+describe("apiRequest 401 handling (default — no logout)", () => {
+  test("401 throws ApiAuthError but does NOT clear auth state", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       status: 401,
       ok: false,
@@ -49,17 +50,35 @@ describe("apiRequest 401 handling", () => {
     });
 
     await expect(
-      apiRequest({ path: "/api/properties" })
+      apiRequest({ path: "/api/notifications/unread-count" })
     ).rejects.toThrow("Token expired");
 
-    // Auth state should be fully cleared
+    // Auth state must remain intact — background 401 must NOT kill session
     const state = authStore.getState();
-    expect(state.status).toBe("unauthenticated");
-    expect(state.accessToken).toBeUndefined();
-    expect(state.user).toBeUndefined();
+    expect(state.status).toBe("authenticated");
+    expect(state.accessToken).toBe("test-access-token");
+    expect(state.user?.email).toBe("a@b.co");
   });
 
-  test("401 with non-JSON body throws generic message", async () => {
+  test("401 throws an ApiAuthError instance with path", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 401,
+      ok: false,
+      text: async () =>
+        JSON.stringify({ error: { message: "Token expired" } }),
+    });
+
+    try {
+      await apiRequest({ path: "api/tenants/me" });
+      throw new Error("should not reach");
+    } catch (err) {
+      expect(err).toBeInstanceOf(ApiAuthError);
+      expect((err as ApiAuthError).status).toBe(401);
+      expect((err as ApiAuthError).path).toBe("api/tenants/me");
+    }
+  });
+
+  test("401 with non-JSON body throws generic ApiAuthError", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       status: 401,
       ok: false,
@@ -69,6 +88,34 @@ describe("apiRequest 401 handling", () => {
     await expect(
       apiRequest({ path: "/api/properties" })
     ).rejects.toThrow("Unauthorized");
+
+    // Still no logout
+    expect(authStore.getState().status).toBe("authenticated");
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/*  401 + logoutOn401 — session-critical: DOES clear auth state         */
+/* ------------------------------------------------------------------ */
+
+describe("apiRequest 401 with logoutOn401=true", () => {
+  test("401 with logoutOn401 calls logout and throws", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 401,
+      ok: false,
+      text: async () =>
+        JSON.stringify({ error: { message: "Token expired" } }),
+    });
+
+    await expect(
+      apiRequest({ path: "/api/auth/me", logoutOn401: true })
+    ).rejects.toThrow("Token expired");
+
+    // Auth state should be fully cleared
+    const state = authStore.getState();
+    expect(state.status).toBe("unauthenticated");
+    expect(state.accessToken).toBeUndefined();
+    expect(state.user).toBeUndefined();
   });
 });
 

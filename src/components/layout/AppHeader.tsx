@@ -49,8 +49,15 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
     } catch { /* silent */ }
   }, []);
 
-  // ── WebSocket: connect on mount, subscribe to events ─────────────────
+  // ── WebSocket: connect only after session is confirmed (user set) ────
+  // The unread-count fetch and WS connection must NOT fire until the
+  // session bootstrap has completed.  A 401 from unread-count must
+  // never destroy the session — apiRequest already handles this via
+  // the non-destructive default, but gating on `user` prevents
+  // unnecessary failed requests during bootstrap.
   useEffect(() => {
+    if (!user) return; // session not yet confirmed
+
     const token = getAccessToken();
     if (token) {
       notificationWs.connect(token);
@@ -83,18 +90,20 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
       unsubs.forEach((fn) => fn());
       notificationWs.disconnect();
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Polling fallback: only when WS is not connected ─────────────────
+  // ── Polling fallback: only when WS is not connected AND session ready ─
   useEffect(() => {
-    fetchUnread(); // initial fetch regardless
+    if (!user) return; // don't poll until session is confirmed
+
+    fetchUnread(); // initial fetch after session confirmed
     const id = setInterval(() => {
       if (!wsConnected.current) {
         fetchUnread();
       }
     }, POLL_INTERVAL);
     return () => clearInterval(id);
-  }, [fetchUnread]);
+  }, [fetchUnread, user]);
 
   const handleLogout = () => {
     authStore.getState().logout("manual");
