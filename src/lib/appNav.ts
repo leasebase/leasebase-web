@@ -6,6 +6,8 @@ export interface AppNavItem {
   icon?: string; // simple string key for now
   personas: Persona[];
   isFuture?: boolean;
+  /** Hide from navigation without removing the route. */
+  hidden?: boolean;
   /** Sidebar group this item belongs to. */
   group?: NavGroupKey;
 }
@@ -45,9 +47,9 @@ export const appNavItems: AppNavItem[] = [
   { path: "/app/maintenance", label: "Maintenance", icon: "maintenance", personas: ["owner", "tenant"], group: "operations" },
   { path: "/app/documents", label: "Documents", icon: "documents", personas: ["owner", "tenant"], group: "operations" },
 
-  // ── Intelligence ──
-  { path: "/app/reports", label: "Reports", icon: "reports", personas: ["owner"], group: "intelligence" },
-  { path: "/app/admin/growth", label: "Growth", icon: "growth", personas: ["owner"], group: "intelligence" },
+  // ── Intelligence (hidden until product is ready for owners) ──
+  { path: "/app/reports", label: "Reports", icon: "reports", personas: ["owner"], group: "intelligence", hidden: true },
+  { path: "/app/admin/growth", label: "Growth", icon: "growth", personas: ["owner"], group: "intelligence", hidden: true },
 
   // Phase 3: Profile + Settings moved to avatar dropdown (AppHeader).
   // They are no longer sidebar nav items.
@@ -55,7 +57,7 @@ export const appNavItems: AppNavItem[] = [
 
 export function filterNavForPersona(persona: Persona | undefined | null): AppNavItem[] {
   if (!persona) return [];
-  return appNavItems.filter((item) => !item.isFuture && item.personas.includes(persona));
+  return appNavItems.filter((item) => !item.isFuture && !item.hidden && item.personas.includes(persona));
 }
 
 /**
