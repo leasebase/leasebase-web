@@ -11,6 +11,15 @@
 import { apiRequest } from "@/lib/api/client";
 import type { DomainResult, PaymentRow, CheckoutResult } from "../types";
 
+/** Response shape from POST /checkout/create-intent */
+export interface PaymentIntentResult {
+  clientSecret: string;
+  paymentIntentId: string;
+  publishableKey: string;
+  amount: number; // cents
+  currency: string;
+}
+
 interface PaginatedResponse<T> {
   data: T[];
   meta: { page: number; limit: number; total: number; hasMore: boolean };
@@ -54,6 +63,38 @@ export async function fetchTenantCharges(): Promise<DomainResult<TenantChargeRow
     return { data: res.data, source: "live", error: null };
   } catch (e: any) {
     return { data: [], source: "unavailable", error: e?.message || "Failed to fetch charges" };
+  }
+}
+
+/** Create a PaymentIntent for embedded in-app checkout (Phase 1) */
+export async function createPaymentIntent(): Promise<CheckoutDomainResult & { intentData: PaymentIntentResult | null }> {
+  try {
+    const res = await apiRequest<{ data: PaymentIntentResult }>({
+      path: "api/payments/checkout/create-intent",
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    return { data: null, intentData: res.data, source: "live", error: null, errorCode: null };
+  } catch (e: any) {
+    let errorCode: CheckoutErrorCode = null;
+    const msg: string = e?.message || "";
+    if (msg.includes("not enabled payments") || msg.includes("not set up payments")) {
+      errorCode = "NO_PAYMENT_ACCOUNT";
+    } else if (msg.includes("not configured for this lease")) {
+      errorCode = "NO_RENT_CONFIGURED";
+    } else if (msg.includes("already been paid")) {
+      errorCode = "ALREADY_PAID";
+    } else if (msg.includes("already in progress")) {
+      errorCode = "PAYMENT_IN_PROGRESS";
+    }
+    return {
+      data: null,
+      intentData: null,
+      source: "unavailable",
+      error: e?.message || "Failed to create payment",
+      errorCode,
+    };
   }
 }
 
