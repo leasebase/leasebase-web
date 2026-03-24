@@ -19,7 +19,13 @@ describe("filterNavForPersona", () => {
     expect(labels).toContain("Maintenance");
     expect(labels).toContain("Documents");
     expect(labels).toContain("Payments");
-    expect(labels).toContain("Reports");
+  });
+
+  test("owner does NOT see hidden Intelligence items (Reports, Growth)", () => {
+    const items = filterNavForPersona("owner");
+    const labels = items.map((i) => i.label);
+    expect(labels).not.toContain("Reports");
+    expect(labels).not.toContain("Growth");
   });
 
   test("tenant does not see owner-only sections", () => {
@@ -63,9 +69,10 @@ describe("filterNavForPersona", () => {
     }
   });
 
-  test("Settings is NOT in the left nav (belongs in user dropdown)", () => {
+  test("Profile and Settings are NOT in the sidebar (they live in avatar dropdown)", () => {
     for (const persona of ["owner", "tenant"] as const) {
       const labels = filterNavForPersona(persona).map((i) => i.label);
+      expect(labels).not.toContain("Profile");
       expect(labels).not.toContain("Settings");
     }
   });
@@ -74,6 +81,13 @@ describe("filterNavForPersona", () => {
     for (const persona of ["owner", "tenant"] as const) {
       const items = filterNavForPersona(persona);
       expect(items.filter((i) => i.isFuture)).toHaveLength(0);
+    }
+  });
+
+  test("hidden items are excluded", () => {
+    for (const persona of ["owner", "tenant"] as const) {
+      const items = filterNavForPersona(persona);
+      expect(items.filter((i) => i.hidden)).toHaveLength(0);
     }
   });
 
@@ -92,13 +106,11 @@ describe("groupNavForPersona", () => {
     }
   });
 
-  test("system group is not present (Settings moved to header)", () => {
+  test("no account group exists (Profile/Settings moved to avatar)", () => {
     for (const persona of ["owner", "tenant"] as const) {
       const groups = groupNavForPersona(persona);
-      // Cast to string[] because "system" was removed from NavGroupKey;
-      // this asserts the old key never appears at runtime either.
       const keys = groups.map((g) => g.key as string);
-      expect(keys).not.toContain("system");
+      expect(keys).not.toContain("account");
     }
   });
 

@@ -103,12 +103,12 @@ describe("AppHeader — user menu items", () => {
     expect(screen.getByRole("menuitem", { name: /sign out/i })).toBeInTheDocument();
   });
 
-  test("user menu does NOT contain duplicate Profile item", async () => {
+  test("user menu contains Profile item (Phase 3: moved from sidebar)", async () => {
     const user = userEvent.setup();
     renderHeader();
     const trigger = screen.getByRole("button", { name: /user menu/i });
     await user.click(trigger);
-    expect(screen.queryByRole("menuitem", { name: /^profile$/i })).toBeNull();
+    expect(screen.getByRole("menuitem", { name: /^profile$/i })).toBeInTheDocument();
   });
 
   test("user menu does NOT contain Billing item (no route yet)", async () => {
@@ -119,12 +119,12 @@ describe("AppHeader — user menu items", () => {
     expect(screen.queryByRole("menuitem", { name: /billing/i })).toBeNull();
   });
 
-  test("user menu has exactly two items: Settings and Sign out", async () => {
+  test("user menu has exactly three items: Profile, Settings, Sign out", async () => {
     const user = userEvent.setup();
     renderHeader();
     const trigger = screen.getByRole("button", { name: /user menu/i });
     await user.click(trigger);
     const items = screen.getAllByRole("menuitem");
-    expect(items).toHaveLength(2);
+    expect(items).toHaveLength(3);
   });
 });

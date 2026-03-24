@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Send, UserPlus } from "lucide-react";
+import { Send, UserPlus, BellRing, BellOff } from "lucide-react";
 import {
   fetchMaintenanceDetail as fetchManagerDetail,
   fetchMaintenanceComments as fetchManagerComments,
@@ -24,6 +24,11 @@ import {
   cancelMaintenanceRequest,
 } from "@/services/tenant/adapters/maintenanceAdapter";
 import type { WorkOrderRow, WorkOrderCommentRow } from "@/services/tenant/types";
+import {
+  fetchSubscription,
+  upsertSubscription,
+  type Subscription,
+} from "@/services/notifications/preferencesV2";
 
 const STATUS_VARIANTS: Record<string, "success" | "warning" | "danger" | "info" | "neutral"> = {
   SUBMITTED: "warning", IN_REVIEW: "info", SCHEDULED: "info",
@@ -53,6 +58,47 @@ const OWNER_TRANSITIONS: Record<string, string[]> = {
 /* ═══════════════════════════════════════════════════════════════════════
    Tenant detail — read-only view with comments
    ═══════════════════════════════════════════════════════════════════════ */
+
+function useFollowMute(entityId: string) {
+  const [sub, setSub] = useState<Subscription | null>(null);
+  const [toggling, setToggling] = useState(false);
+
+  useEffect(() => {
+    fetchSubscription("WORK_ORDER", entityId).then(setSub).catch(() => {});
+  }, [entityId]);
+
+  const toggle = useCallback(async () => {
+    setToggling(true);
+    try {
+      const newState = sub?.state === "muted" ? "following" : "muted";
+      const result = await upsertSubscription({
+        entity_type: "WORK_ORDER",
+        entity_id: entityId,
+        state: newState,
+      });
+      setSub(result);
+    } catch { /* silent */ }
+    finally { setToggling(false); }
+  }, [entityId, sub]);
+
+  return { sub, toggling, toggle };
+}
+
+function FollowMuteButton({ entityId }: { entityId: string }) {
+  const { sub, toggling, toggle } = useFollowMute(entityId);
+  const isMuted = sub?.state === "muted";
+  return (
+    <Button
+      variant={isMuted ? "danger" : "secondary"}
+      size="sm"
+      icon={isMuted ? <BellOff size={14} /> : <BellRing size={14} />}
+      loading={toggling}
+      onClick={toggle}
+    >
+      {isMuted ? "Muted" : "Following"}
+    </Button>
+  );
+}
 
 export function TenantMaintenanceDetail() {
   const { id } = useParams<{ id: string }>();
@@ -122,6 +168,10 @@ export function TenantMaintenanceDetail() {
     <>
       <PageHeader title="Work Order" description="View your maintenance request details." />
       <div className="mt-6 space-y-6">
+        {/* Follow/mute control */}
+        <div className="flex justify-end">
+          <FollowMuteButton entityId={id} />
+        </div>
         {/* Detail card */}
         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-3">
           {item.title && <p className="text-sm font-semibold text-slate-900">{item.title}</p>}
@@ -274,6 +324,10 @@ export function ManagerMaintenanceDetail() {
     <>
       <PageHeader title="Work Order" description="Manage work order details." />
       <div className="mt-6 space-y-6">
+        {/* Follow/mute control */}
+        <div className="flex justify-end">
+          <FollowMuteButton entityId={id} />
+        </div>
         {/* Detail card */}
         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-3">
           {item.title && <p className="text-sm font-semibold text-slate-900">{item.title}</p>}

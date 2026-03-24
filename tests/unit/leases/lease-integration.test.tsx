@@ -52,6 +52,9 @@ jest.mock("lucide-react", () => {
     FilePlus: icon("FilePlus"),
     CheckCircle: icon("CheckCircle"),
     Mail: icon("Mail"),
+    Upload: icon("Upload"),
+    FileCheck: icon("FileCheck"),
+    AlertTriangle: icon("AlertTriangle"),
   };
 });
 
@@ -218,74 +221,83 @@ describe("Lease Management Integration", () => {
       CreatePage = mod.default;
     });
 
-    test("submit calls createLease with correct DTO", async () => {
-      mockCreateLease.mockResolvedValueOnce({ data: { id: "new-lease" } });
+    test("existing lease track calls createLease with EXISTING_LEASE mode", async () => {
+      mockCreateLease.mockResolvedValueOnce({ data: { id: "new-lease", property_id: "p1", unit_id: "u1" } });
       const user = userEvent.setup();
 
       render(<CreatePage />);
 
-      await waitFor(() => {
-        expect(screen.getByText("Sunset")).toBeInTheDocument();
-      });
+      // Step 0: Choose track
+      // Wait for the choose-track step to render
+      await user.click(screen.getByRole('button', { name: /existing lease/i }));
 
-      // Select property
+      // Step 1: Fill lease form
+      await waitFor(() => expect(screen.getByText("Sunset")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/property/i), "p1");
       await waitFor(() => expect(screen.getByText("Unit 101")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/unit/i), "u1");
       await user.type(screen.getByLabelText(/start date/i), "2026-01-01");
-
       await user.click(screen.getByRole("button", { name: /create lease/i }));
 
       await waitFor(() => {
         expect(mockCreateLease).toHaveBeenCalledTimes(1);
+        expect(mockCreateLease).toHaveBeenCalledWith(
+          expect.objectContaining({ activationMode: "EXISTING_LEASE" }),
+        );
       });
     });
 
-    test("successful submit shows invite step, skip redirects to /app/leases", async () => {
+    test("existing lease track: upload step then invite, skip redirects to /app/leases", async () => {
       mockCreateLease.mockResolvedValueOnce({
         data: { id: "new-lease", property_id: "p1", unit_id: "u1" },
       });
       const user = userEvent.setup();
 
       render(<CreatePage />);
-      await waitFor(() => expect(screen.getByText("Sunset")).toBeInTheDocument());
 
+      // Choose existing
+      // Wait for the choose-track step to render
+      await user.click(screen.getByRole('button', { name: /existing lease/i }));
+
+      // Fill lease form
+      await waitFor(() => expect(screen.getByText("Sunset")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/property/i), "p1");
       await waitFor(() => expect(screen.getByText("Unit 101")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/unit/i), "u1");
       await user.type(screen.getByLabelText(/start date/i), "2026-01-01");
-
       await user.click(screen.getByRole("button", { name: /create lease/i }));
 
-      // After lease creation, the invite step is shown
-      await waitFor(() => {
-        expect(screen.getByRole("button", { name: /skip for now/i })).toBeInTheDocument();
-      });
+      // Upload step: skip
+      await waitFor(() => expect(screen.getByText(/skip & continue/i)).toBeInTheDocument());
+      await user.click(screen.getByText(/skip & continue/i));
 
-      // Click "Skip for now" to proceed to the lease detail page
+      // Invite step: skip
+      await waitFor(() => expect(screen.getByRole("button", { name: /skip for now/i })).toBeInTheDocument());
       await user.click(screen.getByRole("button", { name: /skip for now/i }));
 
-      await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith("/app/leases");
-      });
+      await waitFor(() => expect(mockPush).toHaveBeenCalledWith("/app/leases"));
     });
 
-    test("server error displays error banner", async () => {
+    test("server error on lease creation displays error banner", async () => {
       mockCreateLease.mockRejectedValueOnce(new Error("Unit already has an active lease"));
       const user = userEvent.setup();
 
       render(<CreatePage />);
-      await waitFor(() => expect(screen.getByText("Sunset")).toBeInTheDocument());
 
+      // Choose existing
+      // Wait for the choose-track step to render
+      await user.click(screen.getByRole('button', { name: /existing lease/i }));
+
+      // Fill lease form
+      await waitFor(() => expect(screen.getByText("Sunset")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/property/i), "p1");
       await waitFor(() => expect(screen.getByText("Unit 101")).toBeInTheDocument());
       await user.selectOptions(screen.getByLabelText(/unit/i), "u1");
       await user.type(screen.getByLabelText(/start date/i), "2026-01-01");
-
       await user.click(screen.getByRole("button", { name: /create lease/i }));
 
       await waitFor(() => {
-        expect(screen.getByRole("alert")).toHaveTextContent("Unit already has an active lease");
+        expect(screen.getByText(/unit already has an active lease/i)).toBeInTheDocument();
       });
     });
 

@@ -27,12 +27,14 @@ import {
 import { InviteTenantModal } from "@/components/invitations/InviteTenantModal";
 import { LeaseForm } from "@/components/leases/LeaseForm";
 import { LeaseDetailSkeleton } from "@/components/leases/LeaseDetailSkeleton";
-import { Mail, RefreshCw, CheckCircle2, AlertCircle, FileCheck, Upload } from "lucide-react";
+import { DocumentUploadModal } from "@/components/documents/DocumentUploadModal";
+import { Mail, RefreshCw, CheckCircle2, AlertCircle, FileCheck, Upload, Paperclip, MoreVertical, Pencil, ArrowLeft } from "lucide-react";
 import {
   fetchLeaseDocuments,
   confirmLeaseDocument,
   type DocumentRow,
 } from "@/services/documents/documentApiService";
+import { DropdownMenu } from "@/components/ui/DropdownMenu";
 
 /* ── Helpers ── */
 
@@ -231,13 +233,27 @@ function OverviewPanel({
 /* ── Documents Panel ── */
 
 const DOC_STATUS_LABELS: Record<string, string> = {
+  // Phase 1 vocabulary
+  DRAFT: "Draft",
   UPLOADED: "Uploaded",
+  PENDING_TENANT_SIGNATURE: "Pending Signature",
+  FULLY_EXECUTED: "Fully Executed",
+  VERIFIED_EXTERNAL: "Verified on file",
+  ARCHIVED: "Archived",
+  // Legacy vocabulary (backward compat for pre-migration rows)
   EXECUTED: "Executed",
   CONFIRMED_EXTERNAL: "Confirmed on file",
 };
 
 const DOC_STATUS_VARIANTS: Record<string, "success" | "info" | "warning" | "neutral"> = {
+  // Phase 1
+  FULLY_EXECUTED: "success",
+  VERIFIED_EXTERNAL: "success",
   UPLOADED: "warning",
+  DRAFT: "neutral",
+  PENDING_TENANT_SIGNATURE: "warning",
+  ARCHIVED: "neutral",
+  // Legacy
   EXECUTED: "success",
   CONFIRMED_EXTERNAL: "success",
 };
@@ -256,15 +272,20 @@ function DocumentsPanel({
   const [error, setError] = useState<string | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [showUpload, setShowUpload] = useState(false);
+  const [loadKey, setLoadKey] = useState(0);
+
+  const loadDocs = useCallback(() => {
+    setLoading(true);
+    fetchLeaseDocuments(leaseId)
+      .then((res) => setDocs(res.data))
+      .catch(() => setError("Failed to load documents"))
+      .finally(() => setLoading(false));
+  }, [leaseId]);
 
   useEffect(() => {
-    let cancelled = false;
-    fetchLeaseDocuments(leaseId)
-      .then((res) => { if (!cancelled) setDocs(res.data); })
-      .catch(() => { if (!cancelled) setError("Failed to load documents"); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
-  }, [leaseId]);
+    loadDocs();
+  }, [loadDocs, loadKey]);
 
   const handleConfirm = async (docId: string, status: "EXECUTED" | "CONFIRMED_EXTERNAL") => {
     setConfirmingId(docId);
@@ -307,54 +328,78 @@ function DocumentsPanel({
 
       {docs.length === 0 ? (
         <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
-          <Upload size={24} className="mx-auto mb-2 text-slate-300" />
-          <p className="text-sm text-slate-500">No documents yet.</p>
+          <Paperclip size={24} className="mx-auto mb-2 text-slate-300" />
+          <p className="text-sm text-slate-500">No documents attached yet.</p>
           <p className="text-xs text-slate-400 mt-1">
-            Upload the signed lease using the button below, then confirm its status.
+            Attach a signed lease or related document to keep everything in one place.
           </p>
+          <Button
+            variant="primary"
+            size="sm"
+            className="mt-4"
+            onClick={() => setShowUpload(true)}
+            icon={<Paperclip size={14} />}
+          >
+            Attach document
+          </Button>
         </div>
       ) : (
-        <ul className="space-y-2">
-          {docs.map((doc) => (
-            <li
-              key={doc.id}
-              className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4"
+        <>
+          <div className="flex justify-end">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowUpload(true)}
+              icon={<Paperclip size={14} />}
             >
-              <div>
-                <p className="text-sm font-medium text-slate-900">{doc.name}</p>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  {new Date(doc.created_at).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge variant={DOC_STATUS_VARIANTS[doc.status] ?? "neutral"}>
-                  {DOC_STATUS_LABELS[doc.status] ?? doc.status}
-                </Badge>
-                {doc.status === "UPLOADED" && isAcknowledged && (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    loading={confirmingId === doc.id}
-                    onClick={() => handleConfirm(doc.id, "CONFIRMED_EXTERNAL")}
-                    icon={<CheckCircle2 size={13} />}
-                  >
-                    Confirm on file
-                  </Button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
+              Attach document
+            </Button>
+          </div>
+          <ul className="space-y-2">
+            {docs.map((doc) => (
+              <li
+                key={doc.id}
+                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4"
+              >
+                <div>
+                  <p className="text-sm font-medium text-slate-900">{doc.title}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {new Date(doc.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge variant={DOC_STATUS_VARIANTS[doc.status] ?? "neutral"}>
+                    {DOC_STATUS_LABELS[doc.status] ?? doc.status}
+                  </Badge>
+                  {doc.status === "UPLOADED" && isAcknowledged && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      loading={confirmingId === doc.id}
+                      onClick={() => handleConfirm(doc.id, "CONFIRMED_EXTERNAL")}
+                      icon={<CheckCircle2 size={13} />}
+                    >
+                      Confirm on file
+                    </Button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
 
-      <p className="text-xs text-slate-400">
-        To upload, use the API directly:
-        {" "}
-        <code className="font-mono bg-slate-100 px-1 rounded">POST /api/documents/upload</code>
-        {" "}with{" "}
-        <code className="font-mono bg-slate-100 px-1 rounded">relatedType=LEASE</code>.
-        E-sign integration coming soon.
-      </p>
+      {showUpload && (
+        <DocumentUploadModal
+          relatedType="LEASE"
+          relatedId={leaseId}
+          onClose={() => setShowUpload(false)}
+          onSuccess={() => {
+            setShowUpload(false);
+            setLoadKey((k) => k + 1);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -415,6 +460,7 @@ function LeaseDetailContent() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [activateLoading, setActivateLoading] = useState(false);
   const [activateError, setActivateError] = useState<string | null>(null);
+  const [pageMode, setPageMode] = useState<"view" | "edit">("view");
 
   // Renew form state
   const [renewStartDate, setRenewStartDate] = useState("");
@@ -554,11 +600,6 @@ function LeaseDetailContent() {
         ),
       },
       {
-        id: "edit",
-        label: "Edit",
-        content: <EditPanel lease={lease} onSaved={handleSaved} />,
-      },
-      {
         id: "documents",
         label: "Documents",
         content: (
@@ -614,8 +655,43 @@ function LeaseDetailContent() {
         ]}
         className="mb-4"
       />
-      <PageHeader title={title} />
-      <Tabs items={tabs} defaultActiveId="overview" className="mt-6" />
+      <PageHeader
+        title={title}
+        actions={
+          <DropdownMenu
+            trigger={
+              <button
+                className="rounded-md border border-slate-200 bg-white p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors"
+                aria-label="Lease actions"
+              >
+                <MoreVertical size={16} />
+              </button>
+            }
+            items={[
+              {
+                id: "edit",
+                label: "Edit lease",
+                icon: <Pencil size={14} />,
+                onClick: () => setPageMode("edit"),
+              },
+            ]}
+          />
+        }
+      />
+
+      {pageMode === "edit" ? (
+        <div className="mt-6">
+          <button
+            onClick={() => setPageMode("view")}
+            className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+          >
+            <ArrowLeft size={14} /> Back
+          </button>
+          <EditPanel lease={lease} onSaved={handleSaved} />
+        </div>
+      ) : (
+        <Tabs items={tabs} defaultActiveId="overview" className="mt-6" />
+      )}
 
       {/* Terminate confirmation modal */}
       <Modal

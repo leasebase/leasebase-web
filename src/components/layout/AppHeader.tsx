@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -11,12 +12,17 @@ import {
   LogOut,
   Command,
   Settings,
+  User,
 } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { Avatar } from "@/components/ui/Avatar";
 import { DropdownMenu, type DropdownMenuItem } from "@/components/ui/DropdownMenu";
 import { Logo } from "@/components/Logo";
 import { useAppShell } from "./AppShell";
+import { apiRequest } from "@/lib/api/client";
+import { notificationWs } from "@/lib/notifications/ws";
+import { useToast } from "@/components/ui/Toast";
+import { getAccessToken } from "@/lib/auth/tokens";
 
 /* ─── AppHeader ─── */
 
@@ -24,16 +30,92 @@ export interface AppHeaderProps {
   onOpenCommandPalette?: () => void;
 }
 
+const POLL_INTERVAL = 60_000; // 60 seconds (fallback when WS disconnected)
+
 export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
   const router = useRouter();
   const { user } = authStore();
   const { mobileOpen, setMobileOpen, hamburgerRef } = useAppShell();
+  const [unreadCount, setUnreadCount] = useState(0);
+  const { toast } = useToast();
+  const wsConnected = useRef(false);
+
+  const fetchUnread = useCallback(async () => {
+    try {
+      const res = await apiRequest<{ data: { count: number } }>({
+        path: "api/notifications/unread-count",
+      });
+      setUnreadCount(res.data?.count ?? 0);
+    } catch { /* silent */ }
+  }, []);
+
+  // ── WebSocket: connect only after session is confirmed (user set) ────
+  // The unread-count fetch and WS connection must NOT fire until the
+  // session bootstrap has completed.  A 401 from unread-count must
+  // never destroy the session — apiRequest already handles this via
+  // the non-destructive default, but gating on `user` prevents
+  // unnecessary failed requests during bootstrap.
+  useEffect(() => {
+    if (!user) return; // session not yet confirmed
+
+    const token = getAccessToken();
+    if (token) {
+      notificationWs.connect(token);
+    }
+
+    const unsubs: (() => void)[] = [];
+
+    unsubs.push(notificationWs.on('connected', () => {
+      wsConnected.current = true;
+    }));
+
+    unsubs.push(notificationWs.on('disconnected', () => {
+      wsConnected.current = false;
+    }));
+
+    unsubs.push(notificationWs.on('notification.unread_count_updated', (msg: any) => {
+      if (typeof msg.count === 'number') {
+        setUnreadCount(msg.count);
+      }
+    }));
+
+    unsubs.push(notificationWs.on('notification.created', (msg: any) => {
+      const n = msg.notification;
+      if (n?.title) {
+        toast('info', n.title);
+      }
+    }));
+
+    return () => {
+      unsubs.forEach((fn) => fn());
+      notificationWs.disconnect();
+    };
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Polling fallback: only when WS is not connected AND session ready ─
+  useEffect(() => {
+    if (!user) return; // don't poll until session is confirmed
+
+    fetchUnread(); // initial fetch after session confirmed
+    const id = setInterval(() => {
+      if (!wsConnected.current) {
+        fetchUnread();
+      }
+    }, POLL_INTERVAL);
+    return () => clearInterval(id);
+  }, [fetchUnread, user]);
 
   const handleLogout = () => {
     authStore.getState().logout("manual");
   };
 
   const userMenuItems: DropdownMenuItem[] = [
+    {
+      id: "profile",
+      label: "Profile",
+      icon: <User size={14} />,
+      onClick: () => router.push("/app/profile"),
+    },
     {
       id: "settings",
       label: "Settings",
@@ -115,10 +197,15 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
 
           <Link
             href="/app/notifications"
-            className="rounded-full p-2 text-slate-500 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
-            aria-label="Notifications"
+            className="relative rounded-full p-2 text-slate-500 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
+            aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
           >
             <Bell size={18} />
+            {unreadCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
           </Link>
 
           <DropdownMenu

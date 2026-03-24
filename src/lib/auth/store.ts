@@ -222,9 +222,15 @@ export const authStore = create<AuthState>()(
           const response = await fetch(`${base}/api/auth/me`, {
             headers: (() => {
               const headers = new Headers();
-              const { mode, idToken, devBypass } = get();
-              if (mode === "cognito" && idToken) {
-                headers.set("Authorization", `Bearer ${idToken}`);
+              const { mode, accessToken, devBypass } = get();
+              // Use the ACCESS token — same token type as apiRequest().
+              // The Pre-Token Generation V2 Lambda injects custom:role into
+              // access tokens, so both /me and regular API calls validate
+              // identically.  If the access token lacks custom:role, we want
+              // to discover that HERE (at bootstrap) rather than later when
+              // AppHeader or dashboard fetches fail.
+              if (mode === "cognito" && accessToken) {
+                headers.set("Authorization", `Bearer ${accessToken}`);
               }
               if (mode === "devBypass" && devBypass) {
                 headers.set("x-dev-user-email", devBypass.email);

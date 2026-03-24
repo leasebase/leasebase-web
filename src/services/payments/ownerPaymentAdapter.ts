@@ -141,7 +141,7 @@ export async function startOnboarding(): Promise<DomainResult<{ url: string } | 
       path: "api/payments/connect/onboard",
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ returnUrl: `${window.location.origin}/app/settings`, refreshUrl: `${window.location.origin}/app/settings` }),
+      body: JSON.stringify({ return_url: `${window.location.origin}/app/settings?connect=return`, refresh_url: `${window.location.origin}/app/settings?connect=refresh` }),
     });
     return { data: res.data, source: "live", error: null };
   } catch (e: any) {

@@ -123,7 +123,7 @@ function NoLeaseState() {
       <Building2 size={48} strokeWidth={1.5} className="mx-auto mb-4 text-slate-500" />
       <p className="text-lg font-semibold text-slate-200">No lease found</p>
       <p className="mt-2 text-sm text-slate-400">
-        Your lease details will appear here once your property manager sets them up.
+      Your lease details will appear here once your property owner sets them up.
       </p>
     </div>
   );

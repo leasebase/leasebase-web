@@ -10,11 +10,12 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Home } from "lucide-react";
+import { Home, MoreVertical, Pencil } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchUnit, fetchProperty, updateUnit } from "@/services/properties/propertyService";
 import type { UnitRow, PropertyRow, CreateUnitDTO } from "@/services/properties/types";
 import { UnitForm } from "@/components/properties/UnitForm";
+import { DropdownMenu } from "@/components/ui/DropdownMenu";
 
 const STATUS_VARIANTS: Record<string, BadgeVariant> = {
   OCCUPIED: "success",
@@ -90,7 +91,24 @@ function OwnerUnitDetail() {
         title={`Unit ${unit.unit_number}`}
         description={propertyName}
         actions={
-          <Button variant="secondary" size="sm" onClick={() => setShowEdit(true)}>Edit Unit</Button>
+          <DropdownMenu
+            trigger={
+              <button
+                className="rounded-md border border-slate-200 bg-white p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors"
+                aria-label="Unit actions"
+              >
+                <MoreVertical size={16} />
+              </button>
+            }
+            items={[
+              {
+                id: "edit",
+                label: "Edit unit",
+                icon: <Pencil size={14} />,
+                onClick: () => setShowEdit(true),
+              },
+            ]}
+          />
         }
       />
 

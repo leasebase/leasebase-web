@@ -7,6 +7,7 @@ import {
   FileText,
   FolderOpen,
   Users,
+  User,
   CreditCard,
   Wrench,
   MessageSquare,
@@ -52,6 +53,7 @@ const iconMap: Record<string, LucideIcon> = {
   "payment-methods": CreditCard,
   growth: TrendingUp,
   notifications: Bell,
+  profile: User,
 };
 
 export interface IconProps {
