@@ -78,11 +78,12 @@ describe("filterNavForPersona", () => {
     }
   });
 
-  test("Settings IS in the sidebar for both personas", () => {
-    for (const persona of ["owner", "tenant"] as const) {
-      const labels = filterNavForPersona(persona).map((i) => i.label);
-      expect(labels).toContain("Settings");
-    }
+  test("Settings is in the sidebar for tenant only (owner uses avatar dropdown)", () => {
+    const tenantLabels = filterNavForPersona("tenant").map((i) => i.label);
+    expect(tenantLabels).toContain("Settings");
+
+    const ownerLabels = filterNavForPersona("owner").map((i) => i.label);
+    expect(ownerLabels).not.toContain("Settings");
   });
 
   test("future items are excluded", () => {
