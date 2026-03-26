@@ -1,33 +1,16 @@
 <!-- ==========================================================
-     LEASEBASE DEMO PAGE — GUTENBERG BLOCK CONTENT
-     ==========================================================
-     HOW TO USE (if the FSE template page-demo.html is not
-     auto-applied by WordPress):
-     1. Go to WP Admin → Pages → Demo (slug: demo)
-     2. Switch to the Code Editor (⋮ menu → Code editor)
-     3. Select ALL existing content and DELETE it
-     4. Paste this entire file content
-     5. Switch back to Visual Editor to verify
-     6. Click Update / Publish
-     7. Ensure the page uses the "Demo" template (Page Attributes
-        panel → Template → Demo) if available, otherwise the
-        FSE template page-demo.html should apply automatically
-        for the slug "demo".
+     LEASEBASE DEMO PAGE — GUTENBERG BLOCK CONTENT (v6 Redesign)
      ========================================================== -->
 
-
-<!-- DEMO HERO -->
+<!-- HERO -->
 <!-- wp:group {"className":"lb-demo-hero lb-section","layout":{"type":"constrained"}} -->
 <div class="wp-block-group lb-demo-hero lb-section">
-
 <!-- wp:heading {"level":1,"textAlign":"center"} -->
-<h1 class="wp-block-heading has-text-align-center">Book a LeaseBase Demo</h1>
+<h1 class="wp-block-heading has-text-align-center">Book a <span class="lb-gradient-text">LeaseBase Demo</span></h1>
 <!-- /wp:heading -->
-
 <!-- wp:paragraph {"align":"center","className":"lb-hero-sub"} -->
 <p class="has-text-align-center lb-hero-sub">See how LeaseBase helps rental property owners manage leases, rent collection, maintenance, and the tenant experience in one connected platform.</p>
 <!-- /wp:paragraph -->
-
 <!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
 <div class="wp-block-buttons">
 <!-- wp:button -->
@@ -38,100 +21,75 @@
 <!-- /wp:button -->
 </div>
 <!-- /wp:buttons -->
-
 </div>
 <!-- /wp:group -->
 
-
-<!-- SCHEDULER SECTION -->
+<!-- SCHEDULER -->
 <!-- wp:group {"className":"lb-section lb-demo-scheduler-section","style":{"spacing":{"padding":{"top":"48px","bottom":"32px"}}},"layout":{"type":"constrained"}} -->
 <div id="lb-demo-scheduler" class="wp-block-group lb-section lb-demo-scheduler-section" style="padding-top:48px;padding-bottom:32px">
-
 <!-- wp:html -->
 <div class="lb-calendly-wrap">
-  <div
-    class="calendly-inline-widget"
-    data-url="https://calendly.com/leasebase/leasebase-product-demo?hide_gdpr_banner=1"
-    style="min-width:320px;height:700px;"
-  ></div>
+  <div class="calendly-inline-widget" data-url="https://calendly.com/leasebase/leasebase-product-demo?hide_gdpr_banner=1" style="min-width:320px;height:700px;"></div>
   <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
 </div>
 <!-- /wp:html -->
-
 </div>
 <!-- /wp:group -->
 
-
-<!-- FALLBACK LINK -->
+<!-- FALLBACK -->
 <!-- wp:group {"className":"lb-section lb-demo-fallback-section","style":{"spacing":{"padding":{"top":"8px","bottom":"32px"}}},"layout":{"type":"constrained"}} -->
 <div class="wp-block-group lb-section lb-demo-fallback-section" style="padding-top:8px;padding-bottom:32px">
-
 <!-- wp:html -->
 <p class="lb-demo-fallback">Having trouble with the scheduler? <a href="https://calendly.com/leasebase/leasebase-product-demo" target="_blank" rel="noopener">Open the booking page directly.</a></p>
 <!-- /wp:html -->
-
 </div>
 <!-- /wp:group -->
 
-
 <!-- WHAT YOU'LL SEE -->
-<!-- wp:group {"className":"lb-section lb-section-alt lb-demo-preview","style":{"spacing":{"padding":{"top":"72px","bottom":"72px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-section-alt lb-demo-preview" style="padding-top:72px;padding-bottom:72px">
-
+<!-- wp:group {"className":"lb-section lb-section-alt lb-demo-preview","style":{"spacing":{"padding":{"top":"96px","bottom":"96px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-section lb-section-alt lb-demo-preview" style="padding-top:96px;padding-bottom:96px">
 <!-- wp:heading {"textAlign":"center"} -->
 <h2 class="wp-block-heading has-text-align-center">What you'll see in the demo</h2>
 <!-- /wp:heading -->
-
 <!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
 <p class="has-text-align-center lb-subtitle">A personalized walkthrough of the full LeaseBase platform.</p>
 <!-- /wp:paragraph -->
-
 <!-- wp:html -->
 <div class="lb-demo-preview-grid">
-
   <div class="lb-demo-preview-item">
-    <div class="lb-demo-preview-icon" aria-hidden="true">📊</div>
+    <div class="lb-demo-preview-icon">📊</div>
     <h3>Owner Dashboard &amp; Portfolio Visibility</h3>
-    <p>See how your properties, leases, rent status, and maintenance requests are organized in one unified view — no spreadsheets required.</p>
+    <p>See how your properties, leases, rent status, and maintenance requests are organized in one unified view.</p>
   </div>
-
   <div class="lb-demo-preview-item">
-    <div class="lb-demo-preview-icon" aria-hidden="true">📝</div>
+    <div class="lb-demo-preview-icon">📝</div>
     <h3>Lease Workflows &amp; Tenant Onboarding</h3>
-    <p>Walk through end-to-end lease creation, e-signatures, and the tenant onboarding experience from invite to move-in.</p>
+    <p>Walk through end-to-end lease creation, e-signatures, and the tenant onboarding experience.</p>
   </div>
-
   <div class="lb-demo-preview-item">
-    <div class="lb-demo-preview-icon" aria-hidden="true">💰</div>
+    <div class="lb-demo-preview-icon">💰</div>
     <h3>Online Rent Collection &amp; Autopay</h3>
-    <p>See how tenants pay rent online and how autopay keeps collections consistent, on time, and out of your inbox.</p>
+    <p>See how tenants pay rent online and how autopay keeps collections consistent and on time.</p>
   </div>
-
   <div class="lb-demo-preview-item">
-    <div class="lb-demo-preview-icon" aria-hidden="true">🛠️</div>
+    <div class="lb-demo-preview-icon">🛠️</div>
     <h3>Maintenance Management &amp; Tenant Experience</h3>
-    <p>Explore how maintenance requests are submitted, tracked, and resolved — and how tenants experience the platform throughout.</p>
+    <p>Explore how maintenance requests are submitted, tracked, and resolved from both sides.</p>
   </div>
-
 </div>
 <!-- /wp:html -->
-
 </div>
 <!-- /wp:group -->
 
-
-<!-- FINAL CTA BAND -->
-<!-- wp:group {"className":"lb-section lb-demo-final-cta","style":{"spacing":{"padding":{"top":"72px","bottom":"88px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-demo-final-cta" style="padding-top:72px;padding-bottom:88px">
-
+<!-- FINAL CTA -->
+<!-- wp:group {"className":"lb-cta-banner","layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-cta-banner">
 <!-- wp:heading {"textAlign":"center"} -->
 <h2 class="wp-block-heading has-text-align-center">Want to talk through your rental workflow?</h2>
 <!-- /wp:heading -->
-
-<!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
-<p class="has-text-align-center lb-subtitle">Book a demo to see LeaseBase in action, or reach out with your questions.</p>
+<!-- wp:paragraph {"align":"center"} -->
+<p class="has-text-align-center">Book a demo to see LeaseBase in action, or reach out with your questions.</p>
 <!-- /wp:paragraph -->
-
 <!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
 <div class="wp-block-buttons">
 <!-- wp:button -->
@@ -142,6 +100,5 @@
 <!-- /wp:button -->
 </div>
 <!-- /wp:buttons -->
-
 </div>
 <!-- /wp:group -->

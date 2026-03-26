@@ -25,6 +25,11 @@ jest.mock("next/navigation", () => ({
   useParams: () => ({ id: "wo-1" }),
 }));
 
+jest.mock("@/services/notifications/preferencesV2", () => ({
+  fetchSubscription: jest.fn().mockResolvedValue(null),
+  upsertSubscription: jest.fn().mockResolvedValue(null),
+}));
+
 jest.mock("next/link", () => {
   const MockLink = ({ children, href, ...rest }: any) => (
     <a href={href} {...rest}>{children}</a>
@@ -99,9 +104,8 @@ beforeEach(() => {
   mockFetchTimeline.mockReset();
   mockFetchAttachments.mockReset();
   mockAddComment.mockReset();
-  // Default v2 mocks
-  mockFetchTimeline.mockResolvedValue({ data: [], source: "live", error: null });
-  mockFetchAttachments.mockResolvedValue({ data: [], source: "live", error: null });
+  // Default mock for comments (component uses comments, not timeline)
+  mockFetchComments.mockResolvedValue({ data: [], source: "live", error: null });
 });
 
 describe("TenantMaintenanceDetail", () => {
@@ -115,7 +119,7 @@ describe("TenantMaintenanceDetail", () => {
 
   test("renders work order detail with description, status, priority, category, and date", async () => {
     mockFetchDetail.mockResolvedValue(successDetail(workOrder));
-    mockFetchTimeline.mockResolvedValue({ data: comments.map((c: any) => ({ id: c.id, type: "comment", event_type: "COMMENT_ADDED", actor_user_id: c.user_id, actor_name: c.author_name, metadata: { comment: c.comment }, created_at: c.created_at })), source: "live", error: null });
+    mockFetchComments.mockResolvedValue(successComments(comments));
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {
@@ -130,9 +134,9 @@ describe("TenantMaintenanceDetail", () => {
     expect(screen.getByText("Plumbing")).toBeInTheDocument();
   });
 
-  test("renders timeline with comments", async () => {
+  test("renders comments thread", async () => {
     mockFetchDetail.mockResolvedValue(successDetail(workOrder));
-    mockFetchTimeline.mockResolvedValue({ data: comments.map((c: any) => ({ id: c.id, type: "comment", event_type: "COMMENT_ADDED", actor_user_id: c.user_id, actor_name: c.author_name, metadata: { comment: c.comment }, created_at: c.created_at })), source: "live", error: null });
+    mockFetchComments.mockResolvedValue(successComments(comments));
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {
@@ -143,12 +147,12 @@ describe("TenantMaintenanceDetail", () => {
     expect(screen.getByText(/Dev Tenant/)).toBeInTheDocument();
   });
 
-  test("shows empty activity message when no timeline entries", async () => {
+  test("shows empty comments message when no comments", async () => {
     mockFetchDetail.mockResolvedValue(successDetail(workOrder));
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {
-      expect(screen.getByText("No activity yet.")).toBeInTheDocument();
+      expect(screen.getByText("No comments yet.")).toBeInTheDocument();
     });
   });
 
@@ -172,14 +176,6 @@ describe("TenantMaintenanceDetail", () => {
       author_name: "Dev Tenant",
       created_at: "2026-03-11T10:00:00Z",
     });
-    // After comment, timeline refreshes
-    mockFetchTimeline.mockResolvedValue({ data: [{
-      id: "c-new", type: "comment", event_type: "COMMENT_ADDED",
-      actor_user_id: "u-tenant-1", actor_name: "Dev Tenant",
-      metadata: { comment: "When will this be fixed?" },
-      created_at: "2026-03-11T10:00:00Z",
-    }], source: "live", error: null });
-
     render(<TenantMaintenanceDetail />);
 
     await waitFor(() => {

@@ -72,28 +72,72 @@ export function PriorityActions({ actions, loading = false, className = "" }: Pr
 
   if (actions.length === 0) return null;
 
+  const hasDanger = actions.some((a) => a.severity === "danger");
+
   return (
-    <div className={`rounded-lg border border-slate-200 bg-white ${className}`} role="region" aria-label="Priority actions">
-      <div className="border-b border-slate-200 px-4 py-3">
-        <h2 className="text-sm font-semibold text-slate-900">Next Actions</h2>
+    <div
+      className={`rounded-xl border shadow-sm overflow-hidden ${
+        hasDanger
+          ? "border-red-200 bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50/60"
+          : "border-amber-200 bg-gradient-to-br from-amber-50 via-amber-50/80 to-yellow-50/60"
+      } ${className}`}
+      role="region"
+      aria-label="Priority actions"
+    >
+      <div className={`flex items-center gap-3 px-5 py-4 border-b ${
+        hasDanger ? "border-red-100" : "border-amber-100"
+      }`}>
+        <div className={`flex h-8 w-8 items-center justify-center rounded-lg shadow-sm ${
+          hasDanger ? "bg-red-100" : "bg-amber-100"
+        }`}>
+          <ShieldAlert size={16} className={hasDanger ? "text-red-600" : "text-amber-600"} />
+        </div>
+        <div className="flex-1">
+          <h2 className={`text-[14px] font-bold ${
+            hasDanger ? "text-red-900" : "text-amber-900"
+          }`}>Action Required</h2>
+        </div>
+        <span className={`rounded-md px-2.5 py-1 text-[11px] font-bold shadow-sm ${
+          hasDanger ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+        }`}>
+          {actions.length} {actions.length === 1 ? "item" : "items"}
+        </span>
       </div>
-      <ul className="divide-y divide-slate-200">
+      <ul className={`divide-y ${hasDanger ? "divide-red-100/80" : "divide-amber-100/80"}`}>
         {actions.map((action) => {
           const badge = severityBadge[action.severity];
           const IconCmp = action.icon ?? severityIcon[action.severity];
           const bar = severityBar[action.severity];
+          const rowTint =
+            action.severity === "danger"
+              ? "bg-red-50/40"
+              : action.severity === "warning"
+                ? "bg-amber-50/30"
+                : "";
+          const iconGradient =
+            action.severity === "danger"
+              ? "bg-gradient-to-br from-red-500 to-red-600 text-white shadow-sm shadow-red-500/20"
+              : action.severity === "warning"
+                ? "bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-sm shadow-amber-500/20"
+                : "bg-slate-100 text-slate-500";
           return (
-            <li key={action.id} className="flex items-center gap-3 px-4 py-3">
-              <div className={`h-8 w-1 shrink-0 rounded-full ${bar}`} />
-              <IconCmp size={16} className="shrink-0 text-slate-400" aria-hidden="true" />
+            <li key={action.id} className={`flex items-center gap-3.5 px-5 py-4 transition-colors hover:bg-white/50 ${rowTint}`}>
+              <div className={`h-10 w-1.5 shrink-0 rounded-full ${bar}`} />
+              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${iconGradient}`}>
+                <IconCmp size={15} aria-hidden="true" />
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-700 truncate">{action.title}</p>
-                <p className="text-xs text-slate-400 truncate">{action.description}</p>
+                <p className="text-[13px] font-semibold text-slate-900 truncate">{action.title}</p>
+                <p className="mt-0.5 text-xs text-slate-500 truncate">{action.description}</p>
               </div>
               <Badge variant={badge.variant} className="shrink-0">{badge.label}</Badge>
               <Link
                 href={action.ctaHref}
-                className="shrink-0 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className={`shrink-0 rounded-lg px-4 py-2 text-xs font-bold shadow-sm transition-all hover:shadow focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+                  action.severity === "danger"
+                    ? "border border-red-200 bg-white text-red-700 hover:bg-red-50"
+                    : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
               >
                 {action.ctaLabel}
               </Link>

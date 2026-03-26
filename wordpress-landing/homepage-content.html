@@ -1,13 +1,5 @@
 <!-- ==========================================================
-     LEASEBASE HOMEPAGE — GUTENBERG BLOCK CONTENT
-     ==========================================================
-     HOW TO USE:
-     1. Go to WP Admin → Pages → Home (page ID 5)
-     2. Switch to the Code Editor (⋮ menu → Code editor)
-     3. Select ALL existing content and DELETE it
-     4. Paste this entire file content
-     5. Switch back to Visual Editor to verify
-     6. Click Update / Publish
+     LEASEBASE HOMEPAGE — GUTENBERG BLOCK CONTENT (v6 Redesign)
      ========================================================== -->
 
 
@@ -15,52 +7,77 @@
 <!-- wp:group {"className":"lb-hero","layout":{"type":"constrained"}} -->
 <div class="wp-block-group lb-hero">
 
+<!-- wp:html -->
+<div class="lb-badge">Trusted by 2,000+ property owners</div>
+<!-- /wp:html -->
+
 <!-- wp:heading {"level":1,"textAlign":"center"} -->
-<h1 class="wp-block-heading has-text-align-center">Manage your rentals without the chaos</h1>
+<h1 class="wp-block-heading has-text-align-center">Make Your Property <span class="lb-gradient-text">Profitable Faster</span></h1>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"align":"center","className":"lb-hero-sub"} -->
-<p class="has-text-align-center lb-hero-sub">Automate rent collection, organize tenants and leases, and handle maintenance — all from one simple platform built for independent landlords.</p>
+<p class="has-text-align-center lb-hero-sub">The complete platform for independent property owners managing 10–200 units. Automate rent collection, streamline tenant management, and grow your portfolio with confidence.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
 <div class="wp-block-buttons">
 <!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://signup.dev.leasebase.ai">Start Free</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://signup.dev.leasebase.ai">Start Free →</a></div>
 <!-- /wp:button -->
-
 <!-- wp:button {"className":"is-style-outline"} -->
-<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/demo/">Book a Demo</a></div>
+<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/demo/">Schedule Demo</a></div>
 <!-- /wp:button -->
 </div>
 <!-- /wp:buttons -->
+
+<!-- wp:html -->
+<p class="lb-hero-note">No credit card required • Free 14-day trial</p>
+<!-- /wp:html -->
 
 <!-- wp:html -->
 <div class="lb-hero-visual">
   <div class="lb-browser-frame">
     <div class="lb-browser-chrome">
-      <span class="lb-dot"></span><span class="lb-dot"></span><span class="lb-dot"></span>
-      <span class="lb-browser-url">app.dev.leasebase.ai</span>
+      <div class="lb-browser-dots"><span></span><span></span><span></span></div>
+      <div class="lb-browser-title">LeaseBase Dashboard</div>
     </div>
     <div class="lb-browser-body">
-      <div class="lb-mock-sidebar">
-        <div class="lb-mock-nav-item lb-mock-active">Dashboard</div>
-        <div class="lb-mock-nav-item">Properties</div>
-        <div class="lb-mock-nav-item">Tenants</div>
-        <div class="lb-mock-nav-item">Leases</div>
-        <div class="lb-mock-nav-item">Maintenance</div>
-        <div class="lb-mock-nav-item">Payments</div>
-      </div>
-      <div class="lb-mock-main">
-        <div class="lb-mock-stats">
-          <div class="lb-mock-stat"><span class="lb-mock-stat-num">12</span><span class="lb-mock-stat-label">Properties</span></div>
-          <div class="lb-mock-stat"><span class="lb-mock-stat-num">48</span><span class="lb-mock-stat-label">Units</span></div>
-          <div class="lb-mock-stat"><span class="lb-mock-stat-num">44</span><span class="lb-mock-stat-label">Active Leases</span></div>
-          <div class="lb-mock-stat"><span class="lb-mock-stat-num">$52k</span><span class="lb-mock-stat-label">Monthly Rent</span></div>
+      <div class="lb-mock-stats-row">
+        <div class="lb-mock-stat-card">
+          <div class="lb-mock-stat-label">Total Revenue</div>
+          <div class="lb-mock-stat-value">$48,250</div>
+          <div class="lb-mock-stat-change lb-mock-stat-change--green">↗ 12% vs last month</div>
         </div>
-        <div class="lb-mock-cards">
-          <div class="lb-mock-card"></div>
-          <div class="lb-mock-card"></div>
+        <div class="lb-mock-stat-card">
+          <div class="lb-mock-stat-label">Active Leases</div>
+          <div class="lb-mock-stat-value">84</div>
+          <div class="lb-mock-stat-change lb-mock-stat-change--blue">96% occupancy</div>
+        </div>
+        <div class="lb-mock-stat-card">
+          <div class="lb-mock-stat-label">Due This Week</div>
+          <div class="lb-mock-stat-value">$12,400</div>
+          <div class="lb-mock-stat-change lb-mock-stat-change--muted">18 payments</div>
+        </div>
+      </div>
+      <div class="lb-mock-activity">
+        <div class="lb-mock-activity-header">
+          <h3>Recent Activity</h3>
+          <span class="lb-mock-activity-badge">Live</span>
+        </div>
+        <div class="lb-mock-activity-row">
+          <div class="lb-mock-avatar"></div>
+          <div class="lb-mock-activity-lines"><div class="lb-mock-line lb-mock-line--wide"></div><div class="lb-mock-line lb-mock-line--narrow"></div></div>
+          <div class="lb-mock-time">1h ago</div>
+        </div>
+        <div class="lb-mock-activity-row">
+          <div class="lb-mock-avatar"></div>
+          <div class="lb-mock-activity-lines"><div class="lb-mock-line lb-mock-line--wide"></div><div class="lb-mock-line lb-mock-line--narrow"></div></div>
+          <div class="lb-mock-time">2h ago</div>
+        </div>
+        <div class="lb-mock-activity-row">
+          <div class="lb-mock-avatar"></div>
+          <div class="lb-mock-activity-lines"><div class="lb-mock-line lb-mock-line--wide"></div><div class="lb-mock-line lb-mock-line--narrow"></div></div>
+          <div class="lb-mock-time">3h ago</div>
         </div>
       </div>
     </div>
@@ -72,39 +89,36 @@
 <!-- /wp:group -->
 
 
-<!-- SECTION 2: PROBLEM -->
-<!-- wp:group {"className":"lb-section lb-problem","style":{"spacing":{"padding":{"top":"80px","bottom":"80px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-problem" style="padding-top:80px;padding-bottom:80px">
+<!-- SECTION 2: PROBLEM → SOLUTION -->
+<!-- wp:group {"className":"lb-section lb-problem-solution","style":{"spacing":{"padding":{"top":"96px","bottom":"96px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-section lb-problem-solution" style="padding-top:96px;padding-bottom:96px">
 
 <!-- wp:heading {"textAlign":"center"} -->
-<h2 class="wp-block-heading has-text-align-center">Rental management shouldn't be this hard</h2>
+<h2 class="wp-block-heading has-text-align-center">Stop Juggling Spreadsheets and Scattered Tools</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
-<p class="has-text-align-center lb-subtitle">Most landlords still rely on spreadsheets, scattered emails, and disconnected tools to run their rental business. It creates chaos, missed payments, and wasted time.</p>
+<p class="has-text-align-center lb-subtitle">Managing rental properties shouldn't feel like chaos. LeaseBase brings everything into one powerful platform.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:html -->
-<div class="lb-problem-grid">
-
-  <div class="lb-problem-card">
-    <div class="lb-icon">📊</div>
-    <h3>Spreadsheet overload</h3>
-    <p>Tracking rent, leases, and expenses across spreadsheets leads to errors and lost data.</p>
+<div class="lb-ps-grid">
+  <div class="lb-ps-col">
+    <h3>Common Pain Points:</h3>
+    <div class="lb-ps-item"><div class="lb-ps-dot lb-ps-dot--red"></div><p>Chasing tenants for rent payments every month</p></div>
+    <div class="lb-ps-item"><div class="lb-ps-dot lb-ps-dot--red"></div><p>Losing track of lease renewals and important dates</p></div>
+    <div class="lb-ps-item"><div class="lb-ps-dot lb-ps-dot--red"></div><p>Managing maintenance requests via texts and emails</p></div>
+    <div class="lb-ps-item"><div class="lb-ps-dot lb-ps-dot--red"></div><p>Using multiple tools that don't talk to each other</p></div>
+    <div class="lb-ps-item"><div class="lb-ps-dot lb-ps-dot--red"></div><p>Spending hours on manual admin work</p></div>
   </div>
-
-  <div class="lb-problem-card">
-    <div class="lb-icon">📧</div>
-    <h3>Scattered communication</h3>
-    <p>Tenant messages, maintenance requests, and vendor coordination happen across too many channels.</p>
+  <div class="lb-ps-col">
+    <h3>LeaseBase Solution:</h3>
+    <div class="lb-ps-item"><div class="lb-ps-dot lb-ps-dot--green">✓</div><p>Automated rent collection with reminders and ACH/card payments</p></div>
+    <div class="lb-ps-item"><div class="lb-ps-dot lb-ps-dot--green">✓</div><p>Smart lease tracking with renewal alerts and e-signatures</p></div>
+    <div class="lb-ps-item"><div class="lb-ps-dot lb-ps-dot--green">✓</div><p>Centralized maintenance portal with tenant self-service</p></div>
+    <div class="lb-ps-item"><div class="lb-ps-dot lb-ps-dot--green">✓</div><p>All-in-one platform: leases, payments, docs, and communication</p></div>
+    <div class="lb-ps-item"><div class="lb-ps-dot lb-ps-dot--green">✓</div><p>Save 10+ hours per week on property management</p></div>
   </div>
-
-  <div class="lb-problem-card">
-    <div class="lb-icon">⏱️</div>
-    <h3>Manual everything</h3>
-    <p>No automation means hours spent on repetitive tasks that should happen on their own.</p>
-  </div>
-
 </div>
 <!-- /wp:html -->
 
@@ -112,152 +126,57 @@
 <!-- /wp:group -->
 
 
-<!-- SECTION 3: PLATFORM OVERVIEW -->
-<!-- wp:group {"className":"lb-section lb-section-alt lb-platform","style":{"spacing":{"padding":{"top":"80px","bottom":"80px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-section-alt lb-platform" style="padding-top:80px;padding-bottom:80px">
+<!-- SECTION 3: FEATURES GRID -->
+<!-- wp:group {"className":"lb-section lb-section-alt lb-features","style":{"spacing":{"padding":{"top":"96px","bottom":"96px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-section lb-section-alt lb-features" style="padding-top:96px;padding-bottom:96px">
 
 <!-- wp:heading {"textAlign":"center"} -->
-<h2 class="wp-block-heading has-text-align-center">One platform to run your entire rental business</h2>
+<h2 class="wp-block-heading has-text-align-center">Everything You Need to Manage Your Properties</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
-<p class="has-text-align-center lb-subtitle">LeaseBase replaces your spreadsheets, filing cabinets, and patchwork tools with a single intelligent platform built for rental property owners.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:html -->
-<div class="lb-platform-highlights">
-
-  <div class="lb-platform-item">
-    <span class="lb-check">✓</span>
-    <span>Properties, units, and leases organized in one place</span>
-  </div>
-
-  <div class="lb-platform-item">
-    <span class="lb-check">✓</span>
-    <span>Tenant profiles with full history and communication</span>
-  </div>
-
-  <div class="lb-platform-item">
-    <span class="lb-check">✓</span>
-    <span>Rent collection and financial tracking built in</span>
-  </div>
-
-  <div class="lb-platform-item">
-    <span class="lb-check">✓</span>
-    <span>Maintenance workflows from request to resolution</span>
-  </div>
-
-  <div class="lb-platform-item">
-    <span class="lb-check">✓</span>
-    <span>Document storage organized by property and tenant</span>
-  </div>
-
-  <div class="lb-platform-item">
-    <span class="lb-check">✓</span>
-    <span>AI-assisted workflows and smart automation</span>
-  </div>
-
-</div>
-<!-- /wp:html -->
-
-</div>
-<!-- /wp:group -->
-
-
-<!-- SECTION 4: FEATURE GRID -->
-<!-- wp:group {"className":"lb-section lb-features","style":{"spacing":{"padding":{"top":"80px","bottom":"80px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-features" style="padding-top:80px;padding-bottom:80px">
-
-<!-- wp:heading {"textAlign":"center"} -->
-<h2 class="wp-block-heading has-text-align-center">Everything you need to operate like a modern landlord</h2>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
-<p class="has-text-align-center lb-subtitle">A complete set of tools to manage every aspect of your rental properties.</p>
+<p class="has-text-align-center lb-subtitle">Powerful features designed for independent property owners</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:html -->
 <div class="lb-features-grid">
-
   <div class="lb-feature-card">
-    <div class="lb-icon">🏠</div>
-    <h3>Properties &amp; Units</h3>
-    <p>Organize your portfolio with detailed property and unit profiles, occupancy tracking, and unit-level financials.</p>
-  </div>
-
-  <div class="lb-feature-card">
-    <div class="lb-icon">📋</div>
+    <div class="lb-feature-icon lb-feature-icon--blue">📋</div>
     <h3>Lease Management</h3>
-    <p>Create and track leases with terms, renewal dates, rent amounts, and automated status updates.</p>
+    <p>Create, track, and renew leases with digital signatures. Never miss a renewal date.</p>
   </div>
-
   <div class="lb-feature-card">
-    <div class="lb-icon">👥</div>
+    <div class="lb-feature-icon lb-feature-icon--indigo">👥</div>
     <h3>Tenant Management</h3>
-    <p>Maintain complete tenant profiles with contact details, lease history, payment records, and communication logs.</p>
+    <p>Complete tenant profiles, communication history, and document storage in one place.</p>
   </div>
-
   <div class="lb-feature-card">
-    <div class="lb-icon">💳</div>
-    <h3>Rent Payments</h3>
-    <p>Track rent collection, monitor payment history, manage your rent roll, and handle late payments efficiently.</p>
+    <div class="lb-feature-icon lb-feature-icon--green">💰</div>
+    <h3>Rent Collection</h3>
+    <p>Automated payment reminders, ACH/card processing, and instant payment tracking.</p>
   </div>
-
   <div class="lb-feature-card">
-    <div class="lb-icon">🔧</div>
-    <h3>Maintenance</h3>
-    <p>Receive, assign, and track maintenance requests from submission through resolution with full audit trails.</p>
+    <div class="lb-feature-icon lb-feature-icon--orange">🔧</div>
+    <h3>Maintenance Tracking</h3>
+    <p>Tenant portal for submitting requests, automated workflows, and vendor coordination.</p>
   </div>
-
   <div class="lb-feature-card">
-    <div class="lb-icon">📄</div>
-    <h3>Documents</h3>
-    <p>Securely store leases, insurance documents, inspection reports, and receipts — organized by property and tenant.</p>
+    <div class="lb-feature-icon lb-feature-icon--purple">📄</div>
+    <h3>Document Management</h3>
+    <p>Store leases, receipts, and property docs securely. Access anywhere, anytime.</p>
   </div>
-
   <div class="lb-feature-card">
-    <div class="lb-icon">📊</div>
-    <h3>Financial Tracking</h3>
-    <p>Monitor income, expenses, and profitability across your portfolio with real-time financial dashboards.</p>
+    <div class="lb-feature-icon lb-feature-icon--yellow">⚡</div>
+    <h3>Automation & Workflows</h3>
+    <p>Auto-send rent reminders, renewal notices, and late payment alerts. Save hours.</p>
   </div>
-
-  <div class="lb-feature-card">
-    <div class="lb-icon">🔔</div>
-    <h3>Notifications</h3>
-    <p>Stay informed with smart alerts for lease expirations, overdue payments, maintenance updates, and more.</p>
-  </div>
-
-  <div class="lb-feature-card">
-    <div class="lb-icon">📈</div>
-    <h3>Owner Dashboard</h3>
-    <p>Get a complete view of your rental business — occupancy, revenue, pending tasks, and portfolio health at a glance.</p>
-  </div>
-
-  <div class="lb-feature-card">
-    <div class="lb-icon">🤖</div>
-    <h3>AI-Assisted Workflows</h3>
-    <p>Leverage intelligent automation to streamline repetitive tasks, surface insights, and optimize your operations.</p>
-  </div>
-
-  <div class="lb-feature-card">
-    <div class="lb-icon">⚡</div>
-    <h3>Automation</h3>
-    <p>Automate rent reminders, lease renewals, maintenance routing, and communication workflows to save hours every week.</p>
-  </div>
-
-  <div class="lb-feature-card">
-    <div class="lb-icon">💬</div>
-    <h3>Communication</h3>
-    <p>Centralize all tenant and vendor communication with built-in messaging, notifications, and activity logs.</p>
-  </div>
-
 </div>
 <!-- /wp:html -->
 
 <!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"},"style":{"spacing":{"margin":{"top":"48px"}}}} -->
 <div class="wp-block-buttons" style="margin-top:48px">
-<!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://signup.dev.leasebase.ai">Start Free</a></div>
+<!-- wp:button {"className":"is-style-outline"} -->
+<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/features/">View All Features →</a></div>
 <!-- /wp:button -->
 </div>
 <!-- /wp:buttons -->
@@ -266,45 +185,40 @@
 <!-- /wp:group -->
 
 
-<!-- SECTION 5: HOW IT WORKS -->
-<!-- wp:group {"className":"lb-section lb-section-alt lb-steps","style":{"spacing":{"padding":{"top":"80px","bottom":"80px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-section-alt lb-steps" style="padding-top:80px;padding-bottom:80px">
+<!-- SECTION 4: HOW IT WORKS -->
+<!-- wp:group {"className":"lb-section lb-steps","style":{"spacing":{"padding":{"top":"96px","bottom":"96px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-section lb-steps" style="padding-top:96px;padding-bottom:96px">
 
 <!-- wp:heading {"textAlign":"center"} -->
-<h2 class="wp-block-heading has-text-align-center">Get started in minutes</h2>
+<h2 class="wp-block-heading has-text-align-center">How It Works</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
-<p class="has-text-align-center lb-subtitle">LeaseBase is designed to get you up and running fast — no complex setup required.</p>
+<p class="has-text-align-center lb-subtitle">Get started in minutes, not days</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:html -->
-<div class="lb-steps-grid lb-steps-4">
-
+<div class="lb-steps-grid">
   <div class="lb-step">
     <div class="lb-step-num">1</div>
-    <h3>Add your property</h3>
-    <p>Enter your property details and unit information to build your portfolio.</p>
+    <h3>Add Your Properties</h3>
+    <p>Import your properties and units with our simple setup wizard.</p>
   </div>
-
   <div class="lb-step">
     <div class="lb-step-num">2</div>
-    <h3>Organize units and leases</h3>
-    <p>Set up units, assign lease terms, and configure rent schedules.</p>
+    <h3>Invite Tenants</h3>
+    <p>Send invitations to your tenants to join their portal and set up payments.</p>
   </div>
-
   <div class="lb-step">
     <div class="lb-step-num">3</div>
-    <h3>Manage tenants and maintenance</h3>
-    <p>Add tenants, handle maintenance requests, and track everything in one place.</p>
+    <h3>Collect Rent</h3>
+    <p>Automatic payment collection with reminders. Money hits your account on time.</p>
   </div>
-
   <div class="lb-step">
     <div class="lb-step-num">4</div>
-    <h3>Operate from one platform</h3>
-    <p>Run your entire rental business from a single dashboard with full visibility.</p>
+    <h3>Manage Everything</h3>
+    <p>Track leases, handle maintenance, and communicate — all from one dashboard.</p>
   </div>
-
 </div>
 <!-- /wp:html -->
 
@@ -312,142 +226,161 @@
 <!-- /wp:group -->
 
 
-<!-- SECTION 6: DASHBOARD OVERVIEW -->
-<!-- wp:group {"className":"lb-section lb-section-alt lb-dashboard","style":{"spacing":{"padding":{"top":"80px","bottom":"80px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-section-alt lb-dashboard" style="padding-top:80px;padding-bottom:80px">
-
-<!-- wp:html -->
-<div class="lb-dashboard-layout">
-
-  <div class="lb-dashboard-copy">
-    <h2>Run your entire rental operation from one dashboard</h2>
-    <p class="lb-dashboard-desc">LeaseBase brings your day-to-day rental workflows into one place so you can manage properties, leases, tenants, maintenance, documents, and rent activity with more visibility and less manual work.</p>
-
-    <div class="lb-dashboard-capabilities">
-      <span class="lb-cap-tag">Properties &amp; Units</span>
-      <span class="lb-cap-tag">Leases &amp; Renewals</span>
-      <span class="lb-cap-tag">Tenant Management</span>
-      <span class="lb-cap-tag">Maintenance Tracking</span>
-      <span class="lb-cap-tag">Document Storage</span>
-      <span class="lb-cap-tag">Rent &amp; Payments</span>
-      <span class="lb-cap-tag">Notifications</span>
-      <span class="lb-cap-tag">Financial Oversight</span>
-      <span class="lb-cap-tag">Communication</span>
-    </div>
-
-    <a href="https://signup.dev.leasebase.ai" class="lb-dashboard-cta">Start Free</a>
-  </div>
-
-  <div class="lb-dashboard-visual">
-    <div class="lb-dash-panel">
-      <div class="lb-dash-panel-header">
-        <span class="lb-dash-panel-title">Owner Dashboard</span>
-        <span class="lb-dash-panel-badge">Live</span>
-      </div>
-      <div class="lb-dash-panel-metrics">
-        <div class="lb-dash-metric">
-          <div class="lb-dash-metric-value">96%</div>
-          <div class="lb-dash-metric-label">Occupancy</div>
-        </div>
-        <div class="lb-dash-metric">
-          <div class="lb-dash-metric-value">$52k</div>
-          <div class="lb-dash-metric-label">Monthly Revenue</div>
-        </div>
-        <div class="lb-dash-metric">
-          <div class="lb-dash-metric-value">3</div>
-          <div class="lb-dash-metric-label">Open Requests</div>
-        </div>
-      </div>
-      <div class="lb-dash-panel-rows">
-        <div class="lb-dash-row"><span class="lb-dash-row-dot lb-dot-green"></span> 2 leases renewing this month</div>
-        <div class="lb-dash-row"><span class="lb-dash-row-dot lb-dot-blue"></span> Rent collected: 44 of 48 units</div>
-        <div class="lb-dash-row"><span class="lb-dash-row-dot lb-dot-amber"></span> 1 maintenance request pending</div>
-      </div>
-    </div>
-  </div>
-
-</div>
-<!-- /wp:html -->
-
-</div>
-<!-- /wp:group -->
-
-
-<!-- SECTION 7: TENANT EXPERIENCE -->
-<!-- wp:group {"className":"lb-section lb-tenant-exp","style":{"spacing":{"padding":{"top":"80px","bottom":"80px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-tenant-exp" style="padding-top:80px;padding-bottom:80px">
+<!-- SECTION 5: SOCIAL PROOF / TESTIMONIALS -->
+<!-- wp:group {"className":"lb-section lb-section-alt lb-testimonials","style":{"spacing":{"padding":{"top":"96px","bottom":"96px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-section lb-section-alt lb-testimonials" style="padding-top:96px;padding-bottom:96px">
 
 <!-- wp:heading {"textAlign":"center"} -->
-<h2 class="wp-block-heading has-text-align-center">A better experience for your tenants too</h2>
+<h2 class="wp-block-heading has-text-align-center">Trusted by Property Owners Nationwide</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
-<p class="has-text-align-center lb-subtitle">Happy tenants mean fewer vacancies. LeaseBase gives your tenants their own portal to stay connected and self-serve.</p>
+<p class="has-text-align-center lb-subtitle">See what our customers have to say</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:html -->
-<div class="lb-tenant-grid">
-
-  <div class="lb-tenant-card">
-    <div class="lb-icon">🏡</div>
-    <h3>Tenant Portal</h3>
-    <p>Tenants access their own dashboard to view lease details, payment history, and property information.</p>
+<div class="lb-testimonials-grid">
+  <div class="lb-testimonial-card">
+    <div class="lb-testimonial-stars">★★★★★</div>
+    <blockquote>"LeaseBase saved me over 15 hours per week. Rent collection went from a nightmare to completely automated. Best investment I've made."</blockquote>
+    <div class="lb-testimonial-author">Sarah Mitchell</div>
+    <div class="lb-testimonial-role">Owner, 42 units</div>
   </div>
-
-  <div class="lb-tenant-card">
-    <div class="lb-icon">🔧</div>
-    <h3>Submit Maintenance Requests</h3>
-    <p>Tenants submit and track maintenance requests directly from their portal — no phone calls needed.</p>
+  <div class="lb-testimonial-card">
+    <div class="lb-testimonial-stars">★★★★★</div>
+    <blockquote>"We switched from three different tools to just LeaseBase. Our team is more efficient, and tenants love the portal. Game changer."</blockquote>
+    <div class="lb-testimonial-author">James Rodriguez</div>
+    <div class="lb-testimonial-role">Property Manager, 88 units</div>
   </div>
-
-  <div class="lb-tenant-card">
-    <div class="lb-icon">💰</div>
-    <h3>Pay Rent Online</h3>
-    <p>Tenants can view balances and make rent payments through a simple, secure payment flow.</p>
+  <div class="lb-testimonial-card">
+    <div class="lb-testimonial-stars">★★★★★</div>
+    <blockquote>"The maintenance tracking alone is worth it. Tenants submit requests through the portal, and I can manage everything from my phone."</blockquote>
+    <div class="lb-testimonial-author">Emily Chen</div>
+    <div class="lb-testimonial-role">Owner, 26 units</div>
   </div>
+</div>
 
-  <div class="lb-tenant-card">
-    <div class="lb-icon">📄</div>
-    <h3>Access Documents</h3>
-    <p>Tenants view and download lease agreements, notices, and other shared documents anytime.</p>
+<!-- Trust Badges -->
+<div class="lb-trust-row">
+  <div class="lb-trust-item">
+    <div class="lb-trust-icon">🛡️</div>
+    <span>Bank-Level Security</span>
   </div>
-
+  <div class="lb-trust-item">
+    <div class="lb-trust-icon">🔒</div>
+    <span>256-bit Encryption</span>
+  </div>
+  <div class="lb-trust-item">
+    <div class="lb-trust-icon">✓</div>
+    <span>SOC 2 Compliant</span>
+  </div>
+  <div class="lb-trust-item">
+    <div class="lb-trust-icon">⏱️</div>
+    <span>99.9% Uptime</span>
+  </div>
 </div>
 <!-- /wp:html -->
+
+</div>
+<!-- /wp:group -->
+
+
+<!-- SECTION 6: PRICING PREVIEW -->
+<!-- wp:group {"className":"lb-section lb-pricing-section","style":{"spacing":{"padding":{"top":"96px","bottom":"96px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-section lb-pricing-section" style="padding-top:96px;padding-bottom:96px">
+
+<!-- wp:heading {"textAlign":"center"} -->
+<h2 class="wp-block-heading has-text-align-center">Simple, Transparent Pricing</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
+<p class="has-text-align-center lb-subtitle">Choose the plan that fits your portfolio</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<div class="lb-pricing-cards">
+  <div class="lb-pricing-card">
+    <h3>Starter</h3>
+    <p class="lb-pricing-card-desc">Perfect for getting started</p>
+    <div class="lb-pricing-card-price"><span class="lb-pricing-amount">Free</span></div>
+    <a href="https://signup.dev.leasebase.ai" class="lb-pricing-card-cta">Start Free</a>
+    <ul class="lb-pricing-card-features">
+      <li><span class="lb-check-sm">✓</span> Up to 5 units</li>
+      <li><span class="lb-check-sm">✓</span> Basic lease management</li>
+      <li><span class="lb-check-sm">✓</span> Tenant portal</li>
+      <li><span class="lb-check-sm">✓</span> Payment processing (2.9% + 30¢)</li>
+    </ul>
+  </div>
+  <div class="lb-pricing-card lb-pricing-card--popular">
+    <div class="lb-pricing-popular-badge">Most Popular</div>
+    <h3>Professional</h3>
+    <p class="lb-pricing-card-desc">For growing portfolios</p>
+    <div class="lb-pricing-card-price"><span class="lb-pricing-amount">$49</span><span class="lb-pricing-period">/month</span></div>
+    <a href="https://signup.dev.leasebase.ai" class="lb-pricing-card-cta lb-pricing-card-cta--primary">Start Free Trial</a>
+    <ul class="lb-pricing-card-features">
+      <li><span class="lb-check-sm">✓</span> Up to 50 units</li>
+      <li><span class="lb-check-sm">✓</span> Advanced automation</li>
+      <li><span class="lb-check-sm">✓</span> Maintenance tracking</li>
+      <li><span class="lb-check-sm">✓</span> Custom reports</li>
+      <li><span class="lb-check-sm">✓</span> Priority support</li>
+      <li><span class="lb-check-sm">✓</span> Lower payment fees (1.9%)</li>
+    </ul>
+  </div>
+  <div class="lb-pricing-card">
+    <h3>Enterprise</h3>
+    <p class="lb-pricing-card-desc">For large portfolios</p>
+    <div class="lb-pricing-card-price"><span class="lb-pricing-amount">$149</span><span class="lb-pricing-period">/month</span></div>
+    <a href="/contact/" class="lb-pricing-card-cta">Contact Sales</a>
+    <ul class="lb-pricing-card-features">
+      <li><span class="lb-check-sm">✓</span> Up to 200 units</li>
+      <li><span class="lb-check-sm">✓</span> White-label tenant portal</li>
+      <li><span class="lb-check-sm">✓</span> API access</li>
+      <li><span class="lb-check-sm">✓</span> Dedicated account manager</li>
+      <li><span class="lb-check-sm">✓</span> Custom integrations</li>
+      <li><span class="lb-check-sm">✓</span> Lowest fees (1.5%)</li>
+    </ul>
+  </div>
+</div>
+<!-- /wp:html -->
+
+<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"},"style":{"spacing":{"margin":{"top":"48px"}}}} -->
+<div class="wp-block-buttons" style="margin-top:48px">
+<!-- wp:button {"className":"is-style-outline"} -->
+<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/pricing/">Compare All Plans →</a></div>
+<!-- /wp:button -->
+</div>
+<!-- /wp:buttons -->
 
 </div>
 <!-- /wp:group -->
 
 
 <!-- SECTION 7: FINAL CTA -->
-<!-- wp:group {"className":"lb-section lb-section-alt lb-final-cta","style":{"spacing":{"padding":{"top":"80px","bottom":"80px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-section-alt lb-final-cta" style="padding-top:80px;padding-bottom:80px">
+<!-- wp:group {"className":"lb-cta-banner","layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-cta-banner">
 
 <!-- wp:heading {"textAlign":"center"} -->
-<h2 class="wp-block-heading has-text-align-center">Stop juggling tools. Start managing smarter.</h2>
+<h2 class="wp-block-heading has-text-align-center">Ready to Transform Your Property Management?</h2>
 <!-- /wp:heading -->
 
-<!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
-<p class="has-text-align-center lb-subtitle">Join landlords who are replacing spreadsheets and scattered tools with one modern platform.</p>
+<!-- wp:paragraph {"align":"center"} -->
+<p class="has-text-align-center">Join 2,000+ property owners who are saving time and growing their portfolios with LeaseBase.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
 <div class="wp-block-buttons">
 <!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://signup.dev.leasebase.ai">Start Free</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://signup.dev.leasebase.ai">Start Free Trial →</a></div>
 <!-- /wp:button -->
-
 <!-- wp:button {"className":"is-style-outline"} -->
-<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/demo/">Book a Demo</a></div>
+<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/demo/">Schedule Demo</a></div>
 <!-- /wp:button -->
 </div>
 <!-- /wp:buttons -->
 
+<!-- wp:html -->
+<p class="lb-cta-note">No credit card required • Cancel anytime • 14-day free trial</p>
+<!-- /wp:html -->
+
 </div>
 <!-- /wp:group -->
-
-
-<!-- SECTION 8: FOOTER -->
-<!-- (The footer is managed via the FSE template part.
-      To update it, go to Appearance → Editor → Template Parts → Footer
-      and replace with the markup in parts/footer.html.) -->
