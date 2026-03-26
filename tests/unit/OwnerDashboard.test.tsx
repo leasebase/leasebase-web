@@ -155,9 +155,9 @@ describe("OwnerDashboard", () => {
       expect(screen.getByText("Dashboard")).toBeInTheDocument();
     });
 
-    // KPIs rendered — 4 cards: Monthly Cash Flow, Outstanding Payments, Occupancy, Maintenance Requests
-    expect(screen.getByText("Monthly Cash Flow")).toBeInTheDocument();
-    expect(screen.getByText("Outstanding Payments")).toBeInTheDocument();
+    // KPIs rendered — 4 cards matching Figma labels
+    expect(screen.getByText("Monthly Revenue")).toBeInTheDocument();
+    expect(screen.getByText("Outstanding Rent")).toBeInTheDocument();
 
     // Alert rendered (text split across spans: count bold + message)
     expect(screen.getByText(/rent payment/i)).toBeInTheDocument();
