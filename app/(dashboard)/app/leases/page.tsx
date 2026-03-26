@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -8,10 +9,16 @@ import { Plus, FileText, Clock, AlertTriangle } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchLeases } from "@/services/leases/leaseService";
 import type { LeaseRow } from "@/services/leases/types";
-import { LeasesTable } from "@/components/leases/LeasesTable";
 import { LeasesEmptyState } from "@/components/leases/LeasesEmptyState";
 import { LeasesSkeleton } from "@/components/leases/LeasesSkeleton";
 import { TenantLeasePage } from "@/components/tenant/TenantLeasePage";
+
+// Lazy-load LeasesTable (owner-only) to prevent its lucide-react imports
+// from potentially crashing the tenant code path during module evaluation.
+const LeasesTable = dynamic(
+  () => import("@/components/leases/LeasesTable").then((m) => ({ default: m.LeasesTable })),
+  { ssr: false },
+);
 
 /* ── Owner Leases Page ── */
 
