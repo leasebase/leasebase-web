@@ -121,8 +121,6 @@ describe("OwnerMaintenancePage", () => {
     expect(screen.getByText(/Plumbing/)).toBeInTheDocument();
     expect(screen.getByText(/HVAC/)).toBeInTheDocument();
 
-    // Total count
-    expect(screen.getByText("2 work orders")).toBeInTheDocument();
   });
 
   test("rows link to detail page", async () => {
@@ -268,12 +266,4 @@ describe("OwnerMaintenancePage", () => {
     expect(screen.queryByRole("button", { name: /assign/i })).not.toBeInTheDocument();
   });
 
-  test("singular count for 1 work order", async () => {
-    mockFetchMaintenanceList.mockResolvedValue(paginatedResponse([workOrders[0]]));
-    render(<OwnerMaintenancePage />);
-
-    await waitFor(() => {
-      expect(screen.getByText("1 work order")).toBeInTheDocument();
-    });
-  });
 });

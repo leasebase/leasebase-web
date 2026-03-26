@@ -195,6 +195,7 @@ export function OwnerMaintenancePage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
+          aria-label="Filter by status"
           className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-[12px] text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all"
         >
           <option value="">All Statuses</option>
@@ -209,6 +210,7 @@ export function OwnerMaintenancePage() {
         <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
+          aria-label="Filter by priority"
           className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-[12px] text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all"
         >
           <option value="">All Priorities</option>
@@ -225,6 +227,7 @@ export function OwnerMaintenancePage() {
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
             placeholder="Search work orders…"
+            aria-label="Search work orders"
             className="w-full h-9 pl-9 pr-4 bg-white border border-slate-200 rounded-lg text-[12px] text-slate-700 placeholder:text-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all"
           />
         </div>
