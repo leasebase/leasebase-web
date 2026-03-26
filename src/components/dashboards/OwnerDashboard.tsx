@@ -165,19 +165,11 @@ export function OwnerDashboard() {
     <section aria-labelledby="owner-heading" className="space-y-6">
       {/* Sticky Page Header with CTAs */}
       <PageHeader
-        title={vm.header.title}
-        description={vm.header.subtitle}
+        title="Dashboard"
+        description="Real-time overview of your portfolio performance"
         sticky
         actions={
           <>
-            <Button
-              variant="secondary"
-              size="sm"
-              icon={<Settings2 size={14} />}
-              onClick={() => setCustomizeOpen(true)}
-            >
-              Customize
-            </Button>
             <Link href="/app/reports">
               <Button
                 variant="secondary"
