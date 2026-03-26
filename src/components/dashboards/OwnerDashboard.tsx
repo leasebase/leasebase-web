@@ -110,10 +110,10 @@ export function OwnerDashboard() {
         actions={
           <>
             <Link href="/app/reports">
-              <Button variant="secondary" size="sm" icon={<Download size={14} />}>Export Report</Button>
+              <Button variant="secondary" icon={<Download size={16} />}>Export Report</Button>
             </Link>
             <Link href="/app/properties/new">
-              <Button variant="success" size="sm" icon={<Plus size={14} />}>Add Property</Button>
+              <Button variant="primary" icon={<Plus size={16} />}>Add Property</Button>
             </Link>
           </>
         }
