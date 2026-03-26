@@ -108,10 +108,24 @@ export function PriorityActions({ actions, loading = false, className = "" }: Pr
           const badge = severityBadge[action.severity];
           const IconCmp = action.icon ?? severityIcon[action.severity];
           const bar = severityBar[action.severity];
+          const rowTint =
+            action.severity === "danger"
+              ? "bg-red-50/40"
+              : action.severity === "warning"
+                ? "bg-amber-50/30"
+                : "";
+          const iconGradient =
+            action.severity === "danger"
+              ? "bg-gradient-to-br from-red-500 to-red-600 text-white shadow-sm shadow-red-500/20"
+              : action.severity === "warning"
+                ? "bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-sm shadow-amber-500/20"
+                : "bg-slate-100 text-slate-500";
           return (
-            <li key={action.id} className="flex items-center gap-3.5 px-5 py-4 transition-colors hover:bg-white/50">
-              <div className={`h-10 w-1 shrink-0 rounded-full ${bar}`} />
-              <IconCmp size={16} className="shrink-0 text-slate-500" aria-hidden="true" />
+            <li key={action.id} className={`flex items-center gap-3.5 px-5 py-4 transition-colors hover:bg-white/50 ${rowTint}`}>
+              <div className={`h-10 w-1.5 shrink-0 rounded-full ${bar}`} />
+              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${iconGradient}`}>
+                <IconCmp size={15} aria-hidden="true" />
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[13px] font-semibold text-slate-900 truncate">{action.title}</p>
                 <p className="mt-0.5 text-xs text-slate-500 truncate">{action.description}</p>

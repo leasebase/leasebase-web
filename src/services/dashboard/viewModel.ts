@@ -99,6 +99,7 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
       change: kpis.monthlyScheduledRent.value > 0
         ? `${fmtCurrency(kpis.collectedThisMonth.value)} of ${fmtCurrency(kpis.monthlyScheduledRent.value)} expected`
         : undefined,
+      subtitle: "this month",
       source: kpis.collectedThisMonth.source,
       icon: "payments",
       href: "/app/payments",
@@ -108,6 +109,7 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
       label: "Outstanding Payments",
       value: fmtKpiValue(kpis.overdueAmount, fmtCurrency),
       rawValue: kpis.overdueAmount.value,
+      subtitle: "overdue",
       source: kpis.overdueAmount.source,
       icon: "payments",
       href: "/app/payments",
@@ -122,8 +124,9 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
           : "—",
       rawValue: kpis.totalUnits.value > 0 ? 100 - kpis.vacancyRate.value : 0,
       change: kpis.totalUnits.source !== "unavailable"
-        ? `${kpis.occupiedUnits.value} of ${kpis.totalUnits.value} units`
+        ? `${kpis.occupiedUnits.value}/${kpis.totalUnits.value}`
         : undefined,
+      subtitle: "units occupied",
       source: kpis.vacancyRate.source,
       icon: "units",
       href: "/app/units",
@@ -133,6 +136,7 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
       label: "Maintenance Requests",
       value: fmtKpiValue(kpis.openMaintenanceRequests, fmtNumber),
       rawValue: kpis.openMaintenanceRequests.value,
+      subtitle: "open",
       source: kpis.openMaintenanceRequests.source,
       icon: "maintenance",
       href: "/app/maintenance",

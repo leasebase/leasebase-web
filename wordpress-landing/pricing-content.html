@@ -1,423 +1,233 @@
 <!-- ==========================================================
-     LEASEBASE PRICING PAGE — GUTENBERG BLOCK CONTENT
-     ==========================================================
-     HOW TO USE:
-     1. Go to WP Admin → Pages → Add New
-     2. Title: "Pricing" / Slug: "pricing"
-     3. Switch to the Code Editor (⋮ menu → Code editor)
-     4. Paste this entire file content
-     5. Switch back to Visual Editor to verify
-     6. Set Template to "Pricing" if available, or Publish
+     LEASEBASE PRICING PAGE — GUTENBERG BLOCK CONTENT (v6 Redesign)
      ========================================================== -->
 
-
-<!-- SECTION A: HERO -->
+<!-- HERO -->
 <!-- wp:group {"className":"lb-pricing-hero","layout":{"type":"constrained"}} -->
 <div class="wp-block-group lb-pricing-hero">
-
 <!-- wp:heading {"level":1,"textAlign":"center"} -->
-<h1 class="wp-block-heading has-text-align-center">Simple pricing for modern property ownership</h1>
+<h1 class="wp-block-heading has-text-align-center">Simple, <span class="lb-gradient-text">Transparent Pricing</span></h1>
 <!-- /wp:heading -->
-
 <!-- wp:paragraph {"align":"center","className":"lb-hero-sub"} -->
-<p class="has-text-align-center lb-hero-sub">Start free, upgrade when you're ready to automate more of your rental operations and deliver a better tenant experience.</p>
+<p class="has-text-align-center lb-hero-sub">Choose the plan that fits your portfolio. No hidden fees, no surprises.</p>
 <!-- /wp:paragraph -->
-
-<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
-<div class="wp-block-buttons">
-<!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://signup.dev.leasebase.ai">Start Free</a></div>
-<!-- /wp:button -->
-
-<!-- wp:button {"className":"is-style-outline"} -->
-<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/contact/">Contact Us</a></div>
-<!-- /wp:button -->
+<!-- wp:html -->
+<div class="lb-billing-toggle">
+  <span class="lb-billing-label active" id="lb-label-monthly">Monthly</span>
+  <div class="lb-toggle-switch" id="lb-billing-switch" role="switch" aria-checked="false" tabindex="0"></div>
+  <span class="lb-billing-label" id="lb-label-annual">Annual</span>
+  <span class="lb-badge lb-badge--green">Save up to 20%</span>
 </div>
-<!-- /wp:buttons -->
-
+<!-- /wp:html -->
 </div>
 <!-- /wp:group -->
 
-
-<!-- SECTION B: PRICING CARDS -->
-<!-- wp:group {"className":"lb-section lb-pricing-cards-section","style":{"spacing":{"padding":{"top":"72px","bottom":"72px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-pricing-cards-section" style="padding-top:72px;padding-bottom:72px">
-
+<!-- PRICING CARDS -->
+<!-- wp:group {"className":"lb-section lb-pricing-section","style":{"spacing":{"padding":{"top":"48px","bottom":"96px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-section lb-pricing-section" style="padding-top:48px;padding-bottom:96px">
 <!-- wp:html -->
 <div class="lb-pricing-cards">
-
   <div class="lb-pricing-card">
-    <div class="lb-pricing-card-header">
-      <h3>Starter</h3>
-      <p class="lb-pricing-best-for">Best for 1–2 units</p>
-    </div>
-    <div class="lb-pricing-card-price">
-      <span class="lb-pricing-amount">Free</span>
-    </div>
-    <p class="lb-pricing-card-desc">Perfect for getting started. Organize your properties and tenants in one place.</p>
+    <h3>Starter</h3>
+    <p class="lb-pricing-card-desc">Perfect for getting started with a small portfolio</p>
+    <div class="lb-pricing-card-price"><span class="lb-pricing-amount" data-monthly="0" data-annual="0">Free</span></div>
+    <a href="https://signup.dev.leasebase.ai" class="lb-pricing-card-cta">Get Started Free</a>
     <ul class="lb-pricing-card-features">
-      <li><span class="lb-check-sm">✓</span> Property &amp; unit management</li>
-      <li><span class="lb-check-sm">✓</span> Tenant invitations &amp; onboarding</li>
-      <li><span class="lb-check-sm">✓</span> Basic lease creation</li>
-      <li><span class="lb-check-sm">✓</span> Rent collection</li>
-      <li><span class="lb-check-sm">✓</span> Basic maintenance requests</li>
-      <li><span class="lb-check-sm">✓</span> Owner dashboard</li>
-      <li><span class="lb-check-sm">✓</span> Tenant access via owner invitation</li>
-      <li><span class="lb-check-sm">✓</span> 1 owner user</li>
+      <li><span class="lb-check-sm">✓</span> Up to 5 rental units</li>
+      <li><span class="lb-check-sm">✓</span> Basic lease management</li>
+      <li><span class="lb-check-sm">✓</span> Tenant portal access</li>
+      <li><span class="lb-check-sm">✓</span> Online payment processing</li>
+      <li><span class="lb-check-sm">✓</span> Document storage (1GB)</li>
+      <li><span class="lb-check-sm">✓</span> Email support</li>
+      <li><span class="lb-check-sm">✓</span> Mobile app access</li>
     </ul>
-    <a href="https://signup.dev.leasebase.ai" class="lb-pricing-card-cta">Start as Owner (Free)</a>
   </div>
-
   <div class="lb-pricing-card lb-pricing-card--popular">
     <div class="lb-pricing-popular-badge">Most Popular</div>
-    <div class="lb-pricing-card-header">
-      <h3>Growth</h3>
-      <p class="lb-pricing-best-for">Best for growing owner-operators</p>
-    </div>
+    <h3>Professional</h3>
+    <p class="lb-pricing-card-desc">Ideal for growing property portfolios</p>
     <div class="lb-pricing-card-price">
-      <span class="lb-pricing-amount">$9</span>
-      <span class="lb-pricing-period">/unit/month</span>
+      <span class="lb-pricing-amount" data-monthly="49" data-annual="39">$49</span>
+      <span class="lb-pricing-period">/month</span>
     </div>
-    <p class="lb-pricing-billing-note">Per active unit, billed monthly.</p>
-    <p class="lb-pricing-card-desc">Save time with automation and give tenants a better experience. Focus on growing your portfolio.</p>
+    <a href="https://signup.dev.leasebase.ai" class="lb-pricing-card-cta lb-pricing-card-cta--primary">Start Free Trial</a>
     <ul class="lb-pricing-card-features">
-      <li><span class="lb-check-sm">✓</span> Everything in Starter</li>
-      <li><span class="lb-check-sm">✓</span> Autopay</li>
-      <li><span class="lb-check-sm">✓</span> Recurring rent charges</li>
-      <li><span class="lb-check-sm">✓</span> Faster payouts</li>
-      <li><span class="lb-check-sm">✓</span> Full lease workflow with e-signatures</li>
-      <li><span class="lb-check-sm">✓</span> Enhanced maintenance workflow</li>
-      <li><span class="lb-check-sm">✓</span> Alerts &amp; visibility</li>
-      <li><span class="lb-check-sm">✓</span> Multi-property support</li>
-      <li><span class="lb-check-sm">✓</span> Tenant access via owner invitation</li>
-      <li><span class="lb-check-sm">✓</span> Priority support</li>
+      <li><span class="lb-check-sm">✓</span> Up to 50 rental units</li>
+      <li><span class="lb-check-sm">✓</span> Advanced lease management</li>
+      <li><span class="lb-check-sm">✓</span> Automated rent reminders</li>
+      <li><span class="lb-check-sm">✓</span> Maintenance request system</li>
+      <li><span class="lb-check-sm">✓</span> Custom reports &amp; analytics</li>
+      <li><span class="lb-check-sm">✓</span> E-signature integration</li>
+      <li><span class="lb-check-sm">✓</span> Document storage (25GB)</li>
+      <li><span class="lb-check-sm">✓</span> Priority email &amp; chat support</li>
+      <li><span class="lb-check-sm">✓</span> Tenant screening integration</li>
+      <li><span class="lb-check-sm">✓</span> Lease renewal automation</li>
+      <li><span class="lb-check-sm">✓</span> ACH &amp; credit card payments</li>
     </ul>
-    <a href="https://signup.dev.leasebase.ai" class="lb-pricing-card-cta lb-pricing-card-cta--primary">Upgrade Your Portfolio</a>
-    <a href="/demo/" class="lb-pricing-card-demo-link">Schedule a demo to see it in action →</a>
   </div>
-
   <div class="lb-pricing-card">
-    <div class="lb-pricing-card-header">
-      <h3>Portfolio</h3>
-      <p class="lb-pricing-best-for">Best for larger portfolios</p>
-    </div>
+    <h3>Enterprise</h3>
+    <p class="lb-pricing-card-desc">For large portfolios and property managers</p>
     <div class="lb-pricing-card-price">
-      <span class="lb-pricing-amount">Custom</span>
+      <span class="lb-pricing-amount" data-monthly="149" data-annual="119">$149</span>
+      <span class="lb-pricing-period">/month</span>
     </div>
-    <p class="lb-pricing-card-desc">For larger portfolios that need scale, operational control, and dedicated support.</p>
+    <a href="/contact/" class="lb-pricing-card-cta">Contact Sales</a>
     <ul class="lb-pricing-card-features">
-      <li><span class="lb-check-sm">✓</span> Everything in Growth</li>
-      <li><span class="lb-check-sm">✓</span> Multi-user access</li>
-      <li><span class="lb-check-sm">✓</span> Advanced reporting</li>
-      <li><span class="lb-check-sm">✓</span> Portfolio-level operations</li>
-      <li><span class="lb-check-sm">✓</span> Dedicated onboarding support</li>
-    </ul>
-    <a href="/contact/" class="lb-pricing-card-cta">Talk to Us</a>
-  </div>
-
-</div>
-
-<p class="lb-pricing-contrast">A property manager may charge a percentage of collected rent. LeaseBase gives owners modern tools without ongoing management fees.</p>
-<!-- /wp:html -->
-
-</div>
-<!-- /wp:group -->
-
-
-<!-- SECTION C: FEATURE COMPARISON -->
-<!-- wp:group {"className":"lb-section lb-section-alt lb-pricing-compare-section","style":{"spacing":{"padding":{"top":"72px","bottom":"72px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-section-alt lb-pricing-compare-section" style="padding-top:72px;padding-bottom:72px">
-
-<!-- wp:heading {"textAlign":"center"} -->
-<h2 class="wp-block-heading has-text-align-center">Compare plans</h2>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
-<p class="has-text-align-center lb-subtitle">See what's included in each plan at a glance.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:html -->
-<div class="lb-compare-table" role="table" aria-label="Feature comparison">
-  <div class="lb-compare-header" role="row">
-    <div class="lb-compare-feature" role="columnheader">Feature</div>
-    <div class="lb-compare-plan" role="columnheader">Starter</div>
-    <div class="lb-compare-plan" role="columnheader">Growth</div>
-    <div class="lb-compare-plan" role="columnheader">Portfolio</div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Property &amp; unit management</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Tenant onboarding</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Owner dashboard</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Tenant dashboard</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Basic lease creation</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">E-signatures</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-no" aria-label="Not included">—</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Rent collection</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Autopay</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-no" aria-label="Not included">—</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Recurring charges</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-no" aria-label="Not included">—</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Faster payouts</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-no" aria-label="Not included">—</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Maintenance requests</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Basic">Basic</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Enhanced maintenance workflow</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-no" aria-label="Not included">—</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Alerts &amp; visibility</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-no" aria-label="Not included">—</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Priority support</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-no" aria-label="Not included">—</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Multi-user access</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-no" aria-label="Not included">—</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-no" aria-label="Not included">—</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-  <div class="lb-compare-row" role="row">
-    <div class="lb-compare-feature" role="cell">Advanced reporting</div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-no" aria-label="Not included">—</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-no" aria-label="Not included">—</span></div>
-    <div class="lb-compare-plan" role="cell"><span class="lb-compare-yes" aria-label="Included">✓</span></div>
-  </div>
-</div>
-<!-- /wp:html -->
-
-</div>
-<!-- /wp:group -->
-
-
-<!-- SECTION D: CONNECTED PLATFORM -->
-<!-- wp:group {"className":"lb-section lb-pricing-platform","style":{"spacing":{"padding":{"top":"72px","bottom":"72px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-pricing-platform" style="padding-top:72px;padding-bottom:72px">
-
-<!-- wp:heading {"textAlign":"center"} -->
-<h2 class="wp-block-heading has-text-align-center">One platform for owners and tenants</h2>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
-<p class="has-text-align-center lb-subtitle">Owners manage operations. Tenants access what they need — through your invitation. Less work for you, a better experience for them.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:html -->
-<div class="lb-platform-cols">
-  <div class="lb-platform-col">
-    <div class="lb-platform-col-icon" aria-hidden="true">🏠</div>
-    <h3>For Owners</h3>
-    <ul>
-      <li>Track properties, leases, payments, and maintenance</li>
-      <li>Reduce manual work with automation</li>
-      <li>Improve visibility across your portfolio</li>
-    </ul>
-  </div>
-  <div class="lb-platform-col">
-    <div class="lb-platform-col-icon" aria-hidden="true">👤</div>
-    <h3>For Tenants (via invite)</h3>
-    <ul>
-      <li>Pay rent online securely</li>
-      <li>Submit and track maintenance requests</li>
-      <li>Access lease and account info — no separate signup required</li>
+      <li><span class="lb-check-sm">✓</span> Up to 200 rental units</li>
+      <li><span class="lb-check-sm">✓</span> Everything in Professional</li>
+      <li><span class="lb-check-sm">✓</span> White-label tenant portal</li>
+      <li><span class="lb-check-sm">✓</span> API access for integrations</li>
+      <li><span class="lb-check-sm">✓</span> Custom workflow automation</li>
+      <li><span class="lb-check-sm">✓</span> Dedicated account manager</li>
+      <li><span class="lb-check-sm">✓</span> Unlimited document storage</li>
+      <li><span class="lb-check-sm">✓</span> Phone support</li>
+      <li><span class="lb-check-sm">✓</span> Multi-user accounts &amp; roles</li>
+      <li><span class="lb-check-sm">✓</span> Advanced security features</li>
+      <li><span class="lb-check-sm">✓</span> Custom reporting dashboards</li>
+      <li><span class="lb-check-sm">✓</span> Integration with accounting software</li>
     </ul>
   </div>
 </div>
+<p class="lb-pricing-contrast">Need more than 200 units or have special requirements? <a href="/contact/">Contact Sales for Custom Pricing</a></p>
 <!-- /wp:html -->
-
 </div>
 <!-- /wp:group -->
 
-
-<!-- SECTION E: WHY LEASEBASE -->
-<!-- wp:group {"className":"lb-section lb-section-alt lb-pricing-why","style":{"spacing":{"padding":{"top":"72px","bottom":"72px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-section-alt lb-pricing-why" style="padding-top:72px;padding-bottom:72px">
-
+<!-- FEATURE COMPARISON -->
+<!-- wp:group {"className":"lb-section lb-section-alt","style":{"spacing":{"padding":{"top":"96px","bottom":"96px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-section lb-section-alt" style="padding-top:96px;padding-bottom:96px">
 <!-- wp:heading {"textAlign":"center"} -->
-<h2 class="wp-block-heading has-text-align-center">Why LeaseBase</h2>
+<h2 class="wp-block-heading has-text-align-center">Compare All Features</h2>
 <!-- /wp:heading -->
-
-<!-- wp:html -->
-<div class="lb-why-grid">
-  <div class="lb-why-card">
-    <div class="lb-why-icon" aria-hidden="true">🎯</div>
-    <h3>Built for owners, not property managers</h3>
-    <p>Designed specifically for self-managing rental property owners who want professional-grade tools without the complexity.</p>
-  </div>
-  <div class="lb-why-card">
-    <div class="lb-why-icon" aria-hidden="true">⚡</div>
-    <h3>Automate the work that slows you down</h3>
-    <p>From rent collection to lease workflows to maintenance tracking — spend less time on admin and more time growing.</p>
-  </div>
-  <div class="lb-why-card">
-    <div class="lb-why-icon" aria-hidden="true">👥</div>
-    <h3>Give tenants a better rental experience</h3>
-    <p>Happy tenants stay longer. Give them a modern portal to pay rent, submit requests, and access their lease information.</p>
-  </div>
-  <div class="lb-why-card">
-    <div class="lb-why-icon" aria-hidden="true">📊</div>
-    <h3>Visibility into rent, leases, and maintenance</h3>
-    <p>One dashboard to see what's collected, what's overdue, which leases are expiring, and what needs attention.</p>
-  </div>
-  <div class="lb-why-card">
-    <div class="lb-why-icon" aria-hidden="true">💰</div>
-    <h3>Avoid ongoing property management fees</h3>
-    <p>Keep more of your rental income. LeaseBase gives you the tools to manage it yourself — professionally.</p>
-  </div>
-</div>
-<!-- /wp:html -->
-
-</div>
-<!-- /wp:group -->
-
-
-<!-- SECTION F: FAQ -->
-<!-- wp:group {"className":"lb-section lb-pricing-faq","style":{"spacing":{"padding":{"top":"72px","bottom":"72px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-pricing-faq" style="padding-top:72px;padding-bottom:72px">
-
-<!-- wp:heading {"textAlign":"center"} -->
-<h2 class="wp-block-heading has-text-align-center">Frequently asked questions</h2>
-<!-- /wp:heading -->
-
-<!-- wp:html -->
-<div class="lb-faq-list">
-
-  <details class="lb-faq-item">
-    <summary class="lb-faq-question">How does LeaseBase pricing work?</summary>
-    <div class="lb-faq-answer">
-      <p>LeaseBase offers a free Starter plan for basic property management, and a Growth plan at $9 per active unit per month for owners who want automation, e-signatures, autopay, and enhanced workflows. You only pay for units with active leases.</p>
-    </div>
-  </details>
-
-  <details class="lb-faq-item">
-    <summary class="lb-faq-question">Is pricing based on properties or units?</summary>
-    <div class="lb-faq-answer">
-      <p>Pricing is based on active units, not properties. If you have a duplex with two rented units, you pay for two units. Vacant units with no active lease are not charged.</p>
-    </div>
-  </details>
-
-  <details class="lb-faq-item">
-    <summary class="lb-faq-question">Can I start free?</summary>
-    <div class="lb-faq-answer">
-      <p>Yes. The Starter plan is completely free and includes property management, tenant onboarding, basic lease creation, rent collection, and maintenance requests. No credit card required.</p>
-    </div>
-  </details>
-
-  <details class="lb-faq-item">
-    <summary class="lb-faq-question">What do tenants get access to?</summary>
-    <div class="lb-faq-answer">
-      <p>Tenants are invited by the property owner and get their own dashboard where they can pay rent online, submit and track maintenance requests, and access their lease and account information. Tenants do not sign up independently — access is always through the owner's invitation. This is included in all plans.</p>
-    </div>
-  </details>
-
-  <details class="lb-faq-item">
-    <summary class="lb-faq-question">What happens when I grow?</summary>
-    <div class="lb-faq-answer">
-      <p>LeaseBase scales with you. Start free with Starter, upgrade to Growth when you need more automation, and contact us about Portfolio if you need multi-user access, advanced reporting, or support for larger operations.</p>
-    </div>
-  </details>
-
-  <details class="lb-faq-item">
-    <summary class="lb-faq-question">Do I need to sign a long-term contract?</summary>
-    <div class="lb-faq-answer">
-      <p>No. LeaseBase is billed monthly with no long-term contracts. You can upgrade, downgrade, or cancel at any time.</p>
-    </div>
-  </details>
-
-  <details class="lb-faq-item">
-    <summary class="lb-faq-question">Can I contact LeaseBase for larger portfolios?</summary>
-    <div class="lb-faq-answer">
-      <p>Absolutely. If you manage a larger portfolio or need advanced capabilities like multi-user access and custom reporting, <a href="/contact/">reach out via our contact form</a> and we'll work with you on the right plan.</p>
-    </div>
-  </details>
-
-</div>
-<!-- /wp:html -->
-
-</div>
-<!-- /wp:group -->
-
-
-<!-- SECTION G: FINAL CTA -->
-<!-- wp:group {"className":"lb-section lb-section-alt lb-pricing-final-cta","style":{"spacing":{"padding":{"top":"72px","bottom":"88px"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-section-alt lb-pricing-final-cta" style="padding-top:72px;padding-bottom:88px">
-
-<!-- wp:heading {"textAlign":"center"} -->
-<h2 class="wp-block-heading has-text-align-center">Ready to make your property profitable faster?</h2>
-<!-- /wp:heading -->
-
 <!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
-<p class="has-text-align-center lb-subtitle">Built for owners who want better control, better visibility, and less manual work.</p>
+<p class="has-text-align-center lb-subtitle">See exactly what's included in each plan</p>
 <!-- /wp:paragraph -->
+<!-- wp:html -->
+<div class="lb-compare-table">
+  <div class="lb-compare-header">
+    <div class="lb-compare-feature">Feature</div>
+    <div class="lb-compare-plan">Starter</div>
+    <div class="lb-compare-plan">Professional</div>
+    <div class="lb-compare-plan">Enterprise</div>
+  </div>
+  <div class="lb-compare-category">Core Features</div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Rental Units</div><div class="lb-compare-plan">5</div><div class="lb-compare-plan">50</div><div class="lb-compare-plan">200</div></div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Lease Management</div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Tenant Portal</div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Payment Processing</div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Document Storage</div><div class="lb-compare-plan">1GB</div><div class="lb-compare-plan">25GB</div><div class="lb-compare-plan">Unlimited</div></div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Mobile App</div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-category">Automation &amp; Workflows</div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Rent Reminders</div><div class="lb-compare-plan"><span class="lb-compare-no">—</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Lease Renewal Automation</div><div class="lb-compare-plan"><span class="lb-compare-no">—</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Custom Workflows</div><div class="lb-compare-plan"><span class="lb-compare-no">—</span></div><div class="lb-compare-plan"><span class="lb-compare-no">—</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-category">Support</div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Email Support</div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Priority Support</div><div class="lb-compare-plan"><span class="lb-compare-no">—</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Dedicated Account Manager</div><div class="lb-compare-plan"><span class="lb-compare-no">—</span></div><div class="lb-compare-plan"><span class="lb-compare-no">—</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-category">Integrations</div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">E-Signatures</div><div class="lb-compare-plan"><span class="lb-compare-no">—</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">Tenant Screening</div><div class="lb-compare-plan"><span class="lb-compare-no">—</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+  <div class="lb-compare-row"><div class="lb-compare-feature">API Access</div><div class="lb-compare-plan"><span class="lb-compare-no">—</span></div><div class="lb-compare-plan"><span class="lb-compare-no">—</span></div><div class="lb-compare-plan"><span class="lb-compare-yes">✓</span></div></div>
+</div>
+<!-- /wp:html -->
+</div>
+<!-- /wp:group -->
 
+<!-- ROI SECTION -->
+<!-- wp:group {"className":"lb-section","style":{"spacing":{"padding":{"top":"96px","bottom":"96px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-section" style="padding-top:96px;padding-bottom:96px">
+<!-- wp:heading {"textAlign":"center"} -->
+<h2 class="wp-block-heading has-text-align-center">Pays for Itself in Days</h2>
+<!-- /wp:heading -->
+<!-- wp:paragraph {"align":"center","className":"lb-subtitle"} -->
+<p class="has-text-align-center lb-subtitle">See how LeaseBase saves you time and money</p>
+<!-- /wp:paragraph -->
+<!-- wp:html -->
+<div class="lb-roi-grid">
+  <div class="lb-roi-card">
+    <div class="lb-roi-value lb-roi-value--blue">10+</div>
+    <div class="lb-roi-label">Hours Saved Per Week</div>
+    <div class="lb-roi-sub">Value: ~$400/week at $40/hr</div>
+  </div>
+  <div class="lb-roi-card">
+    <div class="lb-roi-value lb-roi-value--green">98%</div>
+    <div class="lb-roi-label">On-Time Rent Collection</div>
+    <div class="lb-roi-sub">Reduce late payments and improve cash flow</div>
+  </div>
+  <div class="lb-roi-card">
+    <div class="lb-roi-value lb-roi-value--purple">3x</div>
+    <div class="lb-roi-label">Faster Response Time</div>
+    <div class="lb-roi-sub">Happier tenants = longer leases</div>
+  </div>
+</div>
+<!-- /wp:html -->
+</div>
+<!-- /wp:group -->
+
+<!-- FAQ -->
+<!-- wp:group {"className":"lb-section lb-section-alt","style":{"spacing":{"padding":{"top":"96px","bottom":"96px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-section lb-section-alt" style="padding-top:96px;padding-bottom:96px">
+<!-- wp:heading {"textAlign":"center"} -->
+<h2 class="wp-block-heading has-text-align-center">Frequently Asked Questions</h2>
+<!-- /wp:heading -->
+<!-- wp:html -->
+<div class="lb-faq-cards">
+  <div class="lb-faq-card"><div class="lb-faq-card-inner"><div class="lb-faq-icon">❓</div><div><h3>Can I switch plans later?</h3><p>Yes! You can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle.</p></div></div></div>
+  <div class="lb-faq-card"><div class="lb-faq-card-inner"><div class="lb-faq-icon">❓</div><div><h3>What are the payment processing fees?</h3><p>Starter: 2.9% + $0.30, Professional: 1.9% + $0.30, Enterprise: 1.5% + $0.30 per transaction.</p></div></div></div>
+  <div class="lb-faq-card"><div class="lb-faq-card-inner"><div class="lb-faq-icon">❓</div><div><h3>Is there a setup fee?</h3><p>No setup fees. Ever. We believe in transparent, straightforward pricing.</p></div></div></div>
+  <div class="lb-faq-card"><div class="lb-faq-card-inner"><div class="lb-faq-icon">❓</div><div><h3>What happens if I exceed my unit limit?</h3><p>We'll notify you and help you upgrade to the appropriate plan. Your service won't be interrupted.</p></div></div></div>
+  <div class="lb-faq-card"><div class="lb-faq-card-inner"><div class="lb-faq-icon">❓</div><div><h3>Do you offer custom enterprise plans?</h3><p>Yes! For portfolios over 200 units or special requirements, contact our sales team for custom pricing.</p></div></div></div>
+</div>
+<p style="text-align:center;margin-top:48px;color:var(--lb-gray-600);">Still have questions? <a href="/contact/" style="color:var(--lb-primary);font-weight:600;text-decoration:none;">Contact Our Team</a></p>
+<!-- /wp:html -->
+</div>
+<!-- /wp:group -->
+
+<!-- FINAL CTA -->
+<!-- wp:group {"className":"lb-cta-banner","layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-cta-banner">
+<!-- wp:heading {"textAlign":"center"} -->
+<h2 class="wp-block-heading has-text-align-center">Start Your Free 14-Day Trial</h2>
+<!-- /wp:heading -->
+<!-- wp:paragraph {"align":"center"} -->
+<p class="has-text-align-center">No credit card required. All plans include a 14-day free trial.</p>
+<!-- /wp:paragraph -->
 <!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
 <div class="wp-block-buttons">
 <!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://signup.dev.leasebase.ai">Start Free</a></div>
-<!-- /wp:button -->
-
-<!-- wp:button {"className":"is-style-outline"} -->
-<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/contact/">Contact Us</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://signup.dev.leasebase.ai">Get Started Free →</a></div>
 <!-- /wp:button -->
 </div>
 <!-- /wp:buttons -->
-
 </div>
 <!-- /wp:group -->
+
+<!-- BILLING TOGGLE SCRIPT -->
+<!-- wp:html -->
+<script>
+(function(){
+  var sw = document.getElementById('lb-billing-switch');
+  var lm = document.getElementById('lb-label-monthly');
+  var la = document.getElementById('lb-label-annual');
+  if(!sw) return;
+  var isAnnual = false;
+  function toggle(){
+    isAnnual = !isAnnual;
+    sw.classList.toggle('active', isAnnual);
+    sw.setAttribute('aria-checked', isAnnual);
+    lm.classList.toggle('active', !isAnnual);
+    la.classList.toggle('active', isAnnual);
+    document.querySelectorAll('.lb-pricing-amount[data-monthly]').forEach(function(el){
+      var m = parseInt(el.dataset.monthly);
+      var a = parseInt(el.dataset.annual);
+      if(m === 0){ el.textContent = 'Free'; return; }
+      el.textContent = '$' + (isAnnual ? a : m);
+    });
+  }
+  sw.addEventListener('click', toggle);
+  sw.addEventListener('keydown', function(e){ if(e.key===' '||e.key==='Enter'){e.preventDefault();toggle();}});
+})();
+</script>
+<!-- /wp:html -->

@@ -233,6 +233,7 @@ export interface KpiItem {
   value: string; // formatted for display
   rawValue: number;
   change?: string;
+  subtitle?: string; // secondary text (e.g. "vs last month")
   source: DataSource;
   icon: string; // lucide icon key
   href?: string; // click-through link

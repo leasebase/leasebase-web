@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { Plus } from "lucide-react";
+import { Plus, FileText, Clock, AlertTriangle } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchLeases } from "@/services/leases/leaseService";
 import type { LeaseRow } from "@/services/leases/types";
@@ -62,6 +62,7 @@ function LeasesListPage() {
 
   const activeCount = leases.filter((l) => (l.display_status ?? l.status) === "ACTIVE" || (l.display_status ?? l.status) === "EXTENDED").length;
   const draftCount = leases.filter((l) => (l.display_status ?? l.status) === "DRAFT").length;
+  const pendingCount = leases.filter((l) => (l.display_status ?? l.status) === "ACKNOWLEDGED").length;
   const expiringCount = leases.filter((l) => {
     if ((l.display_status ?? l.status) !== "ACTIVE") return false;
     const end = new Date(l.end_date);
@@ -74,7 +75,7 @@ function LeasesListPage() {
     <>
       <PageHeader
         title="Leases"
-        description="View and manage lease agreements — active, upcoming, and expired."
+        description={`${activeCount} active \u00b7 ${pendingCount > 0 ? `${pendingCount} pending signature` : `${leases.length} total`}`}
         actions={
           <Link href="/app/leases/new">
             <Button variant="primary" icon={<Plus size={16} />}>Create Lease</Button>
@@ -82,28 +83,38 @@ function LeasesListPage() {
         }
       />
 
-      {/* Summary strip */}
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <span className="inline-flex items-center gap-1.5 rounded-lg bg-green-50 border border-green-200 px-3 py-1.5 text-xs font-semibold text-green-700">
-          <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-          {activeCount} active
-        </span>
-        {draftCount > 0 && (
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-            {draftCount} draft{draftCount !== 1 ? "s" : ""}
-          </span>
-        )}
-        {expiringCount > 0 && (
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
-            {expiringCount} expiring within 90d
-          </span>
-        )}
-        <span className="text-xs text-slate-400">{leases.length} total</span>
+      {/* Summary Cards — UIUX style */}
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-[13px] font-medium text-slate-600">Active Leases</h3>
+            <FileText className="w-5 h-5 text-emerald-600" />
+          </div>
+          <p className="text-3xl font-semibold text-slate-900 tracking-tight">{activeCount}</p>
+          {expiringCount > 0 && (
+            <p className="mt-2 flex items-center gap-1.5 text-[12px] text-amber-600 font-medium">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              {expiringCount} expiring within 90 days
+            </p>
+          )}
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-[13px] font-medium text-slate-600">Pending Signature</h3>
+            <Clock className="w-5 h-5 text-amber-600" />
+          </div>
+          <p className="text-3xl font-semibold text-slate-900 tracking-tight">{pendingCount}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-[13px] font-medium text-slate-600">Drafts</h3>
+            <FileText className="w-5 h-5 text-slate-400" />
+          </div>
+          <p className="text-3xl font-semibold text-slate-900 tracking-tight">{draftCount}</p>
+        </div>
       </div>
 
-      <div className="mt-5">
+      <div className="mt-6">
         <LeasesTable leases={leases} />
       </div>
     </>
