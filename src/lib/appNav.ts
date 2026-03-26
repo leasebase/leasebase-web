@@ -53,7 +53,9 @@ export const appNavItems: AppNavItem[] = [
   { path: "/app/admin/growth", label: "Growth", icon: "growth", personas: ["owner"], group: "intelligence", hidden: true },
 
   // ── Settings ──
-  { path: "/app/settings", label: "Settings", icon: "settings", personas: ["owner", "tenant"], group: "operations" },
+  // Owner accesses Settings via the avatar dropdown in the header.
+  // Tenant still sees it in the sidebar.
+  { path: "/app/settings", label: "Settings", icon: "settings", personas: ["tenant"], group: "operations" },
 ];
 
 export function filterNavForPersona(persona: Persona | undefined | null): AppNavItem[] {
