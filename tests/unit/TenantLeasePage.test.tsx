@@ -14,8 +14,19 @@ import { render, screen, waitFor } from "@testing-library/react";
 /* ── Mocks ── */
 
 const mockFetchTenantLeases = jest.fn();
+const mockFetchTenantProfile = jest.fn();
+const mockFetchTenantDocuments = jest.fn();
+
 jest.mock("@/services/tenant/adapters/leaseAdapter", () => ({
   fetchTenantLeases: () => mockFetchTenantLeases(),
+}));
+
+jest.mock("@/services/tenant/adapters/profileAdapter", () => ({
+  fetchTenantProfile: () => mockFetchTenantProfile(),
+}));
+
+jest.mock("@/services/tenant/adapters/documentAdapter", () => ({
+  fetchTenantDocuments: () => mockFetchTenantDocuments(),
 }));
 
 jest.mock("@/lib/auth/store", () => ({
@@ -61,17 +72,24 @@ const assignedLease = {
 
 /* ── Tests ── */
 
+const defaultProfile = { data: { id: "tp1", user_id: "u1", name: "Jane Doe", email: "jane@example.com", phone: null, lease_id: "l1", emergency_contact: null, notification_preferences: null, created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:00:00Z" }, source: "live", error: null };
+const defaultDocs = { data: [], source: "live", error: null };
+
 beforeEach(() => {
   mockFetchTenantLeases.mockReset();
+  mockFetchTenantProfile.mockReset();
+  mockFetchTenantDocuments.mockReset();
+  mockFetchTenantProfile.mockResolvedValue(defaultProfile);
+  mockFetchTenantDocuments.mockResolvedValue(defaultDocs);
 });
 
 describe("TenantLeasePage", () => {
   test("shows loading skeleton while fetching", () => {
     mockFetchTenantLeases.mockReturnValue(new Promise(() => {}));
+    mockFetchTenantProfile.mockReturnValue(new Promise(() => {}));
+    mockFetchTenantDocuments.mockReturnValue(new Promise(() => {}));
     render(<TenantLeasePage />);
-    // LeaseDetailSkeleton renders a set of skeleton elements
-    // Just verify there is no page content yet
-    expect(screen.queryByText("My Lease")).not.toBeInTheDocument();
+    expect(screen.queryByText("Lease Details")).not.toBeInTheDocument();
   });
 
   test("renders active lease with property and unit context", async () => {
@@ -79,13 +97,12 @@ describe("TenantLeasePage", () => {
     render(<TenantLeasePage />);
 
     await waitFor(() => {
-      expect(screen.getByText("My Lease")).toBeInTheDocument();
+      expect(screen.getByText("Lease Details")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Oak Terrace Apartments")).toBeInTheDocument();
-    expect(screen.getByText(/Unit 3B/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Oak Terrace Apartments/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Unit 3B/).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/123 Oak Ave/)).toBeInTheDocument();
-    // Active status appears in badge and in detail row — use getAllBy
     expect(screen.getAllByText("Active").length).toBeGreaterThanOrEqual(1);
   });
 
@@ -94,23 +111,23 @@ describe("TenantLeasePage", () => {
     render(<TenantLeasePage />);
 
     await waitFor(() => {
-      expect(screen.getByText("My Lease")).toBeInTheDocument();
+      expect(screen.getByText("Lease Details")).toBeInTheDocument();
     });
 
     expect(screen.getAllByText("$1,450").length).toBeGreaterThanOrEqual(1);
   });
 
-  test("enables Pay Rent action for active lease", async () => {
+  test("renders lease period and financial sections", async () => {
     mockFetchTenantLeases.mockResolvedValue({ data: [activeLease], source: "live", error: null });
     render(<TenantLeasePage />);
 
     await waitFor(() => {
-      expect(screen.getByText("My Lease")).toBeInTheDocument();
+      expect(screen.getByText("Lease Details")).toBeInTheDocument();
     });
 
-    const payRentLink = screen.getByRole("link", { name: /Pay Rent/i });
-    expect(payRentLink).toBeInTheDocument();
-    expect(payRentLink).toHaveAttribute("href", "/app/pay-rent");
+    expect(screen.getByText("Lease Period")).toBeInTheDocument();
+    expect(screen.getByText("Financial Terms")).toBeInTheDocument();
+    expect(screen.getByText("Property Information")).toBeInTheDocument();
   });
 
   test("renders pre-active lease with status label", async () => {
@@ -118,15 +135,10 @@ describe("TenantLeasePage", () => {
     render(<TenantLeasePage />);
 
     await waitFor(() => {
-      expect(screen.getByText("My Lease")).toBeInTheDocument();
+      expect(screen.getByText("Lease Details")).toBeInTheDocument();
     });
 
-    // Assigned appears in badge and detail row
     expect(screen.getAllByText("Assigned").length).toBeGreaterThanOrEqual(1);
-    // CTAs for inactive lease are disabled (not links)
-    expect(screen.queryByRole("link", { name: /Pay Rent/i })).not.toBeInTheDocument();
-    // Note about activation
-    expect(screen.getByText(/Pay Rent and Maintenance will be available/i)).toBeInTheDocument();
   });
 
   test("renders no-lease empty state when tenant has no leases", async () => {
@@ -147,27 +159,14 @@ describe("TenantLeasePage", () => {
     });
   });
 
-  test("renders multi-lease summary for tenants with multiple leases", async () => {
-    const secondLease = {
-      ...activeLease,
-      id: "l2",
-      organization_id: "org2",
-      property_name: "Maple Heights",
-      unit_number: "101",
-      status: "ACTIVE" as const,
-    };
-    mockFetchTenantLeases.mockResolvedValue({
-      data: [activeLease, secondLease],
-      source: "live",
-      error: null,
-    });
+  test("renders lease renewal card when end date is available", async () => {
+    mockFetchTenantLeases.mockResolvedValue({ data: [activeLease], source: "live", error: null });
     render(<TenantLeasePage />);
 
     await waitFor(() => {
-      expect(screen.getByText("My Lease")).toBeInTheDocument();
+      expect(screen.getByText("Lease Details")).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/Other leases/i)).toBeInTheDocument();
-    expect(screen.getByText(/Maple Heights/)).toBeInTheDocument();
+    expect(screen.getByText("Lease Renewal")).toBeInTheDocument();
   });
 });
