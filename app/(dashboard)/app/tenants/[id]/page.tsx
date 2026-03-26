@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { UserX, UserCheck, FileText, CreditCard, Wrench, AlertTriangle } from "lucide-react";
+import { UserX, UserCheck, FileText, CreditCard, Wrench, AlertTriangle, Mail, Phone, MapPin, User, ArrowLeft, Calendar } from "lucide-react";
 import {
   fetchTenant, deactivateTenant, reactivateTenant,
   fetchTenantLeases, fetchTenantPayments, fetchTenantMaintenance,
@@ -99,25 +99,37 @@ function OwnerTenantDetail() {
 
   return (
     <>
-      <div className="flex items-start justify-between">
-        <PageHeader
-          title={tenant.name}
-          description={[
-            tenant.email,
-            tenant.unit_number && `Unit ${tenant.unit_number}`,
-            tenant.property_name,
-          ].filter(Boolean).join(" · ")}
-        />
-        <div className="flex items-center gap-2 pt-1">
-          {tenant.status === "ACTIVE" ? (
-            <Button variant="danger" icon={<UserX size={14} />} onClick={handleDeactivate} disabled={actionLoading}>
-              Deactivate
-            </Button>
-          ) : tenant.status === "DEACTIVATED" ? (
-            <Button variant="primary" icon={<UserCheck size={14} />} onClick={handleReactivate} disabled={actionLoading}>
-              Reactivate
-            </Button>
-          ) : null}
+      {/* Back link */}
+      <Link href="/app/tenants" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm mb-4">
+        <ArrowLeft className="w-4 h-4" /> Back to Tenants
+      </Link>
+
+      {/* Tenant header card */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+              <User className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-2xl font-semibold text-gray-900">{tenant.name}</h1>
+                <Badge variant={statusVariant}>{tenant.status}</Badge>
+              </div>
+              <div className="flex items-center gap-4 text-sm text-gray-600">
+                {tenant.property_name && (
+                  <div className="flex items-center gap-2"><MapPin className="w-4 h-4" />{tenant.property_name}{tenant.unit_number ? ` · Unit ${tenant.unit_number}` : ""}</div>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {tenant.status === "ACTIVE" ? (
+              <Button variant="danger" icon={<UserX size={14} />} onClick={handleDeactivate} disabled={actionLoading}>Deactivate</Button>
+            ) : tenant.status === "DEACTIVATED" ? (
+              <Button variant="primary" icon={<UserCheck size={14} />} onClick={handleReactivate} disabled={actionLoading}>Reactivate</Button>
+            ) : null}
+          </div>
         </div>
       </div>
 
@@ -141,28 +153,93 @@ function OwnerTenantDetail() {
       {/* Tab content */}
       <div className="mt-4">
         {activeTab === "profile" && (
-          <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">Status:</span>
-              <Badge variant={statusVariant}>{tenant.status}</Badge>
-            </div>
-            {tenant.phone && <p className="text-sm text-slate-600">Phone: {tenant.phone}</p>}
-            {tenant.emergency_contact && <p className="text-sm text-slate-600">Emergency contact: {tenant.emergency_contact}</p>}
-            {tenant.move_in_date && <p className="text-sm text-slate-600">Move-in: {new Date(tenant.move_in_date).toLocaleDateString()}</p>}
-            {tenant.move_out_date && <p className="text-sm text-slate-600">Move-out: {new Date(tenant.move_out_date).toLocaleDateString()}</p>}
-            {tenant.notes && <p className="text-sm text-slate-600">Notes: {tenant.notes}</p>}
-            {tenant.lease_status && (
-              <div className="pt-2 border-t border-slate-100">
-                <p className="text-xs text-slate-400 mb-1">Current Lease</p>
-                <div className="flex items-center gap-2">
-                  <Badge variant={tenant.lease_status === "ACTIVE" ? "success" : "neutral"}>{tenant.lease_status}</Badge>
-                  {tenant.monthly_rent != null && <span className="text-sm text-slate-600">${(tenant.monthly_rent / 100).toLocaleString()}/mo</span>}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Contact Information */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h2 className="font-semibold text-gray-900 mb-4">Contact Information</h2>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Email</p>
+                    <p className="text-gray-900">{tenant.email}</p>
+                  </div>
                 </div>
-                {tenant.start_date && tenant.end_date && (
-                  <p className="text-xs text-slate-500 mt-1">{new Date(tenant.start_date).toLocaleDateString()} — {new Date(tenant.end_date).toLocaleDateString()}</p>
+                {tenant.phone && (
+                  <div className="flex items-start gap-3">
+                    <Phone className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Phone</p>
+                      <p className="text-gray-900">{tenant.phone}</p>
+                    </div>
+                  </div>
+                )}
+                {tenant.emergency_contact && (
+                  <div className="pt-3 border-t border-gray-100">
+                    <p className="text-sm text-gray-600 mb-1">Emergency Contact</p>
+                    <p className="text-gray-900">{tenant.emergency_contact}</p>
+                  </div>
                 )}
               </div>
-            )}
+            </div>
+
+            {/* Lease Information */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h2 className="font-semibold text-gray-900 mb-4">Lease Information</h2>
+              {tenant.lease_status ? (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Lease Status</p>
+                    <Badge variant={tenant.lease_status === "ACTIVE" ? "success" : "neutral"}>{tenant.lease_status}</Badge>
+                  </div>
+                  {tenant.start_date && tenant.end_date && (
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Lease Period</p>
+                      <div className="flex items-center gap-2 text-gray-900">
+                        <Calendar className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm">{new Date(tenant.start_date).toLocaleDateString()} — {new Date(tenant.end_date).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  )}
+                  {tenant.monthly_rent != null && (
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Monthly Rent</p>
+                      <p className="text-lg font-semibold text-gray-900">${(tenant.monthly_rent / 100).toLocaleString()}</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-gray-600 text-sm">No active lease</p>
+              )}
+            </div>
+
+            {/* Additional Info */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h2 className="font-semibold text-gray-900 mb-4">Details</h2>
+              <div className="space-y-4">
+                {tenant.move_in_date && (
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Move-in Date</p>
+                    <p className="text-gray-900">{new Date(tenant.move_in_date).toLocaleDateString()}</p>
+                  </div>
+                )}
+                {tenant.move_out_date && (
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Move-out Date</p>
+                    <p className="text-gray-900">{new Date(tenant.move_out_date).toLocaleDateString()}</p>
+                  </div>
+                )}
+                {tenant.notes && (
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Notes</p>
+                    <p className="text-gray-900 text-sm">{tenant.notes}</p>
+                  </div>
+                )}
+                {!tenant.move_in_date && !tenant.move_out_date && !tenant.notes && (
+                  <p className="text-sm text-gray-400">No additional details</p>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
