@@ -69,7 +69,6 @@ export function OwnerDashboard() {
         <PageHeader
           title="Dashboard"
           description="Track income, performance, and expenses for your properties."
-          sticky
         />
         <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-sm text-red-700">
           {error}
@@ -87,7 +86,6 @@ export function OwnerDashboard() {
         <PageHeader
           title="Dashboard"
           description="Track income, performance, and expenses for your properties."
-          sticky
         />
         <OwnerEmptyState stage={data.setupStage} />
         {/* Calendly CTA for new users */}
@@ -106,7 +104,6 @@ export function OwnerDashboard() {
       <PageHeader
         title="Dashboard"
         description="Real-time overview of your portfolio performance"
-        sticky
         actions={
           <>
             <Link href="/app/reports">
