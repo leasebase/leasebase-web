@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { Calendar } from "lucide-react";
 import { DataTable, type Column, type FilterConfig } from "@/components/ui/DataTable";
 import { Badge, type BadgeVariant } from "@/components/ui/Badge";
 import type { LeaseRow, LeaseTenantRow } from "@/services/leases/types";
@@ -27,100 +28,112 @@ function statusVariant(status: string): BadgeVariant {
   }
 }
 
-/** Format a tenant name as "F.LastName". */
-function shortName(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length < 2) return name;
-  return `${parts[0][0]}.${parts[parts.length - 1]}`;
+/** Get initials from a name string. */
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((s) => s[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+/** Format a date as "Mar 1, 2026". */
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+/** Format cents to dollar string. */
+function formatRent(cents: number): string {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(cents / 100);
 }
 
 /**
- * Render the Tenants cell.
+ * Render the Tenant cell — UIUX style with avatar initials.
  *
- * • True draft with no tenants → "Not assigned".
- * • Has tenants → clickable name(s) linking to /app/tenants/:id.
- * • Multiple tenants → first name + “+ N more” (all clickable).
+ * • No tenants → "Not assigned".
+ * • Has tenants → initials avatar + clickable full name.
+ * • Multiple tenants → first name + "+N" count.
  */
 function renderTenants(row: LeaseRow): ReactNode {
   const tenants = row.tenants;
   if (!tenants || tenants.length === 0) {
-    return <span className="text-slate-400">Not assigned</span>;
+    return <span className="text-[13px] text-slate-400">Not assigned</span>;
   }
 
   const first = tenants[0];
   const rest = tenants.slice(1);
 
   return (
-    <span className="inline-flex flex-wrap items-center gap-x-1">
-      <Link
-        href={`/app/tenants/${first.id}`}
-        className="font-medium text-brand-600 hover:underline"
-      >
-        {shortName(first.name)}
-      </Link>
-      {rest.map((t) => (
-        <Link
-          key={t.id}
-          href={`/app/tenants/${t.id}`}
-          className="text-brand-600 hover:underline"
-          title={t.name}
-        >
-          +1
-        </Link>
-      ))}
-      {rest.length > 0 && (
-        <span className="text-xs text-slate-400">
-          (+{rest.length} more)
+    <div className="flex items-center gap-3">
+      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center flex-shrink-0">
+        <span className="text-[12px] font-semibold text-slate-600">
+          {getInitials(first.name)}
         </span>
-      )}
-    </span>
+      </div>
+      <div className="min-w-0">
+        <Link
+          href={`/app/tenants/${first.id}`}
+          className="text-[13px] font-medium text-slate-900 hover:text-brand-600 transition-colors truncate block"
+        >
+          {first.name}
+        </Link>
+        {rest.length > 0 && (
+          <span className="text-[11px] text-slate-500">+{rest.length} more</span>
+        )}
+      </div>
+    </div>
   );
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString();
 }
 
 /* ── Columns ── */
 
 const columns: Column<LeaseRow>[] = [
   {
-    key: "property_name",
-    header: "Property",
-    sortable: true,
-    render: (row) => (
-      <Link
-        href={`/app/properties/${row.property_id}`}
-        className="font-medium text-brand-600 hover:underline"
-      >
-        {row.property_name ?? row.property_id.slice(0, 8)}
-      </Link>
-    ),
-  },
-  {
-    key: "unit_number",
-    header: "Unit",
-    render: (row) => (
-      <Link
-        href={`/app/units/${row.unit_id}`}
-        className="font-medium text-brand-600 hover:underline"
-      >
-        {row.unit_number ? `Unit ${row.unit_number}` : row.unit_id.slice(0, 8)}
-      </Link>
-    ),
-  },
-  {
     key: "tenants",
-    header: "Tenants",
+    header: "Tenant",
     render: renderTenants,
   },
   {
-    key: "term_type",
-    header: "Term",
+    key: "property_name",
+    header: "Property & Unit",
+    sortable: true,
     render: (row) => (
-      <span className="text-slate-600 text-xs">
-        {TERM_TYPE_LABELS[row.term_type] ?? row.term_type}
-      </span>
+      <div>
+        <Link
+          href={`/app/properties/${row.property_id}`}
+          className="text-[13px] font-medium text-slate-900 hover:text-brand-600 transition-colors"
+        >
+          {row.property_name ?? row.property_id.slice(0, 8)}
+        </Link>
+        <p className="text-[12px] text-slate-500">
+          {row.unit_number ? `Unit ${row.unit_number}` : "—"}
+        </p>
+      </div>
+    ),
+  },
+  {
+    key: "dates",
+    header: "Lease Period",
+    render: (row) => (
+      <div className="flex items-center gap-2 text-slate-600">
+        <Calendar className="w-4 h-4 text-slate-400 flex-shrink-0" />
+        <div className="text-[12px]">
+          <p className="font-medium">{formatDate(row.start_date)}</p>
+          <p className="text-slate-500">to {formatDate(row.end_date)}</p>
+        </div>
+      </div>
+    ),
+  },
+  {
+    key: "rent_amount",
+    header: "Monthly Rent",
+    sortable: true,
+    render: (row) => (
+      <div className="flex items-center justify-end gap-1.5">
+        <span className="text-[15px] font-semibold text-slate-900">
+          {formatRent(row.rent_amount)}
+        </span>
+      </div>
     ),
   },
   {
@@ -132,33 +145,24 @@ const columns: Column<LeaseRow>[] = [
     },
   },
   {
-    key: "dates",
-    header: "Dates",
-    render: (row) => (
-      <span className="text-xs text-slate-500">
-        {formatDate(row.start_date)} – {formatDate(row.end_date)}
-      </span>
-    ),
-  },
-  {
     key: "actions",
     header: "",
     render: (row) => {
       const ds = displayStatus(row);
-      let label = "View";
-      let cls = "text-brand-600 hover:text-brand-700";
+      let label = "View Details";
+      let cls = "text-blue-600 hover:text-blue-700";
       if (ds === "DRAFT") {
-        label = "Review →";
-        cls = "text-amber-700 font-bold hover:text-amber-800";
+        label = "Review";
+        cls = "text-amber-700 font-semibold hover:text-amber-800";
       } else if (ds === "ACKNOWLEDGED") {
-        label = "Send Docs →";
-        cls = "text-blue-700 font-bold hover:text-blue-800";
+        label = "Send Docs";
+        cls = "text-blue-700 font-semibold hover:text-blue-800";
       } else if (ds === "INACTIVE") {
-        label = "Renew →";
-        cls = "text-brand-600 font-bold hover:text-brand-700";
+        label = "Renew";
+        cls = "text-brand-600 font-semibold hover:text-brand-700";
       }
       return (
-        <Link href={`/app/leases/${row.id}`} className={`text-[13px] transition-colors ${cls}`}>
+        <Link href={`/app/leases/${row.id}`} className={`text-[12px] font-medium transition-colors hover:underline ${cls}`}>
           {label}
         </Link>
       );
