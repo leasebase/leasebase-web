@@ -6,7 +6,7 @@ import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { CreditCard, DollarSign, AlertCircle, Search } from "lucide-react";
+import { CreditCard, DollarSign, AlertCircle, Search, ShieldAlert, ArrowRight } from "lucide-react";
 import {
   fetchOwnerPayments,
   fetchOwnerCharges,
@@ -109,14 +109,39 @@ export default function Page() {
         </div>
       ) : (
         <div className="mt-6 space-y-6">
+          {/* Overdue alert banner */}
+          {totalOverdue > 0 && (
+            <div className="rounded-xl border border-red-200 bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50/60 p-4 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-100 shadow-sm">
+                  <ShieldAlert size={18} className="text-red-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-red-900">
+                    {formatCents(totalOverdue)} overdue
+                  </p>
+                  <p className="text-xs text-red-700">
+                    {charges.filter((c) => c.status === "OVERDUE").length} charge{charges.filter((c) => c.status === "OVERDUE").length !== 1 ? "s" : ""} past due date
+                  </p>
+                </div>
+                <a
+                  href="#payments-table"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-red-700 shadow-sm transition-all hover:bg-red-50 hover:shadow"
+                >
+                  Review <ArrowRight size={12} />
+                </a>
+              </div>
+            </div>
+          )}
+
           {/* Summary cards */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Card>
               <CardBody>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Collected</p>
-                    <p className="mt-1.5 text-2xl font-bold text-slate-900">{formatCents(totalCollected)}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Collected</p>
+                    <p className="mt-2 text-[28px] font-bold leading-none tracking-tight text-slate-900">{formatCents(totalCollected)}</p>
                   </div>
                   <span className="rounded-xl bg-green-50 p-2.5 text-green-500 shadow-sm"><DollarSign size={20} /></span>
                 </div>
@@ -126,8 +151,8 @@ export default function Page() {
               <CardBody>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Outstanding</p>
-                    <p className="mt-1.5 text-2xl font-bold text-slate-900">{formatCents(totalPending)}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Outstanding</p>
+                    <p className="mt-2 text-[28px] font-bold leading-none tracking-tight text-slate-900">{formatCents(totalPending)}</p>
                   </div>
                   <span className="rounded-xl bg-amber-50 p-2.5 text-amber-500 shadow-sm"><CreditCard size={20} /></span>
                 </div>
@@ -137,8 +162,8 @@ export default function Page() {
               <CardBody>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Overdue</p>
-                    <p className="mt-1.5 text-2xl font-bold text-red-600">{formatCents(totalOverdue)}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Overdue</p>
+                    <p className="mt-2 text-[28px] font-bold leading-none tracking-tight text-red-600">{formatCents(totalOverdue)}</p>
                   </div>
                   <span className="rounded-xl bg-red-50 p-2.5 text-red-500 shadow-sm"><AlertCircle size={20} /></span>
                 </div>
@@ -213,27 +238,31 @@ export default function Page() {
                 <tbody>
                   {filteredPayments.map((p) => (
                     <tr key={p.id} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50/60 transition-colors">
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3.5 text-slate-600">
                         {new Date(p.created_at).toLocaleDateString()}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3.5 text-slate-600">
                         {p.billing_period
                           ? new Date(p.billing_period + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })
                           : "—"}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">{p.method ?? "—"}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3.5 text-slate-600">{p.method ?? "—"}</td>
+                      <td className="px-4 py-3.5">
                         <Badge variant={p.source === "AUTOPAY" ? "info" : "neutral"}>
                           {p.source ?? "MANUAL"}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-right font-medium text-slate-900">
+                      <td className={`px-4 py-3.5 text-right font-semibold ${
+                        p.status === "SUCCEEDED" ? "text-green-700" :
+                        p.status === "FAILED" ? "text-red-600" :
+                        "text-slate-900"
+                      }`}>
                         {formatCents(p.amount, p.currency)}
                       </td>
-                      <td className="px-4 py-3 text-right text-slate-400">
+                      <td className="px-4 py-3.5 text-right text-slate-400">
                         {p.application_fee_amount ? formatCents(p.application_fee_amount, p.currency) : "—"}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3.5">
                         <Badge variant={paymentStatusVariant[p.status] ?? "neutral"}>{p.status}</Badge>
                       </td>
                     </tr>

@@ -143,14 +143,26 @@ const columns: Column<LeaseRow>[] = [
   {
     key: "actions",
     header: "",
-    render: (row) => (
-      <Link
-        href={`/app/leases/${row.id}`}
-        className="text-sm text-brand-600 hover:underline"
-      >
-        View
-      </Link>
-    ),
+    render: (row) => {
+      const ds = displayStatus(row);
+      let label = "View";
+      let cls = "text-brand-600 hover:text-brand-700";
+      if (ds === "DRAFT") {
+        label = "Review →";
+        cls = "text-amber-700 font-bold hover:text-amber-800";
+      } else if (ds === "ACKNOWLEDGED") {
+        label = "Send Docs →";
+        cls = "text-blue-700 font-bold hover:text-blue-800";
+      } else if (ds === "INACTIVE") {
+        label = "Renew →";
+        cls = "text-brand-600 font-bold hover:text-brand-700";
+      }
+      return (
+        <Link href={`/app/leases/${row.id}`} className={`text-[13px] transition-colors ${cls}`}>
+          {label}
+        </Link>
+      );
+    },
   },
 ];
 

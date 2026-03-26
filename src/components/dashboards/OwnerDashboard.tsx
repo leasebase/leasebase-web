@@ -83,7 +83,7 @@ export function OwnerDashboard() {
           title="Dashboard"
           description="Track income, performance, and expenses for your properties."
         />
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-sm text-red-700">
           {error}
         </div>
       </section>

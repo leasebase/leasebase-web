@@ -16,7 +16,7 @@ export function QuickActions({ vm }: QuickActionsProps) {
       <div className="border-b border-slate-100 px-5 py-3.5">
         <h2 className="text-sm font-semibold text-slate-900">Quick Actions</h2>
       </div>
-      <div className="flex flex-wrap gap-2.5 px-5 py-5">
+      <div className="flex flex-wrap gap-3 px-5 py-5">
         {vm.actions.map((action) => (
           <Link
             key={action.href}
