@@ -17,7 +17,7 @@ const kpiIconColor: Record<string, string> = {
   collectedThisMonth: "from-green-500 to-green-600",
   overdueAmount: "from-red-500 to-red-600",
   occupancy: "from-blue-500 to-blue-600",
-  openMaintenanceRequests: "from-violet-500 to-violet-600",
+  activeLeases: "from-violet-500 to-violet-600",
 };
 
 /** Maps KPI keys to UIUX change color type */
@@ -33,7 +33,7 @@ interface KpiGridProps {
 
 export function KpiGrid({ vm }: KpiGridProps) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
       {vm.items.map((kpi) => {
         const card = (
           <Tooltip

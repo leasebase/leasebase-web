@@ -101,7 +101,7 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
         : undefined,
       subtitle: "this month",
       source: kpis.collectedThisMonth.source,
-      icon: "payments",
+      icon: "dollar-sign",
       href: "/app/payments",
     },
     {
@@ -111,7 +111,7 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
       rawValue: kpis.overdueAmount.value,
       subtitle: "overdue",
       source: kpis.overdueAmount.source,
-      icon: "payments",
+      icon: "alert-circle",
       href: "/app/payments",
     },
     {
@@ -128,18 +128,18 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
         : undefined,
       subtitle: "units occupied",
       source: kpis.vacancyRate.source,
-      icon: "units",
+      icon: "home",
       href: "/app/units",
     },
     {
-      key: "openMaintenanceRequests",
+      key: "activeLeases",
       label: "Active Leases",
       value: fmtKpiValue(kpis.openMaintenanceRequests, fmtNumber),
       rawValue: kpis.openMaintenanceRequests.value,
       subtitle: "open",
       source: kpis.openMaintenanceRequests.source,
-      icon: "maintenance",
-      href: "/app/maintenance",
+      icon: "leases",
+      href: "/app/leases",
     },
   ];
 
