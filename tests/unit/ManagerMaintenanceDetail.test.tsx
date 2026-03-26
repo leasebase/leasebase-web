@@ -37,6 +37,11 @@ jest.mock("@/lib/auth/store", () => ({
   authStore: () => ({ user: { id: "u-owner-1", name: "Dev Manager", persona: "owner" } }),
 }));
 
+jest.mock("@/services/notifications/preferencesV2", () => ({
+  fetchSubscription: jest.fn().mockResolvedValue(null),
+  upsertSubscription: jest.fn().mockResolvedValue(null),
+}));
+
 jest.mock("next/link", () => {
   const MockLink = ({ children, href, ...rest }: any) => (
     <a href={href} {...rest}>{children}</a>
@@ -103,12 +108,6 @@ const comments: MaintenanceComment[] = [
 function setupSuccess(item = workOrder, cmnts = comments) {
   mockFetchDetail.mockResolvedValue({ data: item });
   mockFetchComments.mockResolvedValue({ data: cmnts });
-  mockFetchTimeline.mockResolvedValue({ data: cmnts.map((c: any) => ({
-    id: c.id, type: "comment", event_type: "COMMENT_ADDED",
-    actor_user_id: c.user_id, actor_name: c.author_name,
-    metadata: { comment: c.comment }, created_at: c.created_at,
-  })) });
-  mockFetchAttachments.mockResolvedValue({ data: [] });
 }
 
 /* ── Tests ── */
@@ -224,7 +223,7 @@ describe("ManagerMaintenanceDetail", () => {
 
   /* ── Assignment controls ── */
 
-  test("renders assignment selector and assign button", async () => {
+  test("renders assignee input and assign button", async () => {
     setupSuccess();
     render(<ManagerMaintenanceDetail />);
 
@@ -232,28 +231,31 @@ describe("ManagerMaintenanceDetail", () => {
       expect(screen.getByText("Kitchen faucet leaking badly")).toBeInTheDocument();
     });
 
-    expect(screen.getByLabelText("Assignee type")).toBeInTheDocument();
+    expect(screen.getByLabelText("Assignee ID")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Assign/ })).toBeInTheDocument();
   });
 
-  test("assign as self calls API with owner info", async () => {
+  test("assign calls API with assignee ID", async () => {
     const user = userEvent.setup();
     setupSuccess();
-    mockAssign.mockResolvedValue({ data: { ...workOrder, assignee_id: "u-owner-1", assignee_name: "Dev Manager" } });
+    mockAssign.mockResolvedValue({ data: { ...workOrder, assignee_id: "u-pm-1", assignee_name: "Joe Plumber" } });
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
       expect(screen.getByText("Kitchen faucet leaking badly")).toBeInTheDocument();
     });
 
+    const input = screen.getByLabelText("Assignee ID");
+    await user.clear(input);
+    await user.type(input, "u-pm-1");
     await user.click(screen.getByRole("button", { name: /Assign/ }));
 
     await waitFor(() => {
-      expect(mockAssign).toHaveBeenCalledWith("wo-1", expect.objectContaining({ assigneeType: "self" }));
+      expect(mockAssign).toHaveBeenCalledWith("wo-1", { assigneeId: "u-pm-1" });
     });
   });
 
-  test("shows current assignee name when assigned", async () => {
+  test("shows current assignee when assigned", async () => {
     const withAssignee = { ...workOrder, assignee_id: "u-pm-1", assignee_name: "Joe Plumber" };
     setupSuccess(withAssignee);
     render(<ManagerMaintenanceDetail />);
@@ -262,7 +264,7 @@ describe("ManagerMaintenanceDetail", () => {
       expect(screen.getByText("Kitchen faucet leaking badly")).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/Currently assigned to/i)).toBeInTheDocument();
+    expect(screen.getByText(/Assigned to/i)).toBeInTheDocument();
     expect(screen.getByText(/Joe Plumber/)).toBeInTheDocument();
   });
 
@@ -280,12 +282,12 @@ describe("ManagerMaintenanceDetail", () => {
     expect(screen.getByText(/Dev Tenant/)).toBeInTheDocument();
   });
 
-  test("shows empty activity message when no timeline entries", async () => {
+  test("shows empty comments message when no comments", async () => {
     setupSuccess(workOrder, []);
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
-      expect(screen.getByText("No activity yet.")).toBeInTheDocument();
+      expect(screen.getByText("No comments yet.")).toBeInTheDocument();
     });
   });
 
@@ -302,12 +304,6 @@ describe("ManagerMaintenanceDetail", () => {
         created_at: "2026-03-11T10:00:00Z",
       },
     });
-    // After comment, timeline is refreshed
-    mockFetchTimeline.mockResolvedValue({ data: [{
-      id: "c-new", type: "comment", event_type: "COMMENT_ADDED",
-      actor_user_id: "u-pm-1", actor_name: "Dev Manager",
-      metadata: { comment: "Will check tomorrow" }, created_at: "2026-03-11T10:00:00Z",
-    }] });
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
@@ -336,7 +332,6 @@ describe("ManagerMaintenanceDetail", () => {
         created_at: "2026-03-11T10:00:00Z",
       },
     });
-    mockFetchTimeline.mockResolvedValue({ data: [] });
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
@@ -362,14 +357,14 @@ describe("ManagerMaintenanceDetail", () => {
     });
   });
 
-  /* ── "Assignment" label present (v2) ── */
+  /* ── "Assignee" label present ── */
 
-  test("shows 'Assignment' label", async () => {
+  test("shows 'Assignee' label", async () => {
     setupSuccess();
     render(<ManagerMaintenanceDetail />);
 
     await waitFor(() => {
-      expect(screen.getByText("Assignment")).toBeInTheDocument();
+      expect(screen.getByText("Assignee")).toBeInTheDocument();
     });
   });
 });

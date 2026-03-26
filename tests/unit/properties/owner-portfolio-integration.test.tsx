@@ -56,6 +56,8 @@ jest.mock("lucide-react", () => {
     MoreVertical: icon("MoreVertical"),
     Pencil: icon("Pencil"),
     ArrowLeft: icon("ArrowLeft"),
+    MapPin: icon("MapPin"),
+    TrendingUp: icon("TrendingUp"),
   };
 });
 
