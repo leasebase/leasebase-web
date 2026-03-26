@@ -5,13 +5,11 @@ import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
 import { Building2, Plus, MapPin, TrendingUp } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { fetchPropertiesWithUnitCounts } from "@/services/properties/propertyService";
 import type { PropertyRow } from "@/services/properties/types";
-import { PropertiesTable } from "@/components/properties/PropertiesTable";
 import { PropertiesEmptyState } from "@/components/properties/PropertiesEmptyState";
 import { PropertiesSkeleton } from "@/components/properties/PropertiesSkeleton";
 
@@ -48,7 +46,7 @@ function OwnerPropertiesPage() {
     return (
       <>
         <PageHeader title="Properties" description="Manage your property portfolio." />
-        <div className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700" role="alert">
           {error}
         </div>
       </>
@@ -131,9 +129,12 @@ function OwnerPropertiesPage() {
                 </div>
 
                 <div className="pt-5 border-t border-slate-100 flex items-center justify-between">
-                  <p className="text-[12px] text-slate-500 font-medium">
-                    {counts.total - counts.occupied} vacant unit{counts.total - counts.occupied !== 1 ? "s" : ""}
-                  </p>
+                  <div>
+                    <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wide mb-1">Vacant</p>
+                    <p className="text-xl font-semibold text-slate-900">
+                      {counts.total - counts.occupied} unit{counts.total - counts.occupied !== 1 ? "s" : ""}
+                    </p>
+                  </div>
                   <span className="text-[13px] text-blue-600 font-medium flex items-center gap-1 group-hover:text-blue-700">
                     View Details
                     <TrendingUp className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
