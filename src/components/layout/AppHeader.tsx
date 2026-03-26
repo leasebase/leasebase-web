@@ -149,14 +149,8 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
           </button>
         </div>
 
-        {/* Welcome text for tenant / Search bar for owner */}
+        {/* Global search bar */}
         <div className="flex-1 max-w-lg">
-          {user?.persona === "tenant" ? (
-            <h2 className="text-[15px] font-semibold text-slate-900">
-              Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
-            </h2>
-          ) : (
-            <>
           <label className="sr-only" htmlFor="global-search">Search</label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-[17px] h-[17px] text-slate-400" aria-hidden="true" />
@@ -164,11 +158,9 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
               id="global-search"
               type="search"
               className="w-full h-10 pl-9 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-[13px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-400 focus:bg-white transition-all"
-              placeholder="Search properties, tenants, leases..."
+              placeholder={user?.persona === "tenant" ? "Search documents, payments, maintenance..." : "Search properties, tenants, leases..."}
             />
           </div>
-            </>
-          )}
         </div>
 
         {/* Right: notification bell + account menu */}
@@ -184,8 +176,8 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
             )}
           </Link>
 
-          {/* Owner account dropdown */}
-          {user?.persona === "owner" && (
+          {/* Account dropdown (both personas) */}
+          {user && (
             <DropdownMenu
               trigger={
                 <button
@@ -205,7 +197,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
                   </div>
                   <div className="hidden sm:block text-left min-w-0">
                     <p className="text-[13px] font-semibold text-slate-900 truncate max-w-[120px]">
-                      {user.name || "Owner"}
+                      {user.name || "User"}
                     </p>
                   </div>
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
