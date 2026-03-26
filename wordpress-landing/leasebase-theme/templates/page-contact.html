@@ -1,59 +1,261 @@
 <!-- wp:template-part {"slug":"header","tagName":"header"} /-->
-<!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->
-<main class="wp-block-group">
 
-<!-- DARK HERO -->
 <!-- wp:html -->
-<section class="lb-contact-dark-hero">
-  <div class="lb-contact-dark-hero-grid"></div>
-  <div class="lb-contact-dark-hero-inner">
-    <div class="lb-contact-dark-hero-badge">We're Here to Help</div>
-    <h1 class="lb-contact-dark-hero-h1">Get in Touch</h1>
-    <p class="lb-contact-dark-hero-sub">Have questions about LeaseBase? Our team is ready to help you find the right solution for your property management needs.</p>
+<style>
+/* Reset WP block defaults for this page */
+.lb-cp * { box-sizing: border-box; margin: 0; padding: 0; }
+.lb-cp { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f172a; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+.lb-cp a { color: inherit; text-decoration: none; }
+.lb-cp h1,.lb-cp h2,.lb-cp h3,.lb-cp h4 { line-height: 1.2; }
+.lb-cp img { max-width: 100%; }
+
+/* ── HERO ── */
+.lb-cp-hero {
+  background: #fff; padding: 80px 24px 48px; text-align: center;
+}
+.lb-cp-hero-wrap { max-width: 720px; margin: 0 auto; }
+.lb-cp-hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; color: #111827;
+  letter-spacing: -.03em; line-height: 1.15; margin-bottom: 16px;
+}
+.lb-cp-hero p { font-size: clamp(1rem, 2.2vw, 1.2rem); color: #64748b; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+/* ── MAIN GRID ── */
+.lb-cp-body { background: #f8fafc; padding: 80px 24px; }
+.lb-cp-grid {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start;
+}
+
+/* ── FORM CARD ── */
+.lb-cp-form-card {
+  background: #fff; border-radius: 16px; padding: 40px;
+  border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.lb-cp-form-card h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 8px; }
+.lb-cp-form-card > p { color: #64748b; margin-bottom: 32px; }
+.lb-cp-form { display: flex; flex-direction: column; gap: 24px; }
+.lb-cp-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.lb-cp-field label { display: block; font-size: .875rem; font-weight: 500; color: #334155; margin-bottom: 8px; }
+.lb-cp-field input,
+.lb-cp-field select,
+.lb-cp-field textarea {
+  width: 100%; padding: 12px 16px;
+  border: 1px solid #cbd5e1; border-radius: 12px;
+  font-size: 1rem; font-family: inherit; color: #0f172a;
+  background: #fff; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.lb-cp-field input:focus,
+.lb-cp-field select:focus,
+.lb-cp-field textarea:focus {
+  border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.15);
+}
+.lb-cp-field input::placeholder,
+.lb-cp-field textarea::placeholder { color: #94a3b8; }
+.lb-cp-field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center; padding-right: 44px;
+}
+.lb-cp-field textarea { resize: none; min-height: 150px; }
+.lb-cp-submit {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 16px; font-size: 1rem; font-weight: 600; font-family: inherit;
+  color: #fff; background: #22c55e; border: none; border-radius: 12px;
+  cursor: pointer; transition: background .2s, transform .1s;
+}
+.lb-cp-submit:hover:not(:disabled) { background: #16a34a; transform: translateY(-1px); }
+.lb-cp-submit:disabled { opacity: .65; cursor: not-allowed; }
+.lb-cp-status { padding: 12px 16px; border-radius: 8px; font-size: .95rem; font-weight: 500; }
+.lb-cp-status--ok { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.lb-cp-status--err { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+/* ── SIDEBAR ── */
+.lb-cp-sidebar { display: flex; flex-direction: column; gap: 24px; }
+
+/* Contact Info */
+.lb-cp-info {
+  background: #fff; border-radius: 16px; padding: 32px;
+  border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.lb-cp-info h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; }
+.lb-cp-info-list { display: flex; flex-direction: column; gap: 24px; }
+.lb-cp-info-item { display: flex; align-items: flex-start; gap: 16px; }
+.lb-cp-info-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: rgba(34,197,94,.1); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.lb-cp-info-item h4 { font-size: 1rem; font-weight: 600; margin-bottom: 2px; }
+.lb-cp-info-item .val { font-size: .95rem; color: #0f172a; }
+.lb-cp-info-item .val a { transition: color .2s; }
+.lb-cp-info-item .val a:hover { color: #22c55e; }
+.lb-cp-info-item .note { font-size: .875rem; color: #64748b; margin-top: 2px; }
+
+/* Demo Card */
+.lb-cp-demo {
+  background: linear-gradient(135deg, rgba(34,197,94,.05), rgba(34,197,94,.1));
+  border-radius: 16px; padding: 32px; border: 1px solid rgba(34,197,94,.2);
+}
+.lb-cp-demo h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; }
+.lb-cp-demo p { color: #64748b; margin-bottom: 24px; }
+.lb-cp-demo a {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 12px; font-size: .875rem; font-weight: 600;
+  color: #fff; background: #22c55e; border-radius: 12px; transition: background .2s;
+}
+.lb-cp-demo a:hover { background: #16a34a; }
+
+/* Help Card */
+.lb-cp-help {
+  background: #fff; border-radius: 16px; padding: 32px;
+  border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.lb-cp-help h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; }
+.lb-cp-help > p { color: #64748b; margin-bottom: 24px; }
+.lb-cp-help a {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 12px; font-size: .875rem; font-weight: 600;
+  color: #334155; background: #fff; border: 1px solid #cbd5e1; border-radius: 12px;
+  transition: background .2s;
+}
+.lb-cp-help a:hover { background: #f8fafc; }
+
+/* ── FAQ ── */
+.lb-cp-faq { background: #fff; padding: 96px 24px; }
+.lb-cp-faq-wrap { max-width: 896px; margin: 0 auto; }
+.lb-cp-faq h2 { font-size: clamp(2rem,4vw,3rem); font-weight: 700; text-align: center; margin-bottom: 16px; letter-spacing: -.02em; }
+.lb-cp-faq > .lb-cp-faq-wrap > p { font-size: 1.25rem; color: #64748b; text-align: center; margin-bottom: 56px; }
+.lb-cp-faq-list { display: flex; flex-direction: column; gap: 12px; }
+.lb-cp-faq-list details {
+  background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden;
+}
+.lb-cp-faq-list summary {
+  padding: 20px 24px; cursor: pointer; list-style: none;
+  display: flex; align-items: center; justify-content: space-between;
+  font-weight: 600; font-size: 1rem; color: #0f172a; transition: background .15s;
+}
+.lb-cp-faq-list summary:hover { background: #f1f5f9; }
+.lb-cp-faq-list summary::-webkit-details-marker { display: none; }
+.lb-cp-faq-list summary::after {
+  content: ''; width: 20px; height: 20px; flex-shrink: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat center;
+  transition: transform .2s;
+}
+.lb-cp-faq-list details[open] summary::after { transform: rotate(180deg); }
+.lb-cp-faq-list .ans { padding: 0 24px 20px; color: #64748b; line-height: 1.7; }
+
+/* ── HOURS ── */
+.lb-cp-hours { background: #f8fafc; padding: 64px 24px; }
+.lb-cp-hours-wrap { max-width: 1200px; margin: 0 auto; }
+.lb-cp-hours-card {
+  background: #fff; border-radius: 16px; padding: 48px;
+  border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+}
+.lb-cp-hours-left h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 12px; }
+.lb-cp-hours-left > p { color: #64748b; margin-bottom: 24px; }
+.lb-cp-hours-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid #e2e8f0;
+}
+.lb-cp-hours-row:last-child { border-bottom: none; }
+.lb-cp-hours-row .day { font-weight: 500; }
+.lb-cp-hours-row .time { color: #64748b; }
+.lb-cp-hours-right {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  border-radius: 12px; padding: 32px; color: #fff;
+}
+.lb-cp-hours-right .badge {
+  display: inline-block; padding: 4px 12px; background: #22c55e;
+  border-radius: 9999px; font-size: .875rem; font-weight: 600; margin-bottom: 16px;
+}
+.lb-cp-hours-right h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+.lb-cp-hours-right p { color: #94a3b8; margin-bottom: 24px; }
+.lb-cp-hours-right a {
+  display: inline-flex; align-items: center; padding: 12px 24px;
+  font-size: .875rem; font-weight: 600; color: #0f172a; background: #fff;
+  border-radius: 12px; transition: background .2s;
+}
+.lb-cp-hours-right a:hover { background: #f1f5f9; }
+
+/* ── CTA ── */
+.lb-cp-cta {
+  background: #f8fafc; padding: 72px 24px 88px; text-align: center;
+}
+.lb-cp-cta-wrap { max-width: 720px; margin: 0 auto; }
+.lb-cp-cta h2 { font-size: 2.25rem; font-weight: 700; color: #111827; margin-bottom: 16px; letter-spacing: -.02em; }
+.lb-cp-cta > .lb-cp-cta-wrap > p { font-size: 1.25rem; color: #64748b; margin-bottom: 32px; max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+.lb-cp-cta-btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+.lb-cp-cta-btns .primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 28px; font-size: .95rem; font-weight: 600;
+  color: #fff; background: linear-gradient(to right, #2563eb, #4f46e5); border-radius: 8px;
+  transition: all .2s;
+}
+.lb-cp-cta-btns .primary:hover { background: linear-gradient(to right, #1d4ed8, #4338ca); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(37,99,235,.25); }
+.lb-cp-cta-btns .secondary {
+  display: inline-flex; align-items: center;
+  padding: 12px 28px; font-size: .95rem; font-weight: 600;
+  color: #111827; border: 1px solid #d1d5db; border-radius: 8px; transition: all .2s;
+}
+.lb-cp-cta-btns .secondary:hover { background: #f9fafb; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .lb-cp-grid { grid-template-columns: 1fr; }
+  .lb-cp-row2 { grid-template-columns: 1fr; }
+  .lb-cp-hours-card { grid-template-columns: 1fr; padding: 24px; }
+  .lb-cp-form-card { padding: 24px; }
+  .lb-cp-cta-btns { flex-direction: column; align-items: center; }
+}
+</style>
+
+<div class="lb-cp">
+
+<!-- ═══ HERO ═══ -->
+<section class="lb-cp-hero">
+  <div class="lb-cp-hero-wrap">
+    <h1>Get in touch with LeaseBase</h1>
+    <p>Have questions about LeaseBase? Our team is ready to help you find the right solution for your property management needs.</p>
   </div>
 </section>
-<!-- /wp:html -->
 
-<!-- FORM + SIDEBAR -->
-<!-- wp:html -->
-<section class="lb-contact-main">
-  <div class="lb-contact-main-inner">
+<!-- ═══ FORM + SIDEBAR ═══ -->
+<section class="lb-cp-body">
+  <div class="lb-cp-grid">
 
-    <!-- Contact Form -->
-    <div class="lb-contact-form-card">
-      <h2 class="lb-contact-form-card-heading">Send us a message</h2>
-      <p class="lb-contact-form-card-sub">Fill out the form below and we'll get back to you within 24 hours.</p>
+    <div class="lb-cp-form-card">
+      <h2>Send us a message</h2>
+      <p>Fill out the form below and we'll get back to you within 24 hours.</p>
 
-      <form id="lb-contact-form" class="lb-contact-form-v2" novalidate>
-        <div class="lb-form-row-2col">
-          <div class="lb-form-field-v2">
-            <label for="lb-firstName" class="lb-form-label-v2">First Name</label>
-            <input type="text" id="lb-firstName" name="firstName" class="lb-form-input-v2" placeholder="John" required autocomplete="given-name" />
+      <form id="lb-contact-form" class="lb-cp-form" novalidate>
+        <div class="lb-cp-row2">
+          <div class="lb-cp-field">
+            <label for="cp-fn">First Name</label>
+            <input type="text" id="cp-fn" name="firstName" placeholder="John" required autocomplete="given-name">
           </div>
-          <div class="lb-form-field-v2">
-            <label for="lb-lastName" class="lb-form-label-v2">Last Name</label>
-            <input type="text" id="lb-lastName" name="lastName" class="lb-form-input-v2" placeholder="Doe" required autocomplete="family-name" />
+          <div class="lb-cp-field">
+            <label for="cp-ln">Last Name</label>
+            <input type="text" id="cp-ln" name="lastName" placeholder="Doe" required autocomplete="family-name">
           </div>
         </div>
-
-        <div class="lb-form-field-v2">
-          <label for="lb-email" class="lb-form-label-v2">Email Address</label>
-          <input type="email" id="lb-email" name="email" class="lb-form-input-v2" placeholder="john@example.com" required autocomplete="email" />
+        <div class="lb-cp-field">
+          <label for="cp-em">Email Address</label>
+          <input type="email" id="cp-em" name="email" placeholder="john@example.com" required autocomplete="email">
         </div>
-
-        <div class="lb-form-field-v2">
-          <label for="lb-phone" class="lb-form-label-v2">Phone Number (Optional)</label>
-          <input type="tel" id="lb-phone" name="phone" class="lb-form-input-v2" placeholder="(555) 123-4567" autocomplete="tel" />
+        <div class="lb-cp-field">
+          <label for="cp-ph">Phone Number (Optional)</label>
+          <input type="tel" id="cp-ph" name="phone" placeholder="(555) 123-4567" autocomplete="tel">
         </div>
-
-        <div class="lb-form-field-v2">
-          <label for="lb-company" class="lb-form-label-v2">Company / Property Name</label>
-          <input type="text" id="lb-company" name="company" class="lb-form-input-v2" placeholder="Your company name" autocomplete="organization" />
+        <div class="lb-cp-field">
+          <label for="cp-co">Company / Property Name</label>
+          <input type="text" id="cp-co" name="company" placeholder="Your company name" autocomplete="organization">
         </div>
-
-        <div class="lb-form-field-v2">
-          <label for="lb-units" class="lb-form-label-v2">Number of Units You Manage</label>
-          <select id="lb-units" name="units" class="lb-form-input-v2 lb-form-select-v2">
+        <div class="lb-cp-field">
+          <label for="cp-un">Number of Units You Manage</label>
+          <select id="cp-un" name="units">
             <option value="">Select range</option>
             <option value="1-5">1-5 units</option>
             <option value="6-10">6-10 units</option>
@@ -64,10 +266,9 @@
             <option value="200+">200+ units</option>
           </select>
         </div>
-
-        <div class="lb-form-field-v2">
-          <label for="lb-subject" class="lb-form-label-v2">What can we help you with?</label>
-          <select id="lb-subject" name="subject" class="lb-form-input-v2 lb-form-select-v2">
+        <div class="lb-cp-field">
+          <label for="cp-su">What can we help you with?</label>
+          <select id="cp-su" name="subject">
             <option value="">Select a topic</option>
             <option value="demo">Schedule a Demo</option>
             <option value="sales">Sales Inquiry</option>
@@ -77,253 +278,162 @@
             <option value="other">Other</option>
           </select>
         </div>
-
-        <div class="lb-form-field-v2">
-          <label for="lb-message" class="lb-form-label-v2">Message</label>
-          <textarea id="lb-message" name="message" class="lb-form-input-v2 lb-form-textarea-v2" rows="6" placeholder="Tell us about your property management needs..." required></textarea>
+        <div class="lb-cp-field">
+          <label for="cp-msg">Message</label>
+          <textarea id="cp-msg" name="message" rows="6" placeholder="Tell us about your property management needs..." required></textarea>
         </div>
 
-        <div id="lb-contact-status" class="lb-contact-status" aria-live="polite" hidden></div>
+        <div id="lb-cp-status" aria-live="polite" hidden></div>
 
-        <button type="submit" id="lb-contact-submit" class="lb-contact-submit-v2">
+        <button type="submit" id="lb-cp-submit" class="lb-cp-submit">
           Send Message
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
         </button>
       </form>
     </div>
 
-    <!-- Sidebar -->
-    <div class="lb-contact-sidebar">
+    <div class="lb-cp-sidebar">
 
-      <!-- Contact Information -->
-      <div class="lb-contact-info-card-v2">
-        <h3 class="lb-contact-info-card-heading">Contact Information</h3>
-        <div class="lb-contact-info-list">
-
-          <div class="lb-contact-info-row">
-            <div class="lb-contact-info-icon-v2">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            </div>
+      <div class="lb-cp-info">
+        <h3>Contact Information</h3>
+        <div class="lb-cp-info-list">
+          <div class="lb-cp-info-item">
+            <div class="lb-cp-info-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div>
             <div>
-              <h4 class="lb-contact-info-title">Email</h4>
-              <a href="mailto:hello@leasebase.com" class="lb-contact-info-value-link">hello@leasebase.com</a>
-              <p class="lb-contact-info-note">We'll respond within 24 hours</p>
+              <h4>Email</h4>
+              <div class="val"><a href="mailto:hello@leasebase.com">hello@leasebase.com</a></div>
+              <div class="note">We'll respond within 24 hours</div>
             </div>
           </div>
-
-          <div class="lb-contact-info-row">
-            <div class="lb-contact-info-icon-v2">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            </div>
+          <div class="lb-cp-info-item">
+            <div class="lb-cp-info-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
             <div>
-              <h4 class="lb-contact-info-title">Phone</h4>
-              <a href="tel:1-800-532-7322" class="lb-contact-info-value-link">1-800-LEASEBASE</a>
-              <p class="lb-contact-info-note">Mon-Fri, 9am-6pm EST</p>
+              <h4>Phone</h4>
+              <div class="val"><a href="tel:1-800-532-7322">1-800-LEASEBASE</a></div>
+              <div class="note">Mon-Fri, 9am-6pm EST</div>
             </div>
           </div>
-
-          <div class="lb-contact-info-row">
-            <div class="lb-contact-info-icon-v2">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </div>
+          <div class="lb-cp-info-item">
+            <div class="lb-cp-info-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
             <div>
-              <h4 class="lb-contact-info-title">Office</h4>
-              <p class="lb-contact-info-value">123 Property Lane, Suite 400</p>
-              <p class="lb-contact-info-note">San Francisco, CA 94102</p>
+              <h4>Office</h4>
+              <div class="val">123 Property Lane, Suite 400</div>
+              <div class="note">San Francisco, CA 94102</div>
             </div>
           </div>
-
-          <div class="lb-contact-info-row">
-            <div class="lb-contact-info-icon-v2">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-            </div>
+          <div class="lb-cp-info-item">
+            <div class="lb-cp-info-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg></div>
             <div>
-              <h4 class="lb-contact-info-title">Live Chat</h4>
-              <p class="lb-contact-info-value">Available in app</p>
-              <p class="lb-contact-info-note">Instant support for customers</p>
+              <h4>Live Chat</h4>
+              <div class="val">Available in app</div>
+              <div class="note">Instant support for customers</div>
             </div>
           </div>
-
         </div>
       </div>
 
-      <!-- Prefer a Live Demo -->
-      <div class="lb-contact-demo-card">
-        <h3 class="lb-contact-demo-heading">Prefer a Live Demo?</h3>
-        <p class="lb-contact-demo-body">See LeaseBase in action with a personalized 30-minute demo tailored to your portfolio.</p>
-        <a href="/demo/" class="lb-contact-demo-btn">
-          Schedule a Demo
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        </a>
+      <div class="lb-cp-demo">
+        <h3>Prefer a Live Demo?</h3>
+        <p>See LeaseBase in action with a personalized 30-minute demo tailored to your portfolio.</p>
+        <a href="/demo/">Schedule a Demo <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></a>
       </div>
 
-      <!-- Need Quick Answers -->
-      <div class="lb-contact-help-card">
-        <h3 class="lb-contact-help-heading">Need Quick Answers?</h3>
-        <p class="lb-contact-help-body">Browse our help center for instant answers to common questions about features, billing, and setup.</p>
-        <a href="#lb-faq-section" class="lb-contact-help-btn">
-          Visit Help Center
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-        </a>
+      <div class="lb-cp-help">
+        <h3>Need Quick Answers?</h3>
+        <p>Browse our help center for instant answers to common questions about features, billing, and setup.</p>
+        <a href="#cp-faq">Visit Help Center <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></a>
       </div>
 
     </div>
   </div>
 </section>
-<!-- /wp:html -->
 
-<!-- FAQ SECTION -->
-<!-- wp:html -->
-<section id="lb-faq-section" class="lb-contact-faq-section">
-  <div class="lb-contact-faq-inner">
-    <h2 class="lb-contact-faq-h2">Frequently Asked Questions</h2>
-    <p class="lb-contact-faq-sub">Quick answers to common questions about LeaseBase</p>
-
-    <div class="lb-contact-faq-list">
-      <details class="lb-contact-faq-item">
-        <summary>How quickly will I receive a response?</summary>
-        <div class="lb-contact-faq-answer">Our support team typically responds to all inquiries within 24 hours during business days. For urgent technical issues, existing customers can access priority support through the app.</div>
-      </details>
-      <details class="lb-contact-faq-item">
-        <summary>Can I schedule a demo before signing up?</summary>
-        <div class="lb-contact-faq-answer">Absolutely! We offer personalized 30-minute demos where we'll walk you through LeaseBase and answer any questions specific to your portfolio. Click the 'Schedule a Demo' button to book a time that works for you.</div>
-      </details>
-      <details class="lb-contact-faq-item">
-        <summary>Do you offer phone support?</summary>
-        <div class="lb-contact-faq-answer">Yes, phone support is available Monday through Friday, 9am-6pm EST. Professional and Enterprise plan customers also have access to priority phone support with shorter wait times.</div>
-      </details>
-      <details class="lb-contact-faq-item">
-        <summary>What if I need technical support?</summary>
-        <div class="lb-contact-faq-answer">Technical support is available through multiple channels: in-app live chat for immediate assistance, email support at support@leasebase.com, or our comprehensive help center with articles and video tutorials.</div>
-      </details>
-      <details class="lb-contact-faq-item">
-        <summary>Can you help with onboarding and migration?</summary>
-        <div class="lb-contact-faq-answer">Yes! We provide onboarding assistance to all new customers. Enterprise customers receive dedicated onboarding support, including help with data migration from your existing system.</div>
-      </details>
-      <details class="lb-contact-faq-item">
-        <summary>Do you offer partnerships or integrations?</summary>
-        <div class="lb-contact-faq-answer">We're always interested in partnerships that add value for property owners. If you have an integration or partnership proposal, please select 'Partnership Opportunity' in the contact form above.</div>
-      </details>
+<!-- ═══ FAQ ═══ -->
+<section id="cp-faq" class="lb-cp-faq">
+  <div class="lb-cp-faq-wrap">
+    <h2>Frequently Asked Questions</h2>
+    <p>Quick answers to common questions about LeaseBase</p>
+    <div class="lb-cp-faq-list">
+      <details><summary>How quickly will I receive a response?</summary><div class="ans">Our support team typically responds to all inquiries within 24 hours during business days. For urgent technical issues, existing customers can access priority support through the app.</div></details>
+      <details><summary>Can I schedule a demo before signing up?</summary><div class="ans">Absolutely! We offer personalized 30-minute demos where we'll walk you through LeaseBase and answer any questions specific to your portfolio. Click the 'Schedule a Demo' button to book a time that works for you.</div></details>
+      <details><summary>Do you offer phone support?</summary><div class="ans">Yes, phone support is available Monday through Friday, 9am-6pm EST. Professional and Enterprise plan customers also have access to priority phone support with shorter wait times.</div></details>
+      <details><summary>What if I need technical support?</summary><div class="ans">Technical support is available through multiple channels: in-app live chat for immediate assistance, email support at support@leasebase.com, or our comprehensive help center with articles and video tutorials.</div></details>
+      <details><summary>Can you help with onboarding and migration?</summary><div class="ans">Yes! We provide onboarding assistance to all new customers. Enterprise customers receive dedicated onboarding support, including help with data migration from your existing system.</div></details>
+      <details><summary>Do you offer partnerships or integrations?</summary><div class="ans">We're always interested in partnerships that add value for property owners. If you have an integration or partnership proposal, please select 'Partnership Opportunity' in the contact form above.</div></details>
     </div>
   </div>
 </section>
-<!-- /wp:html -->
 
-<!-- SUPPORT HOURS -->
-<!-- wp:html -->
-<section class="lb-contact-hours-section">
-  <div class="lb-contact-hours-inner">
-    <div class="lb-contact-hours-card">
-      <div class="lb-contact-hours-grid">
-        <div class="lb-contact-hours-left">
-          <h2 class="lb-contact-hours-h2">Our Support Hours</h2>
-          <p class="lb-contact-hours-sub">We're available to help you succeed with LeaseBase. Here's when you can reach us:</p>
-          <div class="lb-contact-hours-table">
-            <div class="lb-contact-hours-row">
-              <span class="lb-contact-hours-day">Monday - Friday</span>
-              <span class="lb-contact-hours-time">9:00 AM - 6:00 PM EST</span>
-            </div>
-            <div class="lb-contact-hours-row">
-              <span class="lb-contact-hours-day">Saturday</span>
-              <span class="lb-contact-hours-time">10:00 AM - 2:00 PM EST</span>
-            </div>
-            <div class="lb-contact-hours-row lb-contact-hours-row--last">
-              <span class="lb-contact-hours-day">Sunday</span>
-              <span class="lb-contact-hours-time">Closed (Email support available)</span>
-            </div>
-          </div>
-        </div>
-        <div class="lb-contact-hours-right">
-          <div class="lb-contact-hours-enterprise-badge">24/7 Access</div>
-          <h3 class="lb-contact-hours-enterprise-h3">Enterprise Support</h3>
-          <p class="lb-contact-hours-enterprise-body">Need around-the-clock support? Our Enterprise plan includes 24/7 phone and chat support with dedicated account management.</p>
-          <a href="/pricing/" class="lb-contact-hours-enterprise-btn">Learn About Enterprise</a>
+<!-- ═══ SUPPORT HOURS ═══ -->
+<section class="lb-cp-hours">
+  <div class="lb-cp-hours-wrap">
+    <div class="lb-cp-hours-card">
+      <div class="lb-cp-hours-left">
+        <h2>Our Support Hours</h2>
+        <p>We're available to help you succeed with LeaseBase. Here's when you can reach us:</p>
+        <div>
+          <div class="lb-cp-hours-row"><span class="day">Monday - Friday</span><span class="time">9:00 AM - 6:00 PM EST</span></div>
+          <div class="lb-cp-hours-row"><span class="day">Saturday</span><span class="time">10:00 AM - 2:00 PM EST</span></div>
+          <div class="lb-cp-hours-row"><span class="day">Sunday</span><span class="time">Closed (Email support available)</span></div>
         </div>
       </div>
+      <div class="lb-cp-hours-right">
+        <div class="badge">24/7 Access</div>
+        <h3>Enterprise Support</h3>
+        <p>Need around-the-clock support? Our Enterprise plan includes 24/7 phone and chat support with dedicated account management.</p>
+        <a href="/pricing/">Learn About Enterprise</a>
+      </div>
     </div>
   </div>
 </section>
-<!-- /wp:html -->
 
-<!-- CTA -->
-<!-- wp:html -->
-<section class="lb-contact-cta-section">
-  <div class="lb-contact-cta-grid"></div>
-  <div class="lb-contact-cta-inner">
-    <h2 class="lb-contact-cta-h2">Ready to Get Started?</h2>
-    <p class="lb-contact-cta-sub">Start managing your properties more efficiently today with a 14-day free trial.</p>
-    <div class="lb-contact-cta-buttons">
-      <a href="https://signup.dev.leasebase.ai" class="lb-contact-cta-primary">
-        Start Free Trial
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-      </a>
-      <a href="/" class="lb-contact-cta-secondary">Back to Home</a>
+<!-- ═══ CTA ═══ -->
+<section class="lb-cp-cta">
+  <div class="lb-cp-cta-wrap">
+    <h2>Ready to make your property profitable faster?</h2>
+    <p>Built for owners who want better control, better visibility, and less manual work.</p>
+    <div class="lb-cp-cta-btns">
+      <a href="https://signup.dev.leasebase.ai" class="primary">Start Free</a>
+      <a href="/demo/" class="secondary">Book a Demo</a>
     </div>
-    <p class="lb-contact-cta-note">No credit card required &bull; Cancel anytime</p>
   </div>
 </section>
-<!-- /wp:html -->
 
-</main>
-<!-- /wp:group -->
+</div><!-- .lb-cp -->
 
-<!-- FORM SCRIPT -->
-<!-- wp:html -->
 <script>
-(function () {
-  var form = document.getElementById('lb-contact-form');
-  var statusEl = document.getElementById('lb-contact-status');
-  var submitBtn = document.getElementById('lb-contact-submit');
-  if (!form) return;
-
-  function showStatus(msg, isError) {
-    statusEl.textContent = msg;
-    statusEl.className = 'lb-contact-status ' + (isError ? 'lb-contact-status--error' : 'lb-contact-status--success');
-    statusEl.hidden = false;
-  }
-
-  form.addEventListener('submit', function (e) {
+(function(){
+  var f=document.getElementById('lb-contact-form'),
+      s=document.getElementById('lb-cp-status'),
+      b=document.getElementById('lb-cp-submit');
+  if(!f)return;
+  function msg(t,ok){s.textContent=t;s.className='lb-cp-status '+(ok?'lb-cp-status--ok':'lb-cp-status--err');s.hidden=false;}
+  f.addEventListener('submit',function(e){
     e.preventDefault();
-    var firstName = (form.elements['firstName'].value || '').trim();
-    var lastName  = (form.elements['lastName'].value || '').trim();
-    var email     = (form.elements['email'].value || '').trim();
-    var phone     = (form.elements['phone'].value || '').trim();
-    var company   = (form.elements['company'].value || '').trim();
-    var units     = form.elements['units'].value || '';
-    var subject   = form.elements['subject'].value || '';
-    var message   = (form.elements['message'].value || '').trim();
-    var name      = (firstName + ' ' + lastName).trim();
-
-    if (!firstName) { showStatus('Please enter your first name.', true); form.elements['firstName'].focus(); return; }
-    if (!lastName)  { showStatus('Please enter your last name.', true); form.elements['lastName'].focus(); return; }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showStatus('Please enter a valid email address.', true); form.elements['email'].focus(); return; }
-    if (!message)   { showStatus('Please enter a message.', true); form.elements['message'].focus(); return; }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending\u2026';
-    statusEl.hidden = true;
-
-    fetch('/wp-json/leasebase/v1/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, email: email, phone: phone, company: company, units: units, subject: subject, message: message })
-    })
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        if (data.success) {
-          showStatus(data.message || 'Thanks! We\'ll be in touch soon.', false);
-          form.reset();
-        } else {
-          showStatus(data.message || 'Something went wrong. Please try again.', true);
-        }
-      })
-      .catch(function () {
-        showStatus('Network error. Please check your connection and try again.', true);
-      })
-      .finally(function () {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Send Message <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>';
-      });
+    var fn=(f.elements.firstName.value||'').trim(),
+        ln=(f.elements.lastName.value||'').trim(),
+        em=(f.elements.email.value||'').trim(),
+        ph=(f.elements.phone.value||'').trim(),
+        co=(f.elements.company.value||'').trim(),
+        un=f.elements.units.value||'',
+        su=f.elements.subject.value||'',
+        ms=(f.elements.message.value||'').trim();
+    if(!fn){msg('Please enter your first name.',false);f.elements.firstName.focus();return;}
+    if(!ln){msg('Please enter your last name.',false);f.elements.lastName.focus();return;}
+    if(!em||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){msg('Please enter a valid email.',false);f.elements.email.focus();return;}
+    if(!ms){msg('Please enter a message.',false);f.elements.message.focus();return;}
+    b.disabled=true;b.textContent='Sending\u2026';s.hidden=true;
+    fetch('/wp-json/leasebase/v1/contact',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:fn+' '+ln,email:em,phone:ph,company:co,units:un,subject:su,message:ms})
+    }).then(function(r){return r.json()}).then(function(d){
+      if(d.success){msg(d.message||"Thanks! We'll be in touch soon.",true);f.reset();}
+      else{msg(d.message||'Something went wrong.',false);}
+    }).catch(function(){msg('Network error. Please try again.',false);})
+    .finally(function(){
+      b.disabled=false;
+      b.innerHTML='Send Message <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>';
+    });
   });
 })();
 </script>
