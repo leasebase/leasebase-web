@@ -25,21 +25,22 @@ export function SidebarNavItem({
     <Link
       href={path}
       onClick={onClick}
-      className={`flex items-center gap-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 ${
-        collapsed ? "justify-center px-2 py-2" : "px-2.5 py-2"
+      className={`flex items-center gap-2.5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+        collapsed ? "justify-center px-2 py-2" : "px-3 py-2.5"
       } ${
         active
-          ? "bg-brand-500/10 font-medium text-brand-600"
-          : "text-slate-600 hover:bg-surface-raised hover:text-slate-900"
+          ? "bg-brand-50 font-medium text-brand-700 shadow-sm"
+          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
       }`}
       aria-current={active ? "page" : undefined}
     >
       <Icon
         name={icon || ""}
         size={18}
-        className={active ? "text-brand-600" : ""}
+        className={active ? "text-brand-500" : "text-slate-400 group-hover:text-slate-600"}
       />
-      {!collapsed && <span>{label}</span>}
+      {!collapsed && <span className="flex-1">{label}</span>}
+      {!collapsed && active && <div className="h-1.5 w-1.5 rounded-full bg-brand-500" />}
     </Link>
   );
 

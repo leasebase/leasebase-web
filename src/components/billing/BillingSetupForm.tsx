@@ -11,6 +11,7 @@ import {
   confirmOwnerPaymentMethod,
 } from "@/services/owner/adapters/billingAdapter";
 import { track } from "@/lib/analytics";
+import { STRIPE_BRAND_COLOR } from "@/lib/stripe/theme";
 
 // ── Inner form (must be inside <Elements>) ─────────────────────────────────
 
@@ -250,13 +251,13 @@ export function BillingSetupForm({
           stripe={stripePromise}
           options={{
             clientSecret,
-            appearance: {
-              theme: "stripe",
-              variables: {
-                colorPrimary: "#18D7F0",
-                borderRadius: "8px",
+              appearance: {
+                theme: "stripe",
+                variables: {
+                  colorPrimary: STRIPE_BRAND_COLOR,
+                  borderRadius: "8px",
+                },
               },
-            },
           }}
         >
           <SetupForm

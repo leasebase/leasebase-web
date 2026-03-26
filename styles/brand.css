@@ -1,72 +1,84 @@
 /*
- * LeaseBase Brand System — Source of Truth
+ * LeaseBase Brand System — Source of Truth (UIUX v1)
  * Do NOT redefine brand colors outside this file.
  * All components must consume these variables.
  * See also: src/design-system/tokens.css (auto-generated; brand.css overrides where needed).
+ *
+ * Primary: Green #22C55E — action, success, identity
+ * Surface: Light layered — slate-50 base, white cards, slate-100 raised
  */
 
 :root {
-  --lb-color-bg-dark: #05070B;
-  --lb-color-base: #0D1320;
-  --lb-color-surface: #111827;
-  --lb-color-text: #F3F4F6;
-  --lb-color-text-dark: #0F172A;
-  --lb-color-cyan: #18D7F0;
-  --lb-color-teal: #22D3EE;
-  --lb-color-green: #5EEA7A;
-  --lb-color-lime: #D9FF1F;
-  --lb-color-primary: #18D7F0;
-  --lb-color-accent: #5EEA7A;
-  --lb-color-highlight: #D9FF1F;
-  --lb-color-muted: #94A3B8;
-  --lb-color-bg-light: #F8FAFC;
-  --lb-gradient-brand: linear-gradient(135deg, #18D7F0 0%, #5EEA7A 60%, #D9FF1F 100%);
-  --lb-gradient-dark: linear-gradient(135deg, #0D1320 0%, #111827 100%);
+  /* ── Core palette ── */
+  --lb-color-bg-dark: #020617;       /* slate-950 — auth/marketing dark bg */
+  --lb-color-base: #0F172A;          /* slate-900 */
+  --lb-color-surface: #1E293B;       /* slate-800 */
+  --lb-color-text: #F8FAFC;          /* slate-50  — text on dark surfaces */
+  --lb-color-text-dark: #0F172A;     /* slate-900 — text on light surfaces */
+  --lb-color-primary: #22C55E;       /* green-500 — brand primary */
+  --lb-color-accent: #16A34A;        /* green-600 — primary hover / emphasis */
+  --lb-color-highlight: #15803D;     /* green-700 — strong emphasis */
+  --lb-color-muted: #94A3B8;         /* slate-400 */
+  --lb-color-bg-light: #F8FAFC;      /* slate-50  — app background */
+
+  /* ── Gradients ── */
+  --lb-gradient-brand: linear-gradient(135deg, #22C55E 0%, #16A34A 60%, #15803D 100%);
+  --lb-gradient-dark: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+
+  /* ── Typography ── */
   --lb-typography-font-family-sans: "Inter", system-ui, sans-serif;
 
-  /* Compatibility aliases for existing app tokens/classes */
-  --lb-color-brand-primary-50: #E8FBFF;
-  --lb-color-brand-primary-100: #D2F8FE;
-  --lb-color-brand-primary-200: #A8F0FB;
-  --lb-color-brand-primary-300: #7DE8F7;
-  --lb-color-brand-primary-400: #4CDEF4;
-  --lb-color-brand-primary-500: #18D7F0;
-  --lb-color-brand-primary-600: #12BED6;
-  --lb-color-brand-primary-700: #0F9AAF;
-  --lb-color-brand-primary-800: #0B7585;
-  --lb-color-brand-primary-900: #095963;
-  --lb-color-brand-primary-950: #05070B;
-  --lb-color-brand-secondary-50: #F0FFF4;
-  --lb-color-brand-secondary-100: #D9FFE6;
-  --lb-color-brand-secondary-200: #BCFFD0;
-  --lb-color-brand-secondary-300: #9AF8B8;
-  --lb-color-brand-secondary-400: #78F29A;
-  --lb-color-brand-secondary-500: #5EEA7A;
-  --lb-color-brand-secondary-600: #3FD45D;
-  --lb-color-brand-secondary-700: #2DAB4A;
-  --lb-color-brand-secondary-800: #237F3A;
-  --lb-color-brand-secondary-900: #1D622F;
-  --lb-color-brand-secondary-950: #12351B;
-  --lb-color-surface-base: var(--lb-color-bg-light);
-  --lb-color-surface-default: #FFFFFF;
-  --lb-color-surface-raised: #EEF2F7;
-  --lb-color-surface-overlay: #FFFFFF;
-  --lb-color-semantic-success-50: #EEFFF5;
-  --lb-color-semantic-success-100: #DBFFE9;
-  --lb-color-semantic-success-500: #5EEA7A;
-  --lb-color-semantic-success-600: #38C95A;
-  --lb-color-semantic-success-700: #2A9C46;
-  --lb-color-semantic-info-50: #EAFBFF;
-  --lb-color-semantic-info-100: #D6F7FE;
-  --lb-color-semantic-info-500: #18D7F0;
-  --lb-color-semantic-info-600: #12BED6;
-  --lb-color-semantic-info-700: #0F9AAF;
+  /* ── Brand primary scale (green-500 family) ── */
+  --lb-color-brand-primary-50:  #F0FDF4;
+  --lb-color-brand-primary-100: #DCFCE7;
+  --lb-color-brand-primary-200: #BBF7D0;
+  --lb-color-brand-primary-300: #86EFAC;
+  --lb-color-brand-primary-400: #4ADE80;
+  --lb-color-brand-primary-500: #22C55E;
+  --lb-color-brand-primary-600: #16A34A;
+  --lb-color-brand-primary-700: #15803D;
+  --lb-color-brand-primary-800: #166534;
+  --lb-color-brand-primary-900: #14532D;
+  --lb-color-brand-primary-950: #052E16;
+
+  /* ── Brand secondary scale (blue — supporting only) ── */
+  --lb-color-brand-secondary-50:  #eff6ff;
+  --lb-color-brand-secondary-100: #dbeafe;
+  --lb-color-brand-secondary-200: #bfdbfe;
+  --lb-color-brand-secondary-300: #93c5fd;
+  --lb-color-brand-secondary-400: #60a5fa;
+  --lb-color-brand-secondary-500: #3b82f6;
+  --lb-color-brand-secondary-600: #2563eb;
+  --lb-color-brand-secondary-700: #1d4ed8;
+  --lb-color-brand-secondary-800: #1e40af;
+  --lb-color-brand-secondary-900: #1e3a8a;
+  --lb-color-brand-secondary-950: #172554;
+
+  /* ── Surfaces (light layered system) ── */
+  --lb-color-surface-base:    #F8FAFC;  /* app background — slate-50 */
+  --lb-color-surface-default: #FFFFFF;  /* card / panel background */
+  --lb-color-surface-raised:  #F1F5F9;  /* hover / section background — slate-100 */
+  --lb-color-surface-overlay: #FFFFFF;  /* modal / popover background */
+
+  /* ── Semantic success (aligned with brand green) ── */
+  --lb-color-semantic-success-50:  #F0FDF4;
+  --lb-color-semantic-success-100: #DCFCE7;
+  --lb-color-semantic-success-500: #22C55E;
+  --lb-color-semantic-success-600: #16A34A;
+  --lb-color-semantic-success-700: #15803D;
+
+  /* ── Semantic info (blue — supporting) ── */
+  --lb-color-semantic-info-50:  #eff6ff;
+  --lb-color-semantic-info-100: #dbeafe;
+  --lb-color-semantic-info-500: #3b82f6;
+  --lb-color-semantic-info-600: #2563eb;
+  --lb-color-semantic-info-700: #1d4ed8;
 }
 
 html.dark {
-  --lb-color-surface-base: var(--lb-color-base);
+  --lb-color-surface-base:    var(--lb-color-base);
   --lb-color-surface-default: var(--lb-color-surface);
-  --lb-color-surface-raised: #1B2434;
+  --lb-color-surface-raised:  #1B2434;
   --lb-color-surface-overlay: #1B2434;
 }
 
@@ -100,8 +112,8 @@ select {
 
 .lb-brand-glow-subtle {
   box-shadow:
-    0 0 0 1px rgba(24, 215, 240, 0.16),
-    0 12px 24px rgba(17, 24, 39, 0.24);
+    0 0 0 1px rgba(34, 197, 94, 0.16),
+    0 12px 24px rgba(15, 23, 42, 0.24);
 }
 
 .lb-logo {

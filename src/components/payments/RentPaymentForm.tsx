@@ -5,6 +5,7 @@ import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/Button";
 import { Banknote, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { STRIPE_BRAND_COLOR } from "@/lib/stripe/theme";
 
 // ── Inner form (must be inside <Elements>) ─────────────────────────────────
 
@@ -124,7 +125,7 @@ export function RentPaymentForm({
         appearance: {
           theme: "stripe",
           variables: {
-            colorPrimary: "#18D7F0",
+            colorPrimary: STRIPE_BRAND_COLOR,
             borderRadius: "8px",
           },
         },

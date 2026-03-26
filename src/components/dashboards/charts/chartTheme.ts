@@ -6,11 +6,11 @@
  */
 
 export const CHART_COLORS = {
-  brand:   "#18D7F0", // lb-color-primary (cyan)
-  success: "#5EEA7A", // lb-color-accent (green)
+  brand:   "#22C55E", // lb-color-primary (green-500)
+  success: "#16A34A", // lb-color-accent (green-600)
   warning: "#f59e0b", // amber-500
   danger:  "#ef4444", // red-500
-  info:    "#18D7F0", // lb-color-primary (cyan)
+  info:    "#3b82f6", // blue-500
 
   slate100: "#f1f5f9",
   slate200: "#e2e8f0",
@@ -30,7 +30,7 @@ export const PALETTE = [
   CHART_COLORS.info,
   "#8b5cf6", // violet-500
   "#ec4899", // pink-500
-  "#14b8a6", // teal-500
+  "#0f766e", // teal-600
 ] as const;
 
 /** Shared Recharts tooltip style */
