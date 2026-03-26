@@ -187,27 +187,27 @@ export default function SettingsPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Organization Name</label>
               <input type="text" defaultValue="" placeholder="Your organization name"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
                 <input type="email" defaultValue={user?.email ?? ""} placeholder="contact@example.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                 <input type="tel" defaultValue="" placeholder="(555) 000-0000"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300" />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Business Address</label>
               <input type="text" defaultValue="" placeholder="Street address, city, state, zip"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300" />
             </div>
             <div className="pt-4">
-              <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+              <button className="px-6 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors font-medium">
                 Save Changes
               </button>
             </div>
@@ -220,7 +220,7 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Default Payment Method for Tenants</label>
-                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300">
                   <option>ACH Bank Transfer</option>
                   <option>Credit Card</option>
                   <option>Check</option>
@@ -232,12 +232,12 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600">$</span>
                   <input type="number" defaultValue="75"
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Late Fee Grace Period</label>
-                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300">
                   <option>3 days</option>
                   <option>5 days</option>
                   <option>7 days</option>
@@ -245,7 +245,7 @@ export default function SettingsPage() {
                 </select>
               </div>
               <div className="pt-4">
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <button className="px-6 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors font-medium">
                   Save Payment Settings
                 </button>
               </div>
@@ -265,7 +265,7 @@ export default function SettingsPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
               <input type="text" defaultValue={user?.name ?? ""} placeholder="Your name"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
@@ -283,7 +283,7 @@ export default function SettingsPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Theme Mode</label>
               <select value={themeMode} onChange={(e) => setThemeMode(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300">
                 <option value="system">System</option>
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
@@ -301,7 +301,7 @@ export default function SettingsPage() {
             </div>
           </div>
           <div className="pt-4">
-            <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            <button className="px-6 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors font-medium">
               Save Profile
             </button>
           </div>
@@ -330,7 +330,7 @@ export default function SettingsPage() {
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" defaultChecked={t.on} />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500" />
               </label>
             </div>
           ))}
@@ -439,20 +439,20 @@ export default function SettingsPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
               <input type="password" placeholder="••••••••"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
               <input type="password" placeholder="••••••••"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
               <input type="password" placeholder="••••••••"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300" />
             </div>
             <div className="pt-4">
-              <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+              <button className="px-6 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors font-medium">
                 Update Password
               </button>
             </div>
@@ -497,7 +497,7 @@ export default function SettingsPage() {
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Tab Navigation */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-1">
+          <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-0.5 shadow-sm">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.key;
@@ -505,14 +505,15 @@ export default function SettingsPage() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`w-full text-left px-4 py-3 rounded-lg font-medium flex items-center gap-3 transition-colors ${
+                  className={`w-full text-left px-4 py-3 rounded-xl font-medium flex items-center gap-3 transition-all ${
                     isActive
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-700 hover:bg-gray-50"
+                      ? "bg-[#ECFDF5] text-[#15803D] shadow-sm"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  {tab.label}
+              <Icon className={`w-[18px] h-[18px] ${isActive ? "text-[#22C55E]" : "text-slate-400"}`} strokeWidth={2.5} />
+                  <span className="flex-1">{tab.label}</span>
+                  {isActive && <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E] shadow-sm" />}
                 </button>
               );
             })}
