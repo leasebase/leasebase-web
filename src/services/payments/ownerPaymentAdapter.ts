@@ -135,25 +135,30 @@ export async function fetchConnectStatus(): Promise<DomainResult<ConnectStatus |
   }
 }
 
-/** Response from POST /connect/session for embedded onboarding */
-export interface OnboardingSessionResult {
-  clientSecret: string;
-  publishableKey: string;
-  accountId: string;
+export async function startOnboarding(): Promise<DomainResult<{ url: string } | null>> {
+  try {
+    const res = await apiRequest<{ data: { url: string } }>({
+      path: "api/payments/connect/onboard",
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ return_url: `${window.location.origin}/app/settings?connect=return`, refresh_url: `${window.location.origin}/app/settings?connect=refresh` }),
+    });
+    return { data: res.data, source: "live", error: null };
+  } catch (e: any) {
+    return { data: null, source: "unavailable", error: e?.message || "Failed to start onboarding" };
+  }
 }
 
-/** Create an Account Session for embedded onboarding (Phase 2) */
-export async function createOnboardingSession(): Promise<DomainResult<OnboardingSessionResult | null>> {
+export async function getDashboardLink(): Promise<DomainResult<{ url: string } | null>> {
   try {
-    const res = await apiRequest<{ data: OnboardingSessionResult }>({
-      path: "api/payments/connect/session",
+    const res = await apiRequest<{ data: { url: string } }>({
+      path: "api/payments/connect/dashboard-link",
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({}),
     });
     return { data: res.data, source: "live", error: null };
   } catch (e: any) {
-    return { data: null, source: "unavailable", error: e?.message || "Failed to create onboarding session" };
+    return { data: null, source: "unavailable", error: e?.message || "Failed to get dashboard link" };
   }
 }
-
