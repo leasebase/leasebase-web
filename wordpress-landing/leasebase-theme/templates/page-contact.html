@@ -2,145 +2,272 @@
 <!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->
 <main class="wp-block-group">
 
-<!-- CONTACT HERO -->
-<!-- wp:group {"className":"lb-contact-hero lb-section","layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-contact-hero lb-section">
+<!-- DARK HERO -->
 <!-- wp:html -->
-<div class="lb-badge" style="text-align:center;"><span class="lb-badge-label">Get in Touch</span></div>
-<!-- /wp:html -->
-<!-- wp:heading {"level":1,"textAlign":"center"} -->
-<h1 class="wp-block-heading has-text-align-center">We're Here to Help</h1>
-<!-- /wp:heading -->
-<!-- wp:paragraph {"align":"center","className":"lb-contact-hero-sub"} -->
-<p class="has-text-align-center lb-contact-hero-sub">Have questions? Our team typically responds within 24 hours</p>
-<!-- /wp:paragraph -->
-</div>
-<!-- /wp:group -->
-
-<!-- CONTACT FORM + SIDEBAR -->
-<!-- wp:group {"className":"lb-section lb-contact-layout-section","layout":{"type":"constrained"}} -->
-<div class="wp-block-group lb-section lb-contact-layout-section">
-<!-- wp:html -->
-<div class="lb-contact-layout">
-
-  <!-- Contact Form -->
-  <div class="lb-contact-form-wrap">
-    <h2 class="lb-contact-form-heading">Send us a message</h2>
-
-    <form id="lb-contact-form" class="lb-contact-form" novalidate>
-
-      <div class="lb-form-field">
-        <label for="lb-contact-name" class="lb-form-label">Full Name</label>
-        <input
-          type="text"
-          id="lb-contact-name"
-          name="name"
-          class="lb-form-input"
-          placeholder="John Doe"
-          required
-          autocomplete="name"
-        />
-      </div>
-
-      <div class="lb-form-field">
-        <label for="lb-contact-email" class="lb-form-label">Email Address</label>
-        <input
-          type="email"
-          id="lb-contact-email"
-          name="email"
-          class="lb-form-input"
-          placeholder="john@example.com"
-          required
-          autocomplete="email"
-        />
-      </div>
-
-      <div class="lb-form-field">
-        <label for="lb-contact-units" class="lb-form-label">Number of Units</label>
-        <select id="lb-contact-units" name="units" class="lb-form-input lb-form-select">
-          <option value="" disabled selected>Select range</option>
-          <option value="1-10">1-10 units</option>
-          <option value="11-50">11-50 units</option>
-          <option value="51-100">51-100 units</option>
-          <option value="101-200">101-200 units</option>
-          <option value="200+">200+ units</option>
-        </select>
-      </div>
-
-      <div class="lb-form-field">
-        <label for="lb-contact-message" class="lb-form-label">Message</label>
-        <textarea
-          id="lb-contact-message"
-          name="message"
-          class="lb-form-input lb-form-textarea"
-          placeholder="Tell us about your property management needs..."
-          rows="6"
-          required
-        ></textarea>
-      </div>
-
-      <div id="lb-contact-status" class="lb-contact-status" aria-live="polite" hidden></div>
-
-      <button type="submit" id="lb-contact-submit" class="lb-contact-submit">
-        Send Message
-      </button>
-
-    </form>
+<section class="lb-contact-dark-hero">
+  <div class="lb-contact-dark-hero-grid"></div>
+  <div class="lb-contact-dark-hero-inner">
+    <div class="lb-contact-dark-hero-badge">We're Here to Help</div>
+    <h1 class="lb-contact-dark-hero-h1">Get in Touch</h1>
+    <p class="lb-contact-dark-hero-sub">Have questions about LeaseBase? Our team is ready to help you find the right solution for your property management needs.</p>
   </div>
-
-  <!-- Other Ways to Reach Us -->
-  <aside class="lb-contact-info">
-    <h2 class="lb-contact-sidebar-heading">Other ways to reach us</h2>
-
-    <div class="lb-contact-info-card">
-      <div class="lb-contact-info-inner">
-        <div class="lb-contact-info-icon lb-contact-info-icon--green" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-        </div>
-        <div>
-          <h3 class="lb-contact-info-heading">Email</h3>
-          <p class="lb-contact-info-body"><a href="mailto:hello@leasebase.com" class="lb-contact-info-link">hello@leasebase.com</a></p>
-          <p class="lb-contact-info-body">We'll respond within 24 hours</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="lb-contact-info-card">
-      <div class="lb-contact-info-inner">
-        <div class="lb-contact-info-icon lb-contact-info-icon--green" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        </div>
-        <div>
-          <h3 class="lb-contact-info-heading">Phone</h3>
-          <p class="lb-contact-info-body"><strong>1-800-LEASEBASE</strong></p>
-          <p class="lb-contact-info-body">Mon-Fri, 9am-6pm EST</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="lb-contact-info-card">
-      <div class="lb-contact-info-inner">
-        <div class="lb-contact-info-icon lb-contact-info-icon--green" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </div>
-        <div>
-          <h3 class="lb-contact-info-heading">Live Chat</h3>
-          <p class="lb-contact-info-body"><strong>Available in app</strong></p>
-          <p class="lb-contact-info-body">Instant support for customers</p>
-        </div>
-      </div>
-    </div>
-
-  </aside>
-
-</div>
+</section>
 <!-- /wp:html -->
-</div>
-<!-- /wp:group -->
+
+<!-- FORM + SIDEBAR -->
+<!-- wp:html -->
+<section class="lb-contact-main">
+  <div class="lb-contact-main-inner">
+
+    <!-- Contact Form -->
+    <div class="lb-contact-form-card">
+      <h2 class="lb-contact-form-card-heading">Send us a message</h2>
+      <p class="lb-contact-form-card-sub">Fill out the form below and we'll get back to you within 24 hours.</p>
+
+      <form id="lb-contact-form" class="lb-contact-form-v2" novalidate>
+        <div class="lb-form-row-2col">
+          <div class="lb-form-field-v2">
+            <label for="lb-firstName" class="lb-form-label-v2">First Name</label>
+            <input type="text" id="lb-firstName" name="firstName" class="lb-form-input-v2" placeholder="John" required autocomplete="given-name" />
+          </div>
+          <div class="lb-form-field-v2">
+            <label for="lb-lastName" class="lb-form-label-v2">Last Name</label>
+            <input type="text" id="lb-lastName" name="lastName" class="lb-form-input-v2" placeholder="Doe" required autocomplete="family-name" />
+          </div>
+        </div>
+
+        <div class="lb-form-field-v2">
+          <label for="lb-email" class="lb-form-label-v2">Email Address</label>
+          <input type="email" id="lb-email" name="email" class="lb-form-input-v2" placeholder="john@example.com" required autocomplete="email" />
+        </div>
+
+        <div class="lb-form-field-v2">
+          <label for="lb-phone" class="lb-form-label-v2">Phone Number (Optional)</label>
+          <input type="tel" id="lb-phone" name="phone" class="lb-form-input-v2" placeholder="(555) 123-4567" autocomplete="tel" />
+        </div>
+
+        <div class="lb-form-field-v2">
+          <label for="lb-company" class="lb-form-label-v2">Company / Property Name</label>
+          <input type="text" id="lb-company" name="company" class="lb-form-input-v2" placeholder="Your company name" autocomplete="organization" />
+        </div>
+
+        <div class="lb-form-field-v2">
+          <label for="lb-units" class="lb-form-label-v2">Number of Units You Manage</label>
+          <select id="lb-units" name="units" class="lb-form-input-v2 lb-form-select-v2">
+            <option value="">Select range</option>
+            <option value="1-5">1-5 units</option>
+            <option value="6-10">6-10 units</option>
+            <option value="11-25">11-25 units</option>
+            <option value="26-50">26-50 units</option>
+            <option value="51-100">51-100 units</option>
+            <option value="101-200">101-200 units</option>
+            <option value="200+">200+ units</option>
+          </select>
+        </div>
+
+        <div class="lb-form-field-v2">
+          <label for="lb-subject" class="lb-form-label-v2">What can we help you with?</label>
+          <select id="lb-subject" name="subject" class="lb-form-input-v2 lb-form-select-v2">
+            <option value="">Select a topic</option>
+            <option value="demo">Schedule a Demo</option>
+            <option value="sales">Sales Inquiry</option>
+            <option value="support">Technical Support</option>
+            <option value="billing">Billing Question</option>
+            <option value="partnership">Partnership Opportunity</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="lb-form-field-v2">
+          <label for="lb-message" class="lb-form-label-v2">Message</label>
+          <textarea id="lb-message" name="message" class="lb-form-input-v2 lb-form-textarea-v2" rows="6" placeholder="Tell us about your property management needs..." required></textarea>
+        </div>
+
+        <div id="lb-contact-status" class="lb-contact-status" aria-live="polite" hidden></div>
+
+        <button type="submit" id="lb-contact-submit" class="lb-contact-submit-v2">
+          Send Message
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </button>
+      </form>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="lb-contact-sidebar">
+
+      <!-- Contact Information -->
+      <div class="lb-contact-info-card-v2">
+        <h3 class="lb-contact-info-card-heading">Contact Information</h3>
+        <div class="lb-contact-info-list">
+
+          <div class="lb-contact-info-row">
+            <div class="lb-contact-info-icon-v2">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </div>
+            <div>
+              <h4 class="lb-contact-info-title">Email</h4>
+              <a href="mailto:hello@leasebase.com" class="lb-contact-info-value-link">hello@leasebase.com</a>
+              <p class="lb-contact-info-note">We'll respond within 24 hours</p>
+            </div>
+          </div>
+
+          <div class="lb-contact-info-row">
+            <div class="lb-contact-info-icon-v2">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div>
+              <h4 class="lb-contact-info-title">Phone</h4>
+              <a href="tel:1-800-532-7322" class="lb-contact-info-value-link">1-800-LEASEBASE</a>
+              <p class="lb-contact-info-note">Mon-Fri, 9am-6pm EST</p>
+            </div>
+          </div>
+
+          <div class="lb-contact-info-row">
+            <div class="lb-contact-info-icon-v2">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div>
+              <h4 class="lb-contact-info-title">Office</h4>
+              <p class="lb-contact-info-value">123 Property Lane, Suite 400</p>
+              <p class="lb-contact-info-note">San Francisco, CA 94102</p>
+            </div>
+          </div>
+
+          <div class="lb-contact-info-row">
+            <div class="lb-contact-info-icon-v2">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            </div>
+            <div>
+              <h4 class="lb-contact-info-title">Live Chat</h4>
+              <p class="lb-contact-info-value">Available in app</p>
+              <p class="lb-contact-info-note">Instant support for customers</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Prefer a Live Demo -->
+      <div class="lb-contact-demo-card">
+        <h3 class="lb-contact-demo-heading">Prefer a Live Demo?</h3>
+        <p class="lb-contact-demo-body">See LeaseBase in action with a personalized 30-minute demo tailored to your portfolio.</p>
+        <a href="/demo/" class="lb-contact-demo-btn">
+          Schedule a Demo
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </a>
+      </div>
+
+      <!-- Need Quick Answers -->
+      <div class="lb-contact-help-card">
+        <h3 class="lb-contact-help-heading">Need Quick Answers?</h3>
+        <p class="lb-contact-help-body">Browse our help center for instant answers to common questions about features, billing, and setup.</p>
+        <a href="#lb-faq-section" class="lb-contact-help-btn">
+          Visit Help Center
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- /wp:html -->
+
+<!-- FAQ SECTION -->
+<!-- wp:html -->
+<section id="lb-faq-section" class="lb-contact-faq-section">
+  <div class="lb-contact-faq-inner">
+    <h2 class="lb-contact-faq-h2">Frequently Asked Questions</h2>
+    <p class="lb-contact-faq-sub">Quick answers to common questions about LeaseBase</p>
+
+    <div class="lb-contact-faq-list">
+      <details class="lb-contact-faq-item">
+        <summary>How quickly will I receive a response?</summary>
+        <div class="lb-contact-faq-answer">Our support team typically responds to all inquiries within 24 hours during business days. For urgent technical issues, existing customers can access priority support through the app.</div>
+      </details>
+      <details class="lb-contact-faq-item">
+        <summary>Can I schedule a demo before signing up?</summary>
+        <div class="lb-contact-faq-answer">Absolutely! We offer personalized 30-minute demos where we'll walk you through LeaseBase and answer any questions specific to your portfolio. Click the 'Schedule a Demo' button to book a time that works for you.</div>
+      </details>
+      <details class="lb-contact-faq-item">
+        <summary>Do you offer phone support?</summary>
+        <div class="lb-contact-faq-answer">Yes, phone support is available Monday through Friday, 9am-6pm EST. Professional and Enterprise plan customers also have access to priority phone support with shorter wait times.</div>
+      </details>
+      <details class="lb-contact-faq-item">
+        <summary>What if I need technical support?</summary>
+        <div class="lb-contact-faq-answer">Technical support is available through multiple channels: in-app live chat for immediate assistance, email support at support@leasebase.com, or our comprehensive help center with articles and video tutorials.</div>
+      </details>
+      <details class="lb-contact-faq-item">
+        <summary>Can you help with onboarding and migration?</summary>
+        <div class="lb-contact-faq-answer">Yes! We provide onboarding assistance to all new customers. Enterprise customers receive dedicated onboarding support, including help with data migration from your existing system.</div>
+      </details>
+      <details class="lb-contact-faq-item">
+        <summary>Do you offer partnerships or integrations?</summary>
+        <div class="lb-contact-faq-answer">We're always interested in partnerships that add value for property owners. If you have an integration or partnership proposal, please select 'Partnership Opportunity' in the contact form above.</div>
+      </details>
+    </div>
+  </div>
+</section>
+<!-- /wp:html -->
+
+<!-- SUPPORT HOURS -->
+<!-- wp:html -->
+<section class="lb-contact-hours-section">
+  <div class="lb-contact-hours-inner">
+    <div class="lb-contact-hours-card">
+      <div class="lb-contact-hours-grid">
+        <div class="lb-contact-hours-left">
+          <h2 class="lb-contact-hours-h2">Our Support Hours</h2>
+          <p class="lb-contact-hours-sub">We're available to help you succeed with LeaseBase. Here's when you can reach us:</p>
+          <div class="lb-contact-hours-table">
+            <div class="lb-contact-hours-row">
+              <span class="lb-contact-hours-day">Monday - Friday</span>
+              <span class="lb-contact-hours-time">9:00 AM - 6:00 PM EST</span>
+            </div>
+            <div class="lb-contact-hours-row">
+              <span class="lb-contact-hours-day">Saturday</span>
+              <span class="lb-contact-hours-time">10:00 AM - 2:00 PM EST</span>
+            </div>
+            <div class="lb-contact-hours-row lb-contact-hours-row--last">
+              <span class="lb-contact-hours-day">Sunday</span>
+              <span class="lb-contact-hours-time">Closed (Email support available)</span>
+            </div>
+          </div>
+        </div>
+        <div class="lb-contact-hours-right">
+          <div class="lb-contact-hours-enterprise-badge">24/7 Access</div>
+          <h3 class="lb-contact-hours-enterprise-h3">Enterprise Support</h3>
+          <p class="lb-contact-hours-enterprise-body">Need around-the-clock support? Our Enterprise plan includes 24/7 phone and chat support with dedicated account management.</p>
+          <a href="/pricing/" class="lb-contact-hours-enterprise-btn">Learn About Enterprise</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- /wp:html -->
+
+<!-- CTA -->
+<!-- wp:html -->
+<section class="lb-contact-cta-section">
+  <div class="lb-contact-cta-grid"></div>
+  <div class="lb-contact-cta-inner">
+    <h2 class="lb-contact-cta-h2">Ready to Get Started?</h2>
+    <p class="lb-contact-cta-sub">Start managing your properties more efficiently today with a 14-day free trial.</p>
+    <div class="lb-contact-cta-buttons">
+      <a href="https://signup.dev.leasebase.ai" class="lb-contact-cta-primary">
+        Start Free Trial
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </a>
+      <a href="/" class="lb-contact-cta-secondary">Back to Home</a>
+    </div>
+    <p class="lb-contact-cta-note">No credit card required &bull; Cancel anytime</p>
+  </div>
+</section>
+<!-- /wp:html -->
 
 </main>
 <!-- /wp:group -->
 
+<!-- FORM SCRIPT -->
 <!-- wp:html -->
 <script>
 (function () {
@@ -157,14 +284,20 @@
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var name    = (form.elements['name'].value || '').trim();
-    var email   = (form.elements['email'].value || '').trim();
-    var units   = form.elements['units'].value || '';
-    var message = (form.elements['message'].value || '').trim();
+    var firstName = (form.elements['firstName'].value || '').trim();
+    var lastName  = (form.elements['lastName'].value || '').trim();
+    var email     = (form.elements['email'].value || '').trim();
+    var phone     = (form.elements['phone'].value || '').trim();
+    var company   = (form.elements['company'].value || '').trim();
+    var units     = form.elements['units'].value || '';
+    var subject   = form.elements['subject'].value || '';
+    var message   = (form.elements['message'].value || '').trim();
+    var name      = (firstName + ' ' + lastName).trim();
 
-    if (!name) { showStatus('Please enter your name.', true); form.elements['name'].focus(); return; }
+    if (!firstName) { showStatus('Please enter your first name.', true); form.elements['firstName'].focus(); return; }
+    if (!lastName)  { showStatus('Please enter your last name.', true); form.elements['lastName'].focus(); return; }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showStatus('Please enter a valid email address.', true); form.elements['email'].focus(); return; }
-    if (!message) { showStatus('Please enter a message.', true); form.elements['message'].focus(); return; }
+    if (!message)   { showStatus('Please enter a message.', true); form.elements['message'].focus(); return; }
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending\u2026';
@@ -173,7 +306,7 @@
     fetch('/wp-json/leasebase/v1/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, email: email, units: units, message: message })
+      body: JSON.stringify({ name: name, email: email, phone: phone, company: company, units: units, subject: subject, message: message })
     })
       .then(function (res) { return res.json(); })
       .then(function (data) {
@@ -189,7 +322,7 @@
       })
       .finally(function () {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Send Message';
+        submitBtn.innerHTML = 'Send Message <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>';
       });
   });
 })();
