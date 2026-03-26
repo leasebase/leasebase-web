@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Settings2, Plus, Download } from "lucide-react";
+import { Plus, Download } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import type { OwnerDashboardData, OwnerDashboardViewModel } from "@/services/dashboard/types";
@@ -12,15 +12,12 @@ import { WidgetErrorBoundary } from "./owner/WidgetErrorBoundary";
 import { OwnerDashboardSkeleton } from "./owner/OwnerDashboardSkeleton";
 import { OwnerEmptyState } from "./owner/OwnerEmptyState";
 import { AlertStrip } from "./owner/AlertStrip";
+import { KpiGrid } from "./owner/KpiGrid";
+import { CashFlowCard } from "./owner/CashFlowCard";
+import { ActivityFeed } from "./owner/ActivityFeed";
 import { PriorityActions } from "@/components/ui/PriorityActions";
-import { RecommendedActions } from "@/components/ui/RecommendedActions";
-import { WorkflowChecklist } from "@/components/ui/WorkflowChecklist";
-import { CustomizeDashboard } from "./CustomizeDashboard";
-import { deriveOwnerPriorityActions, deriveOwnerInsights } from "@/lib/intelligence/deriveActions";
+import { deriveOwnerPriorityActions } from "@/lib/intelligence/deriveActions";
 import { ownerOnboardingSteps } from "@/lib/intelligence/checklists";
-import { OWNER_WIDGETS } from "@/lib/dashboard/ownerWidgets";
-import { mergePreferences, type ResolvedWidget } from "@/lib/dashboard/widgetRegistry";
-import { loadPreferences } from "@/lib/dashboard/preferences";
 import { track } from "@/lib/analytics";
 import { CalendlyCta } from "@/components/onboarding/CalendlyCta";
 
@@ -28,19 +25,7 @@ export function OwnerDashboard() {
   const [data, setData] = useState<OwnerDashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [customizeOpen, setCustomizeOpen] = useState(false);
-  const [widgets, setWidgets] = useState<ResolvedWidget[]>(() =>
-    mergePreferences(OWNER_WIDGETS, []),
-  );
   const onboardingTracked = useRef(false);
-
-  // Load saved preferences on mount (after hydration)
-  useEffect(() => {
-    const saved = loadPreferences("owner");
-    if (saved.length > 0) {
-      setWidgets(mergePreferences(OWNER_WIDGETS, saved));
-    }
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,57 +98,11 @@ export function OwnerDashboard() {
 
   const vm: OwnerDashboardViewModel = toOwnerDashboardViewModel(data);
   const priorityActions = deriveOwnerPriorityActions(data);
-  const insights = deriveOwnerInsights(data);
   const onboardingSteps = ownerOnboardingSteps(data);
-
-  // Build registry-driven widget elements
-  const enabledWidgets = widgets.filter((w) => w.enabled);
-  const widgetElements: JSX.Element[] = [];
-  let idx = 0;
-
-  while (idx < enabledWidgets.length) {
-    const w = enabledWidgets[idx];
-    const Component = w.definition.component;
-    const vmProp = w.definition.vmKey
-      ? (vm as unknown as Record<string, unknown>)[w.definition.vmKey]
-      : undefined;
-
-    // Pair consecutive half-size widgets into a 2-col grid
-    if (
-      w.size === "half" &&
-      idx + 1 < enabledWidgets.length &&
-      enabledWidgets[idx + 1].size === "half"
-    ) {
-      const next = enabledWidgets[idx + 1];
-      const NextComponent = next.definition.component;
-      const nextVmProp = next.definition.vmKey
-        ? (vm as unknown as Record<string, unknown>)[next.definition.vmKey]
-        : undefined;
-
-      widgetElements.push(
-        <div key={`pair-${w.definition.id}`} className="grid gap-6 lg:grid-cols-2">
-          <WidgetErrorBoundary name={w.definition.title}>
-            <Component vm={vmProp} />
-          </WidgetErrorBoundary>
-          <WidgetErrorBoundary name={next.definition.title}>
-            <NextComponent vm={nextVmProp} />
-          </WidgetErrorBoundary>
-        </div>,
-      );
-      idx += 2;
-    } else {
-      widgetElements.push(
-        <WidgetErrorBoundary key={w.definition.id} name={w.definition.title}>
-          <Component vm={vmProp} />
-        </WidgetErrorBoundary>,
-      );
-      idx += 1;
-    }
-  }
 
   return (
     <section aria-labelledby="owner-heading" className="space-y-6">
-      {/* Sticky Page Header with CTAs */}
+      {/* Page Header */}
       <PageHeader
         title="Dashboard"
         description="Real-time overview of your portfolio performance"
@@ -171,67 +110,50 @@ export function OwnerDashboard() {
         actions={
           <>
             <Link href="/app/reports">
-              <Button
-                variant="secondary"
-                size="sm"
-                icon={<Download size={14} />}
-              >
-                Export Report
-              </Button>
+              <Button variant="secondary" size="sm" icon={<Download size={14} />}>Export Report</Button>
             </Link>
             <Link href="/app/properties/new">
-              <Button
-                variant="success"
-                size="sm"
-                icon={<Plus size={14} />}
-              >
-                Add Property
-              </Button>
+              <Button variant="success" size="sm" icon={<Plus size={14} />}>Add Property</Button>
             </Link>
           </>
         }
       />
 
-      {/* Alert Strip — UIUX gradient banner above KPIs */}
+      {/* Alert Strip */}
       <WidgetErrorBoundary name="Alert Strip">
         <AlertStrip vm={vm.alerts} />
       </WidgetErrorBoundary>
 
-      {/* Priority Actions (fixed) */}
-      <WidgetErrorBoundary name="Priority Actions">
-        <PriorityActions actions={priorityActions} />
+      {/* KPI Cards — 2x2 grid */}
+      <WidgetErrorBoundary name="KPI Grid">
+        <KpiGrid vm={vm.kpis} />
       </WidgetErrorBoundary>
 
-      {/* Registry-driven configurable widgets */}
-      {widgetElements}
+      {/* Action Required Panel + Cash Flow — 3-column grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+        {/* Action Required (1/3) */}
+        <div className="xl:col-span-1">
+          <WidgetErrorBoundary name="Priority Actions">
+            <PriorityActions actions={priorityActions} />
+          </WidgetErrorBoundary>
+        </div>
+        {/* Cash Flow / Revenue (2/3) */}
+        <div className="xl:col-span-2">
+          <WidgetErrorBoundary name="Cash Flow">
+            <CashFlowCard vm={vm.cashFlow} />
+          </WidgetErrorBoundary>
+        </div>
+      </div>
 
-      {/* Recommended Actions (fixed) */}
-      <WidgetErrorBoundary name="Recommended Actions">
-        <RecommendedActions insights={insights} />
+      {/* Activity Feed — full width */}
+      <WidgetErrorBoundary name="Activity Feed">
+        <ActivityFeed vm={vm.activityFeed} />
       </WidgetErrorBoundary>
 
-      {/* Onboarding Checklist (fixed) */}
-      <WidgetErrorBoundary name="Onboarding Checklist">
-        <WorkflowChecklist
-          title="Getting started"
-          steps={onboardingSteps}
-          dismissKey="lb-owner-onboarding-dismissed"
-        />
-      </WidgetErrorBoundary>
-
-      {/* Calendly CTA — shown after onboarding completion */}
+      {/* Calendly CTA */}
       <CalendlyCta
         title="You're all set! Want a walkthrough?"
         description="Book a free call with our team to explore advanced features."
-      />
-
-      {/* Customization modal */}
-      <CustomizeDashboard
-        open={customizeOpen}
-        onClose={() => setCustomizeOpen(false)}
-        role="owner"
-        widgets={widgets}
-        onSave={setWidgets}
       />
     </section>
   );
