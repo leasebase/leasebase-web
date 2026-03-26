@@ -2,19 +2,13 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   Menu,
   X,
   Bell,
   Search,
-  LogOut,
-  Settings,
-  User,
 } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
-import { DropdownMenu, type DropdownMenuItem } from "@/components/ui/DropdownMenu";
-import { Logo } from "@/components/Logo";
 import { useAppShell } from "./AppShell";
 import { apiRequest } from "@/lib/api/client";
 import { notificationWs } from "@/lib/notifications/ws";
@@ -30,7 +24,6 @@ export interface AppHeaderProps {
 const POLL_INTERVAL = 60_000; // 60 seconds (fallback when WS disconnected)
 
 export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
-  const router = useRouter();
   const { user } = authStore();
   const { mobileOpen, setMobileOpen, hamburgerRef } = useAppShell();
   const [unreadCount, setUnreadCount] = useState(0);
@@ -102,32 +95,6 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
     return () => clearInterval(id);
   }, [fetchUnread, user]);
 
-  const handleLogout = () => {
-    authStore.getState().logout("manual");
-  };
-
-  const userMenuItems: DropdownMenuItem[] = [
-    {
-      id: "profile",
-      label: "Profile",
-      icon: <User size={14} />,
-      onClick: () => router.push("/app/profile"),
-    },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: <Settings size={14} />,
-      onClick: () => router.push("/app/settings"),
-    },
-    {
-      id: "sign-out",
-      label: "Sign out",
-      icon: <LogOut size={14} />,
-      danger: true,
-      onClick: handleLogout,
-    },
-  ];
-
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-slate-200 bg-white shadow-sm">
       <div className="flex items-center justify-between gap-4 px-6 py-2.5">
@@ -172,22 +139,6 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
             )}
           </Link>
 
-          {/* Account dropdown — icon-only trigger, menu has Profile/Settings/Sign out */}
-          {user && (
-            <DropdownMenu
-              trigger={
-                <button
-                  type="button"
-                  className="relative p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-green-500/20"
-                  aria-label="Account menu"
-                >
-                  <User className="w-[18px] h-[18px]" />
-                </button>
-              }
-              items={userMenuItems}
-              align="right"
-            />
-          )}
         </div>
       </div>
     </header>
