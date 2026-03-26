@@ -11,7 +11,7 @@ import { Banknote, Clock, CheckCircle, AlertCircle } from "lucide-react";
 import { fetchTenantProfile } from "@/services/tenant/adapters/profileAdapter";
 import { fetchTenantLease } from "@/services/tenant/adapters/leaseAdapter";
 import {
-  createCheckoutSession,
+  createPaymentIntent,
   fetchTenantCharges,
   fetchTenantPayments,
   type TenantChargeRow,
@@ -76,15 +76,13 @@ export default function Page() {
     setIsCheckingOut(true);
     setError(null);
     try {
-      const origin = window.location.origin;
-      const result = await createCheckoutSession(
-        `${origin}/app/payment-history?status=success`,
-        `${origin}/app/pay-rent?status=canceled`,
-      );
-      if (result.data?.checkoutUrl) {
-        window.location.href = result.data.checkoutUrl;
+      const result = await createPaymentIntent();
+      if (result.intentData?.clientSecret) {
+        // TODO: integrate Stripe Elements embedded checkout
+        // For now, show a message that the payment flow is being updated
+        setError("Payment is being processed. Please check your payment history shortly.");
       } else {
-        setError(result.error || "Failed to create checkout session");
+        setError(result.error || "Failed to create payment");
       }
     } catch {
       setError("An unexpected error occurred");

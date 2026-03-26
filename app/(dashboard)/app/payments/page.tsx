@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { CreditCard, DollarSign, AlertCircle, Search } from "lucide-react";
+import { CreditCard, DollarSign, AlertCircle, Search, ShieldAlert, ArrowRight, TrendingUp, Calendar, Send, Download } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 import {
   fetchOwnerPayments,
   fetchOwnerCharges,
@@ -69,6 +69,8 @@ export default function Page() {
   const totalCollected = payments
     .filter((p) => p.status === "SUCCEEDED")
     .reduce((sum, p) => sum + p.amount, 0);
+  const overdueChargeCount = charges.filter((c) => c.status === "OVERDUE").length;
+  const pendingChargeCount = charges.filter((c) => c.status === "PENDING").length;
 
   // Client-side filtered payments
   const filteredPayments = useMemo(() => {
@@ -95,56 +97,138 @@ export default function Page() {
     <>
       <PageHeader
         title="Payments"
-        description="View payment transactions and collection status."
+        description="Track rent collection and payment status."
+        actions={
+          <Button variant="secondary" size="sm" icon={<Download size={14} />}>Export</Button>
+        }
       />
 
       {isLoading ? (
         <div className="mt-6 space-y-4">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-5">
             {[1, 2, 3].map((i) => (
-              <Card key={i}><CardBody><Skeleton variant="text" className="h-10 w-32" /></CardBody></Card>
+              <div key={i} className="rounded-xl border border-slate-200 bg-white p-6 animate-pulse">
+                <div className="h-3 w-24 rounded bg-slate-200" />
+                <div className="mt-4 h-10 w-28 rounded bg-slate-200" />
+                <div className="mt-3 h-3 w-32 rounded bg-slate-200" />
+              </div>
             ))}
           </div>
-          <Card><CardBody><Skeleton variant="text" className="h-48 w-full" /></CardBody></Card>
+          <div className="rounded-xl border border-slate-200 bg-white p-6 animate-pulse">
+            <div className="h-48 w-full rounded bg-slate-100" />
+          </div>
         </div>
       ) : (
         <div className="mt-6 space-y-6">
-          {/* Summary cards */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Card>
-              <CardBody>
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <DollarSign size={14} /> Collected
+          {/* Financial Summary Cards — UIUX gradient style */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* Collected */}
+            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-xl border border-emerald-200/80 p-6 shadow-sm">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-[13px] font-medium text-emerald-700 mb-2">Collected This Month</p>
+                  <p className="text-4xl font-semibold text-emerald-900 tracking-tight">
+                    {formatCents(totalCollected)}
+                  </p>
                 </div>
-                <p className="mt-1 text-2xl font-bold text-slate-900">{formatCents(totalCollected)}</p>
-              </CardBody>
-            </Card>
-            <Card>
-              <CardBody>
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <CreditCard size={14} /> Outstanding
+                <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center shadow-sm">
+                  <DollarSign className="w-6 h-6 text-white" strokeWidth={2.5} />
                 </div>
-                <p className="mt-1 text-2xl font-bold text-slate-900">{formatCents(totalPending)}</p>
-              </CardBody>
-            </Card>
-            <Card>
-              <CardBody>
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <AlertCircle size={14} /> Overdue
+              </div>
+              <div className="flex items-center gap-2 text-[13px]">
+                <TrendingUp className="w-4 h-4 text-emerald-600" />
+                <span className="font-medium text-emerald-700">
+                  {payments.filter((p) => p.status === "SUCCEEDED").length} payment{payments.filter((p) => p.status === "SUCCEEDED").length !== 1 ? "s" : ""}
+                </span>
+                <span className="text-emerald-600">succeeded</span>
+              </div>
+            </div>
+
+            {/* Overdue */}
+            <div className="bg-gradient-to-br from-red-50 to-red-100/50 rounded-xl border border-red-200/80 p-6 shadow-sm">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-[13px] font-medium text-red-700 mb-2">Outstanding / Overdue</p>
+                  <p className="text-4xl font-semibold text-red-900 tracking-tight">
+                    {formatCents(totalOverdue)}
+                  </p>
                 </div>
-                <p className="mt-1 text-2xl font-bold text-red-600">{formatCents(totalOverdue)}</p>
-              </CardBody>
-            </Card>
+                <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center shadow-sm">
+                  <AlertCircle className="w-6 h-6 text-white" strokeWidth={2.5} />
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-[13px]">
+                {overdueChargeCount > 0 && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />}
+                <span className="font-medium text-red-700">
+                  {overdueChargeCount} charge{overdueChargeCount !== 1 ? "s" : ""}
+                </span>
+                <span className="text-red-600">overdue</span>
+              </div>
+            </div>
+
+            {/* Pending / Scheduled */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl border border-blue-200/80 p-6 shadow-sm">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-[13px] font-medium text-blue-700 mb-2">Pending Charges</p>
+                  <p className="text-4xl font-semibold text-blue-900 tracking-tight">
+                    {formatCents(totalPending)}
+                  </p>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-sm">
+                  <Calendar className="w-6 h-6 text-white" strokeWidth={2.5} />
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-[13px]">
+                <Calendar className="w-4 h-4 text-blue-600" />
+                <span className="font-medium text-blue-700">{pendingChargeCount} pending</span>
+                <span className="text-blue-600">this period</span>
+              </div>
+            </div>
           </div>
 
-          {/* Filters */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Overdue Alert Banner — UIUX style */}
+          {totalOverdue > 0 && (
+            <div className="bg-gradient-to-r from-red-50 to-red-50/50 border border-red-200/80 rounded-xl p-5 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                  <ShieldAlert className="w-5 h-5 text-red-600" strokeWidth={2.5} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-[15px] font-semibold text-red-900">Urgent: Overdue Payments</h3>
+                    <span className="px-2 py-0.5 bg-red-100 text-red-700 text-[11px] font-medium rounded-md">
+                      {overdueChargeCount} charge{overdueChargeCount !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                  <p className="text-[13px] text-red-800 mb-4">
+                    Total {formatCents(totalOverdue)} in overdue charges. Immediate collection action required.
+                  </p>
+                  <div className="flex gap-3">
+                    <button className="h-9 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 text-[12px] font-medium transition-all shadow-sm flex items-center gap-2">
+                      <Send className="w-3.5 h-3.5" />
+                      Send All Reminders
+                    </button>
+                    <a
+                      href="#payments-table"
+                      className="h-9 px-4 bg-white text-red-700 border border-red-300 rounded-lg hover:bg-red-50 text-[12px] font-medium transition-all inline-flex items-center gap-1.5"
+                    >
+                      View Details
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Filters — UIUX style */}
+          <div className="flex flex-wrap items-center gap-3">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none"
+              className="h-10 px-4 bg-white border border-slate-200 rounded-lg text-[13px] text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all"
             >
-              <option value="">All statuses</option>
+              <option value="">All Statuses</option>
               {PAYMENT_STATUSES.map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
@@ -153,86 +237,126 @@ export default function Page() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none"
-              placeholder="Start date"
+              className="h-10 px-4 bg-white border border-slate-200 rounded-lg text-[13px] text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all"
             />
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none"
-              placeholder="End date"
+              className="h-10 px-4 bg-white border border-slate-200 rounded-lg text-[13px] text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all"
             />
             <div className="relative flex-1 min-w-[180px]">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search by tenant ID…"
                 value={tenantSearch}
                 onChange={(e) => setTenantSearch(e.target.value)}
-                className="w-full rounded-md border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full h-10 pl-9 pr-4 bg-white border border-slate-200 rounded-lg text-[13px] text-slate-700 placeholder:text-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all"
               />
             </div>
           </div>
 
-          {/* Payments table */}
-          {filteredPayments.length === 0 ? (
-            <EmptyState
-              icon={<CreditCard size={48} strokeWidth={1.5} />}
-              title="No payments found"
-              description={
-                statusFilter || startDate || endDate || tenantSearch
-                  ? "No payments match your current filters."
-                  : "Payment transactions will appear here once tenants start paying."
-              }
-              className="mt-4"
-            />
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200 text-left text-xs text-slate-400">
-                    <th className="pb-2 pr-4">Date</th>
-                    <th className="pb-2 pr-4">Period</th>
-                    <th className="pb-2 pr-4">Method</th>
-                    <th className="pb-2 pr-4">Source</th>
-                    <th className="pb-2 pr-4 text-right">Amount</th>
-                    <th className="pb-2 pr-4 text-right">Fee</th>
-                    <th className="pb-2">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPayments.map((p) => (
-                    <tr key={p.id} className="border-b border-slate-100">
-                      <td className="py-2.5 pr-4 text-slate-600">
-                        {new Date(p.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="py-2.5 pr-4 text-slate-600">
-                        {p.billing_period
-                          ? new Date(p.billing_period + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })
-                          : "—"}
-                      </td>
-                      <td className="py-2.5 pr-4 text-slate-600">{p.method ?? "—"}</td>
-                      <td className="py-2.5 pr-4">
-                        <Badge variant={p.source === "AUTOPAY" ? "info" : "neutral"}>
-                          {p.source ?? "MANUAL"}
-                        </Badge>
-                      </td>
-                      <td className="py-2.5 pr-4 text-right font-medium text-slate-900">
-                        {formatCents(p.amount, p.currency)}
-                      </td>
-                      <td className="py-2.5 pr-4 text-right text-slate-400">
-                        {p.application_fee_amount ? formatCents(p.application_fee_amount, p.currency) : "—"}
-                      </td>
-                      <td className="py-2.5">
-                        <Badge variant={paymentStatusVariant[p.status] ?? "neutral"}>{p.status}</Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {/* Payments table — UIUX style */}
+          <div id="payments-table">
+            {filteredPayments.length === 0 ? (
+              <EmptyState
+                icon={<CreditCard size={48} strokeWidth={1.5} />}
+                title="No payments found"
+                description={
+                  statusFilter || startDate || endDate || tenantSearch
+                    ? "No payments match your current filters."
+                    : "Payment transactions will appear here once tenants start paying."
+                }
+              />
+            ) : (
+              <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200/80">
+                        <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Date</th>
+                        <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Period</th>
+                        <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Type</th>
+                        <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Method</th>
+                        <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Source</th>
+                        <th className="text-right py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Amount</th>
+                        <th className="text-right py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Fee</th>
+                        <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Status</th>
+                        <th className="text-right py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredPayments.map((p) => (
+                        <tr
+                          key={p.id}
+                          className={`hover:bg-slate-50 transition-colors ${
+                            p.status === "FAILED" ? "bg-red-50/30" : ""
+                          }`}
+                        >
+                          <td className="py-4 px-6 text-[13px] text-slate-600 font-medium">
+                            {new Date(p.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                          </td>
+                          <td className="py-4 px-6 text-[13px] text-slate-600">
+                            {p.billing_period
+                              ? new Date(p.billing_period + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })
+                              : "—"}
+                          </td>
+                          <td className="py-4 px-6">
+                            {p.charge_type ? (
+                              <span className="inline-flex px-2 py-0.5 bg-slate-100 text-slate-700 text-[11px] font-medium rounded-md">
+                                {p.charge_type}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400">—</span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 text-[13px] text-slate-600">{p.method ?? "—"}</td>
+                          <td className="py-4 px-6">
+                            <Badge variant={p.source === "AUTOPAY" ? "info" : "neutral"}>
+                              {p.source ?? "MANUAL"}
+                            </Badge>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <span className={`text-[15px] font-semibold ${
+                              p.status === "SUCCEEDED" ? "text-emerald-700" :
+                              p.status === "FAILED" ? "text-red-600" :
+                              "text-slate-900"
+                            }`}>
+                              {formatCents(p.amount, p.currency)}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-right text-[13px] text-slate-400">
+                            {p.application_fee_amount ? formatCents(p.application_fee_amount, p.currency) : "—"}
+                          </td>
+                          <td className="py-4 px-6">
+                            <Badge variant={paymentStatusVariant[p.status] ?? "neutral"}>{p.status}</Badge>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            {p.status === "SUCCEEDED" && (
+                              <button className="text-[12px] text-slate-600 hover:text-slate-700 font-medium hover:underline">
+                                Receipt
+                              </button>
+                            )}
+                            {p.status === "FAILED" && (
+                              <button className="text-[12px] text-red-600 hover:text-red-700 font-medium hover:underline">
+                                Retry
+                              </button>
+                            )}
+                            {(p.status === "PENDING" || p.status === "PROCESSING") && (
+                              <button className="text-[12px] text-blue-600 hover:text-blue-700 font-medium hover:underline">
+                                View
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </>

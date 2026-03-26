@@ -6,9 +6,11 @@ import type { MaintenanceWorkOrder } from "@/services/maintenance/maintenanceApi
 /* ── Mocks ── */
 
 const mockFetchMaintenanceList = jest.fn();
+const mockFetchMaintenanceStats = jest.fn();
 
 jest.mock("@/services/maintenance/maintenanceApiService", () => ({
   fetchMaintenanceList: (...args: any[]) => mockFetchMaintenanceList(...args),
+  fetchMaintenanceStats: (...args: any[]) => mockFetchMaintenanceStats(...args),
 }));
 
 jest.mock("next/link", () => {
@@ -87,6 +89,8 @@ function paginatedResponse(data: MaintenanceWorkOrder[]) {
 
 beforeEach(() => {
   mockFetchMaintenanceList.mockReset();
+  mockFetchMaintenanceStats.mockReset();
+  mockFetchMaintenanceStats.mockResolvedValue({ data: { submitted: 1, in_review: 0, scheduled: 0, in_progress: 1, completed: 0, closed: 0, cancelled: 0 } });
 });
 
 describe("OwnerMaintenancePage", () => {

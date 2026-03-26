@@ -63,6 +63,42 @@ export interface MaintenanceComment {
   created_at: string;
 }
 
+export interface MaintenanceAttachment {
+  id: string;
+  work_order_id: string;
+  file_url: string;
+  file_type: string;
+  file_name: string;
+  uploaded_by_user_id: string;
+  uploader_name: string;
+  created_at: string;
+}
+
+export interface TimelineEntry {
+  id: string;
+  type: "event" | "comment";
+  event_type: string;
+  actor_user_id: string;
+  actor_name: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface Vendor {
+  id: string;
+  organization_id: string;
+  name: string;
+  company: string | null;
+  email: string | null;
+  phone: string | null;
+  specialty: string | null;
+  notes: string | null;
+  is_preferred: boolean;
+  status: "ACTIVE" | "ARCHIVED";
+  created_at: string;
+  updated_at: string;
+}
+
 /** Server-side aggregated counts by status from GET /api/maintenance/stats. */
 export interface MaintenanceStats {
   submitted: number;
@@ -140,16 +176,16 @@ export async function updateMaintenanceStatus(
   });
 }
 
-/** Assign a work order. Requires OWNER. */
+/** Assign a work order. Requires OWNER. v3: supports vendor assignment. */
 export async function assignMaintenanceWorkOrder(
   id: string,
-  assigneeId: string,
+  assignment: { assigneeId?: string; assigneeName?: string; assigneeType?: "self" | "external" | "vendor"; vendorId?: string },
 ): Promise<{ data: MaintenanceWorkOrder }> {
   return apiRequest<{ data: MaintenanceWorkOrder }>({
     path: `api/maintenance/${id}/assign`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ assigneeId }),
+    body: JSON.stringify(assignment),
   });
 }
 
@@ -160,6 +196,87 @@ export async function cancelMaintenanceWorkOrder(
   return apiRequest<{ data: MaintenanceWorkOrder }>({
     path: `api/maintenance/${id}/cancel`,
     method: "POST",
+  });
+}
+
+/** Fetch attachments for a work order. */
+export async function fetchMaintenanceAttachments(
+  id: string,
+): Promise<{ data: MaintenanceAttachment[] }> {
+  return apiRequest<{ data: MaintenanceAttachment[] }>({ path: `api/maintenance/${id}/attachments` });
+}
+
+/** Upload an attachment to a work order. */
+export async function uploadMaintenanceAttachment(
+  id: string,
+  attachment: { fileUrl: string; fileType: string; fileName: string },
+): Promise<{ data: MaintenanceAttachment }> {
+  return apiRequest<{ data: MaintenanceAttachment }>({
+    path: `api/maintenance/${id}/attachments`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(attachment),
+  });
+}
+
+/** Fetch the unified timeline for a work order. */
+export async function fetchMaintenanceTimeline(
+  id: string,
+): Promise<{ data: TimelineEntry[] }> {
+  return apiRequest<{ data: TimelineEntry[] }>({ path: `api/maintenance/${id}/timeline` });
+}
+
+/* ── Vendor API ── */
+
+/** Fetch vendors for the org. Requires OWNER. */
+export async function fetchVendors(
+  filters: { specialty?: string; status?: string; search?: string; page?: number; limit?: number } = {},
+): Promise<PaginatedResponse<Vendor>> {
+  const params = new URLSearchParams();
+  if (filters.specialty) params.set("specialty", filters.specialty);
+  if (filters.status) params.set("status", filters.status);
+  if (filters.search) params.set("search", filters.search);
+  if (filters.page) params.set("page", String(filters.page));
+  if (filters.limit) params.set("limit", String(filters.limit));
+  const qs = params.toString();
+  return apiRequest<PaginatedResponse<Vendor>>({ path: qs ? `api/maintenance/vendors?${qs}` : "api/maintenance/vendors" });
+}
+
+/** Fetch a single vendor. */
+export async function fetchVendor(id: string): Promise<{ data: Vendor }> {
+  return apiRequest<{ data: Vendor }>({ path: `api/maintenance/vendors/${id}` });
+}
+
+/** Create a vendor. */
+export async function createVendor(
+  vendor: { name: string; company?: string; email?: string; phone?: string; specialty?: string; notes?: string; isPreferred?: boolean },
+): Promise<{ data: Vendor }> {
+  return apiRequest<{ data: Vendor }>({
+    path: "api/maintenance/vendors",
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(vendor),
+  });
+}
+
+/** Update a vendor. */
+export async function updateVendor(
+  id: string,
+  fields: Partial<{ name: string; company: string | null; email: string | null; phone: string | null; specialty: string | null; notes: string | null; isPreferred: boolean }>,
+): Promise<{ data: Vendor }> {
+  return apiRequest<{ data: Vendor }>({
+    path: `api/maintenance/vendors/${id}`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(fields),
+  });
+}
+
+/** Archive (soft-delete) a vendor. */
+export async function archiveVendor(id: string): Promise<{ data: Vendor }> {
+  return apiRequest<{ data: Vendor }>({
+    path: `api/maintenance/vendors/${id}`,
+    method: "DELETE",
   });
 }
 

@@ -9,7 +9,7 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 export function Card({ children, className = "", ...rest }: CardProps) {
   return (
     <div
-      className={`rounded-lg border border-slate-200 bg-white shadow-card ${className}`}
+      className={`rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}
       {...rest}
     >
       {children}
@@ -19,7 +19,7 @@ export function Card({ children, className = "", ...rest }: CardProps) {
 
 export function CardHeader({ children, className = "", ...rest }: CardProps) {
   return (
-    <div className={`border-b border-slate-200 px-4 py-3 ${className}`} {...rest}>
+    <div className={`border-b border-slate-100 px-5 py-3.5 ${className}`} {...rest}>
       {children}
     </div>
   );
@@ -27,7 +27,7 @@ export function CardHeader({ children, className = "", ...rest }: CardProps) {
 
 export function CardBody({ children, className = "", ...rest }: CardProps) {
   return (
-    <div className={`px-4 py-4 ${className}`} {...rest}>
+    <div className={`px-5 py-5 ${className}`} {...rest}>
       {children}
     </div>
   );
@@ -35,7 +35,7 @@ export function CardBody({ children, className = "", ...rest }: CardProps) {
 
 export function CardFooter({ children, className = "", ...rest }: CardProps) {
   return (
-    <div className={`border-t border-slate-200 px-4 py-3 ${className}`} {...rest}>
+    <div className={`border-t border-slate-100 px-5 py-3.5 ${className}`} {...rest}>
       {children}
     </div>
   );

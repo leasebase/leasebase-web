@@ -132,7 +132,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-surface/80 backdrop-blur">
+    <header className="sticky top-0 z-30 h-16 border-b border-slate-200 bg-white/80 shadow-sm backdrop-blur">
       <div className="flex items-center justify-between gap-4 px-4 py-2.5">
         {/* Left: brand + mobile hamburger */}
         <div className="flex items-center gap-3">
@@ -167,7 +167,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
             <input
               id="global-search"
               type="search"
-              className="w-full rounded-lg border border-slate-200 bg-white pl-8 pr-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 focus:bg-white transition-all"
               placeholder="Search…"
             />
           </div>

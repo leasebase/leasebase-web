@@ -9,7 +9,34 @@
  */
 
 import { apiRequest } from "@/lib/api/client";
-import type { DomainResult, PaymentRow, CheckoutResult } from "../types";
+import type { DomainResult, PaymentRow } from "../types";
+
+/** Pre-flight readiness check result */
+export interface PreflightResult {
+  ready: boolean;
+  issues: string[];
+}
+
+/** Check if payment is possible before showing the form */
+export async function checkPaymentReadiness(): Promise<DomainResult<PreflightResult | null>> {
+  try {
+    const res = await apiRequest<{ data: PreflightResult }>({
+      path: "api/payments/checkout/preflight",
+    });
+    return { data: res.data, source: "live", error: null };
+  } catch (e: any) {
+    return { data: null, source: "unavailable", error: e?.message || "Failed to check payment readiness" };
+  }
+}
+
+/** Response shape from POST /checkout/create-intent */
+export interface PaymentIntentResult {
+  clientSecret: string;
+  paymentIntentId: string;
+  publishableKey: string;
+  amount: number; // cents
+  currency: string;
+}
 
 interface PaginatedResponse<T> {
   data: T[];
@@ -57,24 +84,42 @@ export async function fetchTenantCharges(): Promise<DomainResult<TenantChargeRow
   }
 }
 
-/** Create a Stripe Checkout Session for rent payment */
-export async function createCheckoutSession(
-  returnUrl: string,
-  cancelUrl: string,
-): Promise<DomainResult<CheckoutResult | null>> {
+/** Create a PaymentIntent for embedded in-app checkout (Phase 1) */
+export async function createPaymentIntent(): Promise<CheckoutDomainResult & { intentData: PaymentIntentResult | null }> {
   try {
-    const res = await apiRequest<{ data: CheckoutResult }>({
-      path: "api/payments/checkout",
+    const res = await apiRequest<{ data: PaymentIntentResult }>({
+      path: "api/payments/checkout/create-intent",
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ returnUrl, cancelUrl }),
+      body: JSON.stringify({}),
     });
-    return { data: res.data, source: "live", error: null };
+    return { data: null, intentData: res.data, source: "live", error: null, errorCode: null };
   } catch (e: any) {
+    let errorCode: CheckoutErrorCode = null;
+    const msg: string = e?.message || "";
+    if (msg.includes("not enabled payments") || msg.includes("not set up payments")) {
+      errorCode = "NO_PAYMENT_ACCOUNT";
+    } else if (msg.includes("not configured for this lease")) {
+      errorCode = "NO_RENT_CONFIGURED";
+    } else if (msg.includes("already been paid")) {
+      errorCode = "ALREADY_PAID";
+    } else if (msg.includes("already in progress")) {
+      errorCode = "PAYMENT_IN_PROGRESS";
+    }
     return {
       data: null,
+      intentData: null,
       source: "unavailable",
-      error: e?.message || "Failed to create checkout session",
+      error: e?.message || "Failed to create payment",
+      errorCode,
     };
   }
 }
+
+/** Error code returned alongside DomainResult for checkout failures. */
+export type CheckoutErrorCode = "NO_PAYMENT_ACCOUNT" | "NO_RENT_CONFIGURED" | "ALREADY_PAID" | "PAYMENT_IN_PROGRESS" | "STRIPE_NOT_CONFIGURED" | null;
+
+export interface CheckoutDomainResult extends DomainResult<null> {
+  errorCode: CheckoutErrorCode;
+}
+

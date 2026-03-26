@@ -138,16 +138,16 @@ describe("Security: adapters call tenant-scoped endpoints only", () => {
     expect(result.error).toBe("Network error");
   });
 
-  test("checkoutSession sends returnUrl/cancelUrl only (no IDs)", async () => {
-    mockApiRequest.mockResolvedValue({ data: { checkoutUrl: "https://stripe.com/session", sessionId: "sess_1" } });
-    const { createCheckoutSession } = await import(
+  test("createPaymentIntent sends no tenant IDs in body", async () => {
+    mockApiRequest.mockResolvedValue({ data: { clientSecret: "pi_secret", paymentIntentId: "pi_1", publishableKey: "pk_test", amount: 180000, currency: "usd" } });
+    const { createPaymentIntent } = await import(
       "@/services/tenant/adapters/paymentAdapter"
     );
-    await createCheckoutSession("https://app.example.com/success", "https://app.example.com/cancel");
+    await createPaymentIntent();
     const callArg = mockApiRequest.mock.calls[0][0];
+    expect(callArg.path).toBe("api/payments/checkout/create-intent");
+    // No tenant_id, lease_id, or org_id in body
     const body = JSON.parse(callArg.body);
-    expect(body).toEqual({ returnUrl: "https://app.example.com/success", cancelUrl: "https://app.example.com/cancel" });
-    // No tenant_id, lease_id, or org_id
     expect(body.tenant_id).toBeUndefined();
     expect(body.lease_id).toBeUndefined();
     expect(body.org_id).toBeUndefined();
