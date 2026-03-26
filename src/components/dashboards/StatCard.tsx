@@ -20,23 +20,27 @@ const changeColors = {
 
 export function StatCard({ label, value, change, changeType = "neutral", icon, iconColor, subtitle }: StatCardProps) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between">
+    <div className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-all duration-200 group">
+      <div className="flex items-start justify-between mb-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{label}</p>
-          <p className="mt-1.5 text-2xl font-bold text-slate-900">{value}</p>
-          {change && <p className={`mt-1 text-xs font-medium ${changeColors[changeType]}`}>{change}</p>}
-          {subtitle && <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>}
+          <p className="text-[12px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">{label}</p>
+          <p className="text-[32px] font-bold text-slate-900 tracking-tight leading-none">{value}</p>
         </div>
         {icon && (
-          <span
-            className={`rounded-xl p-2.5 shadow-sm ${iconColor ? `bg-gradient-to-br ${iconColor} text-white` : "bg-brand-50 text-brand-500"}`}
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow ${iconColor ? `bg-gradient-to-br ${iconColor} text-white` : "bg-brand-50 text-brand-500"}`}
             aria-hidden="true"
           >
             {icon}
-          </span>
+          </div>
         )}
       </div>
+      {(change || subtitle) && (
+        <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
+          {change && <span className={`text-[13px] font-semibold ${changeColors[changeType]}`}>{change}</span>}
+          {subtitle && <span className="text-[13px] text-slate-500">{subtitle}</span>}
+        </div>
+      )}
     </div>
   );
 }
