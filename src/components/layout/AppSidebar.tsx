@@ -125,7 +125,7 @@ export function AppSidebar() {
           />
         </div>
 
-        {/* Footer: tenant unit info + collapse toggle */}
+        {/* Footer: tenant unit info + user avatar */}
         <div className="border-t border-slate-100 px-3 py-2.5 bg-slate-50/50">
           {sidebarCollapsed ? (
             <button
@@ -140,12 +140,24 @@ export function AppSidebar() {
             <>
               {/* Tenant unit info card */}
               {isTenant && tenantUnit && (
-                <div className="px-3 py-2.5 bg-slate-50 rounded-xl">
+                <div className="mb-2 px-3 py-2.5 bg-slate-50 rounded-xl">
                   <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1">Your Unit</p>
                   <p className="text-[13px] font-semibold text-slate-900">{tenantUnit.propertyName}</p>
                   <p className="text-[12px] text-slate-600">Unit {tenantUnit.unitNumber}</p>
                 </div>
               )}
+              {/* User avatar + name */}
+              <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center ring-2 ring-white shadow-sm">
+                  <span className="text-[11px] font-bold text-slate-600">
+                    {user?.name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() || "?"}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-slate-900 truncate">{user?.name || "User"}</p>
+                  <p className="text-[11px] text-slate-500 truncate">{user?.persona === "owner" ? "Owner" : "Tenant"}</p>
+                </div>
+              </div>
             </>
           )}
         </div>
