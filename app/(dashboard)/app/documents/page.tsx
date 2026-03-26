@@ -256,13 +256,39 @@ function OwnerDocuments() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// TENANT DOCUMENTS
+// TENANT DOCUMENTS — UIUX design
 // ══════════════════════════════════════════════════════════════════════════════
+
+const DOC_TYPE_ICON_STYLE: Record<string, string> = {
+  LEASE_AGREEMENT: "bg-blue-50 text-blue-600",
+  LEASE_ADDENDUM: "bg-blue-50 text-blue-600",
+  PAYMENT_RECEIPT: "bg-green-50 text-green-600",
+  MOVE_IN_CHECKLIST: "bg-violet-50 text-violet-600",
+  MOVE_OUT_CHECKLIST: "bg-violet-50 text-violet-600",
+  NOTICE: "bg-amber-50 text-amber-600",
+  MAINTENANCE_ATTACHMENT: "bg-amber-50 text-amber-600",
+  OWNER_UPLOAD: "bg-slate-50 text-slate-600",
+};
+
+const DOC_TYPE_BADGE_STYLE: Record<string, string> = {
+  LEASE_AGREEMENT: "bg-blue-100 text-blue-700",
+  LEASE_ADDENDUM: "bg-blue-100 text-blue-700",
+  PAYMENT_RECEIPT: "bg-green-100 text-green-700",
+  MOVE_IN_CHECKLIST: "bg-violet-100 text-violet-700",
+  MOVE_OUT_CHECKLIST: "bg-violet-100 text-violet-700",
+  NOTICE: "bg-amber-100 text-amber-700",
+  MAINTENANCE_ATTACHMENT: "bg-amber-100 text-amber-700",
+  OWNER_UPLOAD: "bg-slate-100 text-slate-700",
+};
+
+type DocFilter = "all" | string;
 
 function TenantDocuments() {
   const [docs, setDocs] = useState<TenantDocumentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<DocFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -291,51 +317,180 @@ function TenantDocuments() {
     }
   }, []);
 
+  // Derive categories present in actual data
+  const categoryCounts = docs.reduce<Record<string, number>>((acc, d) => {
+    const cat = d.category || d.related_type || "OTHER";
+    acc[cat] = (acc[cat] || 0) + 1;
+    return acc;
+  }, {});
+
+  const filtered = docs.filter((d) => {
+    const cat = d.category || d.related_type || "OTHER";
+    const matchesFilter = filter === "all" || cat === filter;
+    const matchesSearch = !searchQuery || (d.title || d.name || "").toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
+
+  // Unique filter buttons from actual data
+  const filterButtons: { key: string; label: string }[] = [
+    { key: "all", label: "All" },
+    ...Object.keys(categoryCounts).map((k) => ({ key: k, label: CATEGORY_LABELS[k] || k })),
+  ];
+
   if (loading) {
     return (
-      <div className="mt-6 space-y-2">
-        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} variant="text" className="h-14 w-full rounded-md" />)}
+      <div className="space-y-6">
+        <div><Skeleton variant="text" className="h-7 w-48" /><Skeleton variant="text" className="mt-2 h-4 w-72" /></div>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4"><Skeleton variant="text" className="h-10 w-full rounded-lg" /></div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">{[0,1,2,3].map(i=><div key={i} className="bg-white rounded-xl border border-slate-200 p-4"><Skeleton variant="text" className="h-7 w-12" /><Skeleton variant="text" className="mt-1 h-4 w-20" /></div>)}</div>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-5">{[0,1,2].map(i=><Skeleton key={i} variant="rectangular" className="mt-3 h-16 rounded-xl" />)}</div>
       </div>
     );
   }
 
   if (error) {
-    return <div className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>;
-  }
-
-  if (docs.length === 0) {
     return (
-      <EmptyState
-        icon={<FolderOpen size={48} strokeWidth={1.5} />}
-        title="No documents available"
-        description="Your lease documents will appear here once your property manager uploads them."
-        className="mt-8"
-      />
+      <div className="space-y-6">
+        <div><h1 className="text-[26px] font-semibold text-slate-900 mb-1">Documents</h1><p className="text-[14px] text-slate-600">Access your lease documents, receipts, and files</p></div>
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+      </div>
     );
   }
 
+  const leaseCount = docs.filter((d) => (d.category || d.related_type) === "LEASE_AGREEMENT" || (d.category || d.related_type) === "LEASE_ADDENDUM" || d.related_type === "lease").length;
+  const receiptCount = docs.filter((d) => d.category === "PAYMENT_RECEIPT").length;
+  const inspectionCount = docs.filter((d) => (d.category || "").includes("CHECKLIST")).length;
+
   return (
-    <div className="mt-6 space-y-2">
-      {docs.map((doc) => (
-        <div key={doc.id} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-4">
-          <FileText size={20} className="shrink-0 text-slate-400" />
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-slate-900 truncate">{doc.title || doc.name || "Untitled"}</p>
-            <p className="text-xs text-slate-400">
-              {CATEGORY_LABELS[doc.category || ""] || doc.category || doc.related_type}
-              {" · "}{formatDate(doc.created_at)}
-            </p>
+    <div className="space-y-6">
+      {/* \u2500\u2500 Page Header \u2500\u2500 */}
+      <div>
+        <h1 className="text-[26px] font-semibold text-slate-900 mb-1">Documents</h1>
+        <p className="text-[14px] text-slate-600">Access your lease documents, receipts, and files</p>
+      </div>
+
+      {/* \u2500\u2500 Search and Filter \u2500\u2500 */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search documents..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-10 pl-10 pr-4 rounded-lg border border-slate-300 text-[13px] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
           </div>
-          {doc.status && (
-            <Badge variant={STATUS_VARIANTS[doc.status] || "neutral"}>
-              {DOCUMENT_STATUS_LABELS[doc.status as DocumentStatus] || doc.status}
-            </Badge>
-          )}
-          <Button variant="ghost" size="sm" icon={<Download size={14} />} onClick={() => handleDownload(doc.id)}>
-            Download
-          </Button>
+          <div className="flex gap-2 overflow-x-auto">
+            {filterButtons.map((fb) => (
+              <button
+                key={fb.key}
+                onClick={() => setFilter(fb.key)}
+                className={`px-4 h-10 rounded-lg text-[13px] font-semibold whitespace-nowrap transition-all ${
+                  filter === fb.key
+                    ? "bg-gradient-to-r from-green-50 to-green-50/50 text-green-700 ring-2 ring-green-200"
+                    : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                {fb.label}
+              </button>
+            ))}
+          </div>
         </div>
-      ))}
+      </div>
+
+      {/* \u2500\u2500 Document Stats \u2500\u2500 */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p className="text-[24px] font-bold text-slate-900 mb-1">{docs.length}</p>
+          <p className="text-[12px] text-slate-600 font-medium">Total Documents</p>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p className="text-[24px] font-bold text-blue-600 mb-1">{leaseCount}</p>
+          <p className="text-[12px] text-slate-600 font-medium">Lease Docs</p>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p className="text-[24px] font-bold text-green-600 mb-1">{receiptCount}</p>
+          <p className="text-[12px] text-slate-600 font-medium">Receipts</p>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p className="text-[24px] font-bold text-violet-600 mb-1">{inspectionCount}</p>
+          <p className="text-[12px] text-slate-600 font-medium">Inspections</p>
+        </div>
+      </div>
+
+      {/* \u2500\u2500 Documents List \u2500\u2500 */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden">
+        <div className="p-5 border-b border-slate-100 bg-gradient-to-br from-slate-50 to-white">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[15px] font-semibold text-slate-900">
+              {filter === "all" ? "All Documents" : `${CATEGORY_LABELS[filter] || filter} Documents`}
+            </h3>
+            <span className="text-[13px] text-slate-600">
+              {filtered.length} document{filtered.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+        </div>
+        <div className="p-5">
+          {filtered.length > 0 ? (
+            <div className="space-y-3">
+              {filtered.map((doc) => {
+                const cat = doc.category || doc.related_type || "OTHER";
+                const iconStyle = DOC_TYPE_ICON_STYLE[cat] ?? "bg-slate-50 text-slate-600";
+                const badgeStyle = DOC_TYPE_BADGE_STYLE[cat] ?? "bg-slate-100 text-slate-700";
+                return (
+                  <div
+                    key={doc.id}
+                    className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-br from-slate-50 to-white border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all group"
+                  >
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm ${iconStyle}`}>
+                        <FileText className="w-6 h-6" strokeWidth={2.5} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[14px] font-semibold text-slate-900 mb-1">{doc.title || doc.name || "Document"}</p>
+                        <div className="flex items-center gap-3 text-[12px] text-slate-600">
+                          <span className={`px-2 py-0.5 rounded-md font-semibold ${badgeStyle}`}>
+                            {CATEGORY_LABELS[cat] || cat}
+                          </span>
+                          <span>\u2022</span>
+                          <span>{formatDate(doc.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDownload(doc.id)}
+                      className="flex items-center gap-2 h-10 px-4 bg-white text-slate-700 text-[13px] font-semibold rounded-lg border border-slate-300 hover:border-slate-400 hover:bg-slate-50 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto mb-4">
+                <FolderOpen className="w-8 h-8 text-slate-400" />
+              </div>
+              <p className="text-[14px] text-slate-600 mb-1">No documents found</p>
+              <p className="text-[12px] text-slate-500">
+                {searchQuery ? "Try a different search term" : "Documents will appear here when available"}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* \u2500\u2500 Help Card \u2500\u2500 */}
+      <div className="bg-gradient-to-br from-blue-50 to-blue-50/50 rounded-2xl border border-blue-200 p-6">
+        <h3 className="text-[15px] font-semibold text-slate-900 mb-2">Need a document?</h3>
+        <p className="text-[13px] text-slate-600">
+          If you need a specific document that isn\u2019t listed here, reach out to your property manager directly and they\u2019ll provide it to you.
+        </p>
+      </div>
     </div>
   );
 }
@@ -348,16 +503,18 @@ export default function DocumentsPage() {
   const { user } = authStore();
   const isOwner = user?.persona === "owner";
 
+  if (!isOwner) {
+    // Tenant documents page handles its own header
+    return <TenantDocuments />;
+  }
+
   return (
     <>
       <PageHeader
         title="Documents"
-        description={isOwner
-          ? "Upload, manage, and organize documents — leases, notices, and receipts."
-          : "View lease documents, notices, and receipts."}
+        description="Upload, manage, and organize documents \u2014 leases, notices, and receipts."
       />
-
-      {isOwner ? <OwnerDocuments /> : <TenantDocuments />}
+      <OwnerDocuments />
     </>
   );
 }

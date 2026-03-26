@@ -188,26 +188,26 @@ describe("TenantDashboard", () => {
     expect(screen.getByText("What happens next")).toBeInTheDocument();
   });
 
-  test("renders active dashboard with KPIs and widgets", async () => {
+  test("renders active dashboard with UIUX design", async () => {
     mockFetchTenantDashboard.mockResolvedValue(activeDashboard);
     render(<TenantDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText("Tenant dashboard")).toBeInTheDocument();
+      expect(screen.getByText(/Welcome back, Jane/)).toBeInTheDocument();
     });
 
-    // KPI header — rent amount from enriched lease (appears in hero + KPI header)
+    // Rent amount appears in rent card + lease summary
     expect(screen.getAllByText("$1,450").length).toBeGreaterThanOrEqual(1);
 
-    // Quick actions (also appears in hero CTA)
-    expect(screen.getAllByText("Pay Rent").length).toBeGreaterThanOrEqual(1);
+    // Pay Rent CTA
+    expect(screen.getByText("Pay Rent Now")).toBeInTheDocument();
 
-    // Stubbed widgets show provenance labels
-    expect(screen.getByText("Payments")).toBeInTheDocument();
-    expect(screen.getAllByText("Maintenance").length).toBeGreaterThanOrEqual(1);
+    // Lease summary card
+    expect(screen.getByText("Lease Summary")).toBeInTheDocument();
+    expect(screen.getByText("Maintenance Requests")).toBeInTheDocument();
 
-    // Notification rendered
-    expect(screen.getByText("Maintenance update")).toBeInTheDocument();
+    // Notification rendered (appears in both notifications preview and activity timeline)
+    expect(screen.getAllByText("Maintenance update").length).toBeGreaterThanOrEqual(1);
   });
 
   test("shows error when service completely fails", async () => {

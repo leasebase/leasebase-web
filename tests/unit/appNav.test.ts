@@ -41,25 +41,27 @@ describe("filterNavForPersona", () => {
     const items = filterNavForPersona("tenant");
     const labels = items.map((i) => i.label);
     expect(labels).toContain("Dashboard");
-    // Tenants see "My Lease" (not "Leases") at the same /app/leases route
-    expect(labels).toContain("My Lease");
+    // Tenants see "Lease Details" (not "Leases") at the same /app/leases route
+    expect(labels).toContain("Lease Details");
     expect(labels).not.toContain("Leases");
+    expect(labels).toContain("Rent & Payments");
     expect(labels).toContain("Maintenance");
     expect(labels).toContain("Documents");
+    expect(labels).toContain("Notifications");
   });
 
-  test("tenant 'My Lease' nav item points to /app/leases", () => {
+  test("tenant 'Lease Details' nav item points to /app/leases", () => {
     const items = filterNavForPersona("tenant");
-    const myLease = items.find((i) => i.label === "My Lease");
-    expect(myLease).toBeDefined();
-    expect(myLease!.path).toBe("/app/leases");
+    const leaseDetails = items.find((i) => i.label === "Lease Details");
+    expect(leaseDetails).toBeDefined();
+    expect(leaseDetails!.path).toBe("/app/leases");
   });
 
-  test("Notifications is NOT in the left nav (belongs in header)", () => {
-    for (const persona of ["owner", "tenant"] as const) {
-      const labels = filterNavForPersona(persona).map((i) => i.label);
-      expect(labels).not.toContain("Notifications");
-    }
+  test("Notifications is in the sidebar for tenant, not for owner", () => {
+    const ownerLabels = filterNavForPersona("owner").map((i) => i.label);
+    expect(ownerLabels).not.toContain("Notifications");
+    const tenantLabels = filterNavForPersona("tenant").map((i) => i.label);
+    expect(tenantLabels).toContain("Notifications");
   });
 
   test("Messages is NOT in the left nav (belongs in header)", () => {
