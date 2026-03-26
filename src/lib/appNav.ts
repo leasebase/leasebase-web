@@ -51,8 +51,8 @@ export const appNavItems: AppNavItem[] = [
   { path: "/app/reports", label: "Reports", icon: "reports", personas: ["owner"], group: "intelligence", hidden: true },
   { path: "/app/admin/growth", label: "Growth", icon: "growth", personas: ["owner"], group: "intelligence", hidden: true },
 
-  // Phase 3: Profile + Settings moved to avatar dropdown (AppHeader).
-  // They are no longer sidebar nav items.
+  // ── Settings ──
+  { path: "/app/settings", label: "Settings", icon: "settings", personas: ["owner", "tenant"], group: "operations" },
 ];
 
 export function filterNavForPersona(persona: Persona | undefined | null): AppNavItem[] {

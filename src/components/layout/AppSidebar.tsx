@@ -23,38 +23,22 @@ function SidebarNavGroups({
   collapsed: boolean;
   onItemClick?: () => void;
 }) {
+  // Flatten all groups into a single list (no section headers per Figma)
+  const allItems = groups.flatMap((g) => g.items);
   return (
-    <div className="space-y-4">
-      {groups.map((group) => (
-        <div key={group.key}>
-          {/* Group label — hidden when collapsed */}
-          {!collapsed && (
-            <p className="mb-1 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-              {group.label}
-            </p>
-          )}
-          {collapsed && (
-            <div
-              className="mx-auto my-1 h-px w-6 bg-slate-200"
-              aria-hidden="true"
-            />
-          )}
-          <ul className="space-y-0.5 text-sm">
-            {group.items.map((item) => (
-              <SidebarNavItem
-                key={item.path}
-                path={item.path}
-                label={item.label}
-                icon={item.icon}
-                active={pathname === item.path}
-                collapsed={collapsed}
-                onClick={onItemClick}
-              />
-            ))}
-          </ul>
-        </div>
+    <ul className="space-y-1 text-sm">
+      {allItems.map((item) => (
+        <SidebarNavItem
+          key={item.path}
+          path={item.path}
+          label={item.label}
+          icon={item.icon}
+          active={pathname === item.path}
+          collapsed={collapsed}
+          onClick={onItemClick}
+        />
       ))}
-    </div>
+    </ul>
   );
 }
 
