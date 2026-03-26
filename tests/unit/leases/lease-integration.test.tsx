@@ -55,6 +55,7 @@ jest.mock("lucide-react", () => {
     Upload: icon("Upload"),
     FileCheck: icon("FileCheck"),
     AlertTriangle: icon("AlertTriangle"),
+    Clock: icon("Clock"),
   };
 });
 
