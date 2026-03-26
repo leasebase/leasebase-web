@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { Users, Search, Mail, Phone, MapPin, User, Filter, Plus } from "lucide-react";
+import { Users, Search, Mail, Phone, MapPin, Plus, Calendar } from "lucide-react";
 import { fetchTenants } from "@/services/tenants/tenantApiService";
 import type { TenantListRow, PaginationMeta } from "@/services/tenants/tenantApiService";
 
@@ -71,14 +71,25 @@ function TenantCard({ t }: { t: TenantListRow }) {
         )}
       </div>
 
-      {t.lease_status && (
-        <div className="pt-5 border-t border-slate-100">
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] text-slate-500 font-medium">Lease Status</span>
-            <Badge variant={t.lease_status === "ACTIVE" ? "success" : t.lease_status === "DRAFT" ? "warning" : "neutral"}>
-              {t.lease_status}
-            </Badge>
-          </div>
+      {(t.lease_status || t.move_in_date) && (
+        <div className="pt-5 border-t border-slate-100 space-y-2.5">
+          {t.lease_status && (
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] text-slate-500 font-medium">Lease Status</span>
+              <Badge variant={t.lease_status === "ACTIVE" ? "success" : t.lease_status === "DRAFT" ? "warning" : "neutral"}>
+                {t.lease_status}
+              </Badge>
+            </div>
+          )}
+          {t.move_in_date && (
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] text-slate-500 font-medium">Move-in Date</span>
+              <span className="text-[13px] font-medium text-slate-700 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                {new Date(t.move_in_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              </span>
+            </div>
+          )}
         </div>
       )}
     </>
@@ -131,7 +142,7 @@ function OwnerTenantsPage() {
         description={`${activeCount} active \u00b7 ${invitedCount} invited`}
         actions={
           <Link href="/app/tenants/invitations">
-            <Button variant="secondary" size="sm" icon={<Mail size={14} />}>Manage Invitations</Button>
+            <Button variant="primary" size="sm" icon={<Plus size={14} />}>Invite Tenant</Button>
           </Link>
         }
       />
