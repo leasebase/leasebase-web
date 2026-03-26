@@ -13,6 +13,7 @@ import {
   Command,
   Settings,
   User,
+  ChevronDown,
 } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { Avatar } from "@/components/ui/Avatar";
@@ -170,7 +171,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
           )}
         </div>
 
-        {/* Right: notification bell only */}
+        {/* Right: notification bell + account menu */}
         <div className="flex items-center gap-2 ml-4">
           <Link
             href="/app/notifications"
@@ -182,6 +183,38 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
             )}
           </Link>
+
+          {/* Owner account dropdown */}
+          {user?.persona === "owner" && (
+            <DropdownMenu
+              trigger={
+                <button
+                  type="button"
+                  className="flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 hover:bg-slate-50 transition-all focus:outline-none focus:ring-2 focus:ring-green-500/20"
+                  aria-label="Account menu"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center ring-2 ring-white shadow-sm">
+                    <span className="text-[11px] font-bold text-slate-600">
+                      {user.name
+                        ?.split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase() || "?"}
+                    </span>
+                  </div>
+                  <div className="hidden sm:block text-left min-w-0">
+                    <p className="text-[13px] font-semibold text-slate-900 truncate max-w-[120px]">
+                      {user.name || "Owner"}
+                    </p>
+                  </div>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
+                </button>
+              }
+              items={userMenuItems}
+              align="right"
+            />
+          )}
         </div>
       </div>
     </header>
