@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { PanelLeftClose, PanelLeftOpen, X, ChevronRight } from "lucide-react";
-import { authStore } from "@/lib/auth/store";
+import { PanelLeftClose, PanelLeftOpen, X, ChevronRight, User, Settings, LogOut } from "lucide-react";
+import { authStore, type CurrentUser } from "@/lib/auth/store";
 import { groupNavForPersona, type NavGroup } from "@/lib/appNav";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { Logo } from "@/components/Logo";
@@ -73,6 +74,98 @@ function useTenantUnitInfo(isTenant: boolean): TenantUnitInfo | null {
   }, [isTenant]);
 
   return info;
+}
+
+/* ─── Sidebar user menu (bottom-left avatar with dropdown) ─── */
+
+function SidebarUserMenu({ user }: { user: CurrentUser | undefined }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  // Close on Escape
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [open]);
+
+  const initials = user?.name
+    ?.split(" ")
+    .map((n: string) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase() || "?";
+
+  const handleNav = useCallback((path: string) => {
+    setOpen(false);
+    router.push(path);
+  }, [router]);
+
+  const handleLogout = useCallback(() => {
+    setOpen(false);
+    authStore.getState().logout("manual");
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white cursor-pointer transition-all shadow-sm hover:shadow"
+      >
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center ring-2 ring-white shadow-sm">
+          <span className="text-[11px] font-bold text-slate-600">{initials}</span>
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          <p className="text-[13px] font-semibold text-slate-900 truncate">{user?.name || "User"}</p>
+          <p className="text-[11px] text-slate-500 truncate">{user?.persona === "owner" ? "Owner" : "Tenant"}</p>
+        </div>
+        <ChevronRight className={`w-3.5 h-3.5 text-slate-400 transition-transform ${open ? "rotate-90" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute bottom-full left-0 right-0 mb-1 rounded-xl border border-slate-200 bg-white py-1 shadow-xl z-50">
+          <button
+            type="button"
+            onClick={() => handleNav("/app/profile")}
+            className="flex w-full items-center gap-2.5 px-4 py-2.5 text-[13px] text-slate-700 hover:bg-slate-50 transition-colors"
+          >
+            <User size={15} className="text-slate-400" />
+            Profile
+          </button>
+          <button
+            type="button"
+            onClick={() => handleNav("/app/settings")}
+            className="flex w-full items-center gap-2.5 px-4 py-2.5 text-[13px] text-slate-700 hover:bg-slate-50 transition-colors"
+          >
+            <Settings size={15} className="text-slate-400" />
+            Settings
+          </button>
+          <div className="mx-3 my-1 border-t border-slate-100" />
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center gap-2.5 px-4 py-2.5 text-[13px] text-red-600 hover:bg-red-50 transition-colors"
+          >
+            <LogOut size={15} />
+            Sign out
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 /* ─── AppSidebar ─── */
@@ -146,21 +239,7 @@ export function AppSidebar() {
                   <p className="text-[12px] text-slate-600">Unit {tenantUnit.unitNumber}</p>
                 </div>
               )}
-              <Link
-                href="/app/profile"
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white cursor-pointer transition-all shadow-sm hover:shadow"
-              >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center ring-2 ring-white shadow-sm">
-                  <span className="text-[11px] font-bold text-slate-600">
-                    {user?.name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() || "?"}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-slate-900 truncate">{user?.name || "User"}</p>
-                  <p className="text-[11px] text-slate-500 truncate">{user?.persona === "owner" ? "Owner" : "Tenant"}</p>
-                </div>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-              </Link>
+              <SidebarUserMenu user={user} />
             </>
           )}
         </div>
