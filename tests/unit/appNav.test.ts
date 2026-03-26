@@ -69,11 +69,17 @@ describe("filterNavForPersona", () => {
     }
   });
 
-  test("Profile and Settings are NOT in the sidebar (they live in avatar dropdown)", () => {
+  test("Profile is NOT in the sidebar (lives in avatar dropdown)", () => {
     for (const persona of ["owner", "tenant"] as const) {
       const labels = filterNavForPersona(persona).map((i) => i.label);
       expect(labels).not.toContain("Profile");
-      expect(labels).not.toContain("Settings");
+    }
+  });
+
+  test("Settings IS in the sidebar for both personas", () => {
+    for (const persona of ["owner", "tenant"] as const) {
+      const labels = filterNavForPersona(persona).map((i) => i.label);
+      expect(labels).toContain("Settings");
     }
   });
 
