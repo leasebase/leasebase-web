@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { FolderOpen, FileText, Plus, Download, Archive, MoreVertical } from "lucide-react";
+import { FolderOpen, FileText, Plus, Download, Archive, MoreVertical, Upload, Search } from "lucide-react";
 import { DropdownMenu, type DropdownMenuItem } from "@/components/ui/DropdownMenu";
 import { authStore } from "@/lib/auth/store";
 import {
@@ -111,16 +111,33 @@ function OwnerDocuments() {
     return <div className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>;
   }
 
+  // Category counts
+  const categoryCounts = docs.reduce<Record<string, number>>((acc, d) => {
+    const cat = d.category || "OTHER";
+    acc[cat] = (acc[cat] || 0) + 1;
+    return acc;
+  }, {});
+
+  const categoryCards = [
+    { key: "LEASE_AGREEMENT", label: "Leases", color: "bg-blue-100 text-blue-600" },
+    { key: "MAINTENANCE_ATTACHMENT", label: "Maintenance", color: "bg-yellow-100 text-yellow-600" },
+    { key: "NOTICE", label: "Notices", color: "bg-green-100 text-green-600" },
+    { key: "PAYMENT_RECEIPT", label: "Receipts", color: "bg-purple-100 text-purple-600" },
+  ];
+
   if (docs.length === 0) {
     return (
       <>
-        <EmptyState
-          icon={<FolderOpen size={48} strokeWidth={1.5} />}
-          title="No documents yet"
-          description="Upload leases, notices, and receipts to keep everything organized."
-          action={<Button variant="primary" icon={<Plus size={16} />} onClick={() => setUploadOpen(true)}>Upload Document</Button>}
-          className="mt-8"
-        />
+        <div className="mt-8 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 p-12 text-center">
+          <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-4">
+            <FolderOpen className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="font-semibold text-gray-900 mb-2">No documents yet</h3>
+          <p className="text-gray-600 mb-4 max-w-md mx-auto">
+            Upload your first document to get started. You can organize leases, notices, and other property documents here.
+          </p>
+          <Button variant="primary" icon={<Upload size={16} />} onClick={() => setUploadOpen(true)}>Upload First Document</Button>
+        </div>
         <UploadDocumentModal open={uploadOpen} onClose={() => setUploadOpen(false)} onSuccess={handleUploadSuccess} />
       </>
     );
@@ -128,49 +145,110 @@ function OwnerDocuments() {
 
   return (
     <>
-      {/* Header with upload button */}
-      <div className="mt-4 flex justify-end">
-        <Button variant="primary" icon={<Plus size={16} />} onClick={() => setUploadOpen(true)}>Upload Document</Button>
-      </div>
-
       {successMsg && (
         <div className="mt-3 rounded-md border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-700">{successMsg}</div>
       )}
 
-      <div className="mt-4 space-y-2">
-        {docs.map((doc) => {
-          const isDownloadable = doc.status !== "DRAFT";
-          const menuItems: DropdownMenuItem[] = [
-            ...(isDownloadable ? [{ id: "download", label: "Download", icon: <Download size={14} />, onClick: () => handleDownload(doc.id) }] : []),
-            { id: "archive", label: "Archive", icon: <Archive size={14} />, danger: true, onClick: () => handleArchive(doc.id) },
-          ];
-
-          return (
-            <div key={doc.id} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-4 hover:bg-slate-50 transition-colors">
-              <FileText size={20} className="shrink-0 text-slate-400" />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-slate-900 truncate">{doc.title}</p>
-                <p className="text-xs text-slate-400">
-                  {CATEGORY_LABELS[doc.category] || doc.category}
-                  {doc.related_type !== "GENERAL" && <> · {doc.related_type}</>}
-                  {" · "}{formatDate(doc.created_at)}
-                </p>
+      {/* Category Cards */}
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        {categoryCards.map((cat) => (
+          <div key={cat.key} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`w-10 h-10 rounded-lg ${cat.color} flex items-center justify-center`}>
+                <FileText className="w-5 h-5" />
               </div>
-              <Badge variant={STATUS_VARIANTS[doc.status] || "neutral"}>
-                {DOCUMENT_STATUS_LABELS[doc.status as DocumentStatus] || doc.status}
-              </Badge>
-              <DropdownMenu
-                trigger={
-                  <button type="button" className="rounded p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Document actions">
-                    <MoreVertical size={16} />
-                  </button>
-                }
-                items={menuItems}
-                align="right"
-              />
+              <div>
+                <h3 className="font-semibold text-gray-900">{cat.label}</h3>
+                <p className="text-sm text-gray-600">{categoryCounts[cat.key] || 0} files</p>
+              </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
+      </div>
+
+      {/* Search & Filters */}
+      <div className="mt-6 flex items-center gap-3">
+        <div className="relative flex-1">
+          <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input type="text" placeholder="Search documents…"
+            className="w-full h-9 pl-9 pr-4 bg-white border border-slate-200 rounded-lg text-[12px] text-slate-700 placeholder:text-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all" />
+        </div>
+        <select className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-[12px] text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all">
+          <option value="">All Categories</option>
+          <option value="LEASE_AGREEMENT">Leases</option>
+          <option value="NOTICE">Notices</option>
+          <option value="PAYMENT_RECEIPT">Receipts</option>
+          <option value="MAINTENANCE_ATTACHMENT">Maintenance</option>
+        </select>
+        <Button variant="primary" size="sm" icon={<Upload size={14} />} onClick={() => setUploadOpen(true)}>Upload</Button>
+      </div>
+
+      {/* Documents Table */}
+      <div className="mt-4 bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-200/80">
+                <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Document</th>
+                <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Category</th>
+                <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Status</th>
+                <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Date Added</th>
+                <th className="text-right py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {docs.map((doc) => {
+                const isDownloadable = doc.status !== "DRAFT";
+                return (
+                  <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <span className="text-[13px] font-medium text-gray-900 truncate">{doc.title}</span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-6">
+                      <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                        {CATEGORY_LABELS[doc.category] || doc.category}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6">
+                      <Badge variant={STATUS_VARIANTS[doc.status] || "neutral"}>
+                        {DOCUMENT_STATUS_LABELS[doc.status as DocumentStatus] || doc.status}
+                      </Badge>
+                    </td>
+                    <td className="py-4 px-6 text-[13px] text-gray-600">
+                      {formatDate(doc.created_at)}
+                    </td>
+                    <td className="py-4 px-6 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {isDownloadable && (
+                          <button onClick={() => handleDownload(doc.id)} className="text-[12px] text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1">
+                            <Download size={14} /> Download
+                          </button>
+                        )}
+                        <DropdownMenu
+                          trigger={
+                            <button type="button" className="rounded p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Document actions">
+                              <MoreVertical size={16} />
+                            </button>
+                          }
+                          items={[
+                            ...(isDownloadable ? [{ id: "download", label: "Download", icon: <Download size={14} />, onClick: () => handleDownload(doc.id) }] : []),
+                            { id: "archive", label: "Archive", icon: <Archive size={14} />, danger: true, onClick: () => handleArchive(doc.id) },
+                          ]}
+                          align="right"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
       <UploadDocumentModal open={uploadOpen} onClose={() => setUploadOpen(false)} onSuccess={handleUploadSuccess} />
     </>
