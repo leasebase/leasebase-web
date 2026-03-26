@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PanelLeftClose, PanelLeftOpen, X, ChevronRight } from "lucide-react";
@@ -9,6 +10,7 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import { Logo } from "@/components/Logo";
 import { useAppShell } from "./AppShell";
 import { SidebarNavItem } from "./SidebarNavItem";
+import { apiRequest } from "@/lib/api/client";
 
 /* ─── Nav group list (shared desktop / mobile) ─── */
 
@@ -42,6 +44,37 @@ function SidebarNavGroups({
   );
 }
 
+/* ─── Tenant unit info (lightweight fetch) ─── */
+
+interface TenantUnitInfo {
+  propertyName: string;
+  unitNumber: string;
+}
+
+function useTenantUnitInfo(isTenant: boolean): TenantUnitInfo | null {
+  const [info, setInfo] = useState<TenantUnitInfo | null>(null);
+
+  useEffect(() => {
+    if (!isTenant) return;
+    apiRequest<{ data: Array<{ property_name?: string | null; unit_number?: string | null; status: string }> }>({
+      path: "api/tenants/me/leases",
+    })
+      .then((res) => {
+        const leases = res.data ?? [];
+        const active = leases.find((l) => l.status === "ACTIVE" || l.status === "EXTENDED") ?? leases[0];
+        if (active) {
+          setInfo({
+            propertyName: active.property_name || "Property",
+            unitNumber: active.unit_number || "—",
+          });
+        }
+      })
+      .catch(() => {});
+  }, [isTenant]);
+
+  return info;
+}
+
 /* ─── AppSidebar ─── */
 
 export function AppSidebar() {
@@ -55,6 +88,8 @@ export function AppSidebar() {
   } = useAppShell();
 
   const groups = groupNavForPersona(user?.persona);
+  const isTenant = user?.persona === "tenant";
+  const tenantUnit = useTenantUnitInfo(isTenant);
 
   return (
     <>
@@ -90,7 +125,7 @@ export function AppSidebar() {
           />
         </div>
 
-        {/* Footer: user profile (matching Figma) */}
+        {/* Footer: tenant unit info + user profile */}
         <div className="border-t border-slate-100 px-3 py-2.5 bg-slate-50/50">
           {sidebarCollapsed ? (
             <button
@@ -102,21 +137,31 @@ export function AppSidebar() {
               <PanelLeftOpen size={16} />
             </button>
           ) : (
-            <Link
-              href="/app/profile"
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white cursor-pointer transition-all shadow-sm hover:shadow"
-            >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center ring-2 ring-white shadow-sm">
-                <span className="text-[11px] font-bold text-slate-600">
-                  {user?.name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() || "?"}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-semibold text-slate-900 truncate">{user?.name || "User"}</p>
-                <p className="text-[11px] text-slate-500 truncate">{user?.persona === "owner" ? "Owner" : "Tenant"}</p>
-              </div>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-            </Link>
+            <>
+              {/* Tenant unit info card (UIUX design) */}
+              {isTenant && tenantUnit && (
+                <div className="mb-2 px-3 py-2.5 bg-slate-50 rounded-xl">
+                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1">Your Unit</p>
+                  <p className="text-[13px] font-semibold text-slate-900">{tenantUnit.propertyName}</p>
+                  <p className="text-[12px] text-slate-600">Unit {tenantUnit.unitNumber}</p>
+                </div>
+              )}
+              <Link
+                href="/app/profile"
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white cursor-pointer transition-all shadow-sm hover:shadow"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center ring-2 ring-white shadow-sm">
+                  <span className="text-[11px] font-bold text-slate-600">
+                    {user?.name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() || "?"}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-slate-900 truncate">{user?.name || "User"}</p>
+                  <p className="text-[11px] text-slate-500 truncate">{user?.persona === "owner" ? "Owner" : "Tenant"}</p>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+              </Link>
+            </>
           )}
         </div>
       </nav>

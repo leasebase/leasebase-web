@@ -36,16 +36,17 @@ export const appNavItems: AppNavItem[] = [
   { path: "/app/properties", label: "Properties", icon: "properties", personas: ["owner"], group: "portfolio" },
   { path: "/app/tenants", label: "Tenants", icon: "tenants", personas: ["owner"], group: "portfolio" },
   { path: "/app/leases", label: "Leases", icon: "leases", personas: ["owner"], group: "portfolio" },
-  // Tenants see the same route but with a human label that matches their mental model
-  { path: "/app/leases", label: "My Lease", icon: "leases", personas: ["tenant"], group: "portfolio" },
 
   // ── Operations ──
   { path: "/app/payments", label: "Payments", icon: "payments", personas: ["owner"], group: "operations" },
-  { path: "/app/pay-rent", label: "Pay Rent", icon: "pay-rent", personas: ["tenant"], group: "operations" },
-  { path: "/app/payment-methods", label: "Payment Methods", icon: "payment-methods", personas: ["tenant"], group: "operations" },
-  { path: "/app/payment-history", label: "Payment History", icon: "payment-history", personas: ["tenant"], group: "operations" },
+  // Tenant nav items — consolidated per UIUX Figma design
+  { path: "/app/pay-rent", label: "Rent & Payments", icon: "payments", personas: ["tenant"], group: "operations" },
+  { path: "/app/payment-methods", label: "Payment Methods", icon: "payment-methods", personas: ["tenant"], group: "operations", hidden: true },
+  { path: "/app/payment-history", label: "Payment History", icon: "payment-history", personas: ["tenant"], group: "operations", hidden: true },
   { path: "/app/maintenance", label: "Maintenance", icon: "maintenance", personas: ["owner", "tenant"], group: "operations" },
+  { path: "/app/leases", label: "Lease Details", icon: "leases", personas: ["tenant"], group: "operations" },
   { path: "/app/documents", label: "Documents", icon: "documents", personas: ["owner", "tenant"], group: "operations" },
+  { path: "/app/notifications", label: "Notifications", icon: "notifications", personas: ["tenant"], group: "operations" },
 
   // ── Intelligence (hidden until product is ready for owners) ──
   { path: "/app/reports", label: "Reports", icon: "reports", personas: ["owner"], group: "intelligence", hidden: true },

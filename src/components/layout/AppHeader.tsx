@@ -148,8 +148,14 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
           </button>
         </div>
 
-        {/* Search bar — wide, matching Figma */}
+        {/* Welcome text for tenant / Search bar for owner */}
         <div className="flex-1 max-w-lg">
+          {user?.persona === "tenant" ? (
+            <h2 className="text-[15px] font-semibold text-slate-900">
+              Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
+            </h2>
+          ) : (
+            <>
           <label className="sr-only" htmlFor="global-search">Search</label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-[17px] h-[17px] text-slate-400" aria-hidden="true" />
@@ -160,6 +166,8 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
               placeholder="Search properties, tenants, leases..."
             />
           </div>
+            </>
+          )}
         </div>
 
         {/* Right: notification bell only */}
