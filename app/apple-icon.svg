@@ -1,11 +1,13 @@
 <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="180" height="180" rx="40" fill="url(#bg)" />
-  <path d="M90 38L142 77L90 88L38 77L90 38Z" fill="white" fill-opacity="0.95" />
-  <path d="M90 88L142 77V122L90 142V88Z" fill="white" fill-opacity="0.5" />
-  <path d="M90 88L38 77V122L90 142V88Z" fill="white" fill-opacity="0.7" />
-  <rect x="73" y="112" width="34" height="28" fill="#22C55E" fill-opacity="0.8" />
+  <rect width="180" height="180" rx="40" fill="url(#apple-bg)" />
+  <g transform="translate(13,13) scale(5.923)">
+    <path d="M13 4L22 11L13 13L4 11L13 4Z" fill="white" fill-opacity="0.95" />
+    <path d="M13 13L22 11V19L13 22V13Z" fill="white" fill-opacity="0.5" />
+    <path d="M13 13L4 11V19L13 22V13Z" fill="white" fill-opacity="0.7" />
+    <rect x="10" y="17" width="6" height="5" fill="#22C55E" fill-opacity="0.8" />
+  </g>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+    <linearGradient id="apple-bg" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
       <stop stop-color="#22C55E" />
       <stop offset="1" stop-color="#16A34A" />
     </linearGradient>
