@@ -132,98 +132,48 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-30 h-16 border-b border-slate-200 bg-white/80 shadow-sm backdrop-blur">
-      <div className="flex items-center justify-between gap-4 px-4 py-2.5">
-        {/* Left: brand + mobile hamburger */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center md:hidden">
-            <button
-              ref={hamburgerRef}
-              type="button"
-              className="rounded p-1.5 text-slate-600 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              aria-expanded={mobileOpen}
-              onClick={() => setMobileOpen(!mobileOpen)}
-            >
-              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-          <Link href="/app" className="inline-flex items-center">
-            <Logo variant="full" theme="light" size={152} />
-          </Link>
+    <header className="sticky top-0 z-30 h-16 border-b border-slate-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between gap-4 px-6 py-2.5">
+        {/* Mobile hamburger (hidden on desktop) */}
+        <div className="flex items-center md:hidden">
+          <button
+            ref={hamburgerRef}
+            type="button"
+            className="rounded p-1.5 text-slate-600 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
 
-        {/* Center: global search — hidden on xs, shown md+ */}
-        <div className="hidden flex-1 max-w-sm md:block">
-          <label className="sr-only" htmlFor="global-search">
-            Search
-          </label>
+        {/* Search bar — wide, matching Figma */}
+        <div className="flex-1 max-w-lg">
+          <label className="sr-only" htmlFor="global-search">Search</label>
           <div className="relative">
-            <Search
-              size={16}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500"
-              aria-hidden="true"
-            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-[17px] h-[17px] text-slate-400" aria-hidden="true" />
             <input
               id="global-search"
               type="search"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 focus:bg-white transition-all"
-              placeholder="Search…"
+              className="w-full h-10 pl-9 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-[13px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-400 focus:bg-white transition-all"
+              placeholder="Search properties, tenants, leases..."
             />
           </div>
         </div>
 
-        {/* Right: Cmd+K, messages, notifications, user dropdown */}
-        <div className="flex items-center gap-2">
-          {onOpenCommandPalette && (
-            <button
-              type="button"
-              onClick={onOpenCommandPalette}
-              className="hidden items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-500 hover:bg-surface-raised hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 md:inline-flex"
-              aria-label="Open command palette"
-            >
-              <Command size={14} />
-              <kbd className="font-sans">K</kbd>
-            </button>
-          )}
-
-          <Link
-            href="/app/messages"
-            className="rounded-full p-2 text-slate-500 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
-            aria-label="Messages"
-          >
-            <MessageSquare size={18} />
-          </Link>
-
+        {/* Right: notification bell only */}
+        <div className="flex items-center gap-2 ml-4">
           <Link
             href="/app/notifications"
-            className="relative rounded-full p-2 text-slate-500 hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="relative p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-all"
             aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
           >
-            <Bell size={18} />
+            <Bell className="w-[18px] h-[18px]" />
             {unreadCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
             )}
           </Link>
-
-          <DropdownMenu
-            trigger={
-              <button
-                type="button"
-                className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-surface-raised focus:outline-none focus:ring-2 focus:ring-brand-500"
-                aria-label="User menu"
-              >
-                <Avatar name={user?.name || user?.email} size="sm" />
-                <span className="hidden max-w-[8rem] truncate text-xs font-medium text-slate-700 sm:block">
-                  {user?.name || user?.email || ""}
-                </span>
-              </button>
-            }
-            items={userMenuItems}
-            align="right"
-          />
         </div>
       </div>
     </header>

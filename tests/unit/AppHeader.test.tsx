@@ -1,16 +1,15 @@
 /**
- * AppHeader — shell structure tests.
+ * AppHeader — shell structure tests (Figma design).
  *
- * Verifies the post-refactor contract:
- *  - Messages trigger lives in the header
- *  - Notifications trigger lives in the header
- *  - A single user/account menu trigger exists
- *  - No breadcrumb <nav> is rendered
- *  - User menu contains Settings and Sign out (no duplicate destinations)
+ * Verifies the minimal header contract:
+ *  - Search bar present
+ *  - Notifications bell present
+ *  - No messages link (moved to sidebar/removed)
+ *  - No user menu (user profile in sidebar footer)
+ *  - No breadcrumbs
  */
 
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
 
@@ -40,20 +39,16 @@ jest.mock("@/components/layout/AppShell", () => ({
 
 import { AppHeader } from "@/components/layout/AppHeader";
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
 function renderHeader() {
   return render(<AppHeader />);
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
-describe("AppHeader — top-right controls", () => {
-  test("renders a Messages link pointing to /app/messages", () => {
+describe("AppHeader — Figma minimal header", () => {
+  test("renders search input with Figma placeholder", () => {
     renderHeader();
-    const link = screen.getByRole("link", { name: /messages/i });
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute("href", "/app/messages");
+    expect(screen.getByPlaceholderText(/search properties, tenants, leases/i)).toBeInTheDocument();
   });
 
   test("renders a Notifications link pointing to /app/notifications", () => {
@@ -63,68 +58,18 @@ describe("AppHeader — top-right controls", () => {
     expect(link).toHaveAttribute("href", "/app/notifications");
   });
 
-  test("renders exactly one user/account menu trigger", () => {
+  test("does NOT render a Messages link (per Figma)", () => {
     renderHeader();
-    const userMenuTriggers = screen.getAllByRole("button", { name: /user menu/i });
-    expect(userMenuTriggers).toHaveLength(1);
+    expect(screen.queryByRole("link", { name: /messages/i })).toBeNull();
   });
-});
 
-describe("AppHeader — breadcrumbs absent", () => {
-  test("does not render a breadcrumb navigation element", () => {
+  test("does NOT render a user menu trigger (user profile in sidebar)", () => {
     renderHeader();
-    // The old HeaderBreadcrumbs used aria-label="Breadcrumb"
+    expect(screen.queryByRole("button", { name: /user menu/i })).toBeNull();
+  });
+
+  test("does not render breadcrumbs", () => {
+    renderHeader();
     expect(screen.queryByRole("navigation", { name: /breadcrumb/i })).toBeNull();
-  });
-
-  test("does not render Home breadcrumb link", () => {
-    renderHeader();
-    // If breadcrumbs were present, there would be a 'Home' link inside them.
-    // The Leasebase logo link is NOT a breadcrumb; this asserts no extra 'Home' link.
-    const homeLinks = screen.queryAllByRole("link", { name: /^home$/i });
-    expect(homeLinks).toHaveLength(0);
-  });
-});
-
-describe("AppHeader — user menu items", () => {
-  test("user menu contains Settings after opening", async () => {
-    const user = userEvent.setup();
-    renderHeader();
-    const trigger = screen.getByRole("button", { name: /user menu/i });
-    await user.click(trigger);
-    expect(screen.getByRole("menuitem", { name: /settings/i })).toBeInTheDocument();
-  });
-
-  test("user menu contains Sign out after opening", async () => {
-    const user = userEvent.setup();
-    renderHeader();
-    const trigger = screen.getByRole("button", { name: /user menu/i });
-    await user.click(trigger);
-    expect(screen.getByRole("menuitem", { name: /sign out/i })).toBeInTheDocument();
-  });
-
-  test("user menu contains Profile item (Phase 3: moved from sidebar)", async () => {
-    const user = userEvent.setup();
-    renderHeader();
-    const trigger = screen.getByRole("button", { name: /user menu/i });
-    await user.click(trigger);
-    expect(screen.getByRole("menuitem", { name: /^profile$/i })).toBeInTheDocument();
-  });
-
-  test("user menu does NOT contain Billing item (no route yet)", async () => {
-    const user = userEvent.setup();
-    renderHeader();
-    const trigger = screen.getByRole("button", { name: /user menu/i });
-    await user.click(trigger);
-    expect(screen.queryByRole("menuitem", { name: /billing/i })).toBeNull();
-  });
-
-  test("user menu has exactly three items: Profile, Settings, Sign out", async () => {
-    const user = userEvent.setup();
-    renderHeader();
-    const trigger = screen.getByRole("button", { name: /user menu/i });
-    await user.click(trigger);
-    const items = screen.getAllByRole("menuitem");
-    expect(items).toHaveLength(3);
   });
 });

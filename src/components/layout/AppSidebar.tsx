@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, X, ChevronRight } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { groupNavForPersona, type NavGroup } from "@/lib/appNav";
 import { Tooltip } from "@/components/ui/Tooltip";
@@ -90,27 +90,34 @@ export function AppSidebar() {
           />
         </div>
 
-        {/* Footer: collapse toggle */}
+        {/* Footer: user profile (matching Figma) */}
         <div className="border-t border-slate-100 px-3 py-2.5 bg-slate-50/50">
-          <button
-            type="button"
-            onClick={toggleSidebar}
-            className={`flex w-full items-center rounded-lg px-2.5 py-2 text-xs text-slate-500 transition-colors hover:bg-surface-raised hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 ${
-              sidebarCollapsed ? "justify-center" : "gap-2"
-            }`}
-            aria-label={
-              sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
-            }
-          >
-            {sidebarCollapsed ? (
+          {sidebarCollapsed ? (
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              className="flex w-full items-center justify-center rounded-lg px-2.5 py-2 text-xs text-slate-500 hover:bg-surface-raised hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              aria-label="Expand sidebar"
+            >
               <PanelLeftOpen size={16} />
-            ) : (
-              <>
-                <PanelLeftClose size={16} />
-                <span>Collapse</span>
-              </>
-            )}
-          </button>
+            </button>
+          ) : (
+            <Link
+              href="/app/profile"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white cursor-pointer transition-all shadow-sm hover:shadow"
+            >
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center ring-2 ring-white shadow-sm">
+                <span className="text-[11px] font-bold text-slate-600">
+                  {user?.name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() || "?"}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-slate-900 truncate">{user?.name || "User"}</p>
+                <p className="text-[11px] text-slate-500 truncate">{user?.persona === "owner" ? "Owner" : "Tenant"}</p>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+            </Link>
+          )}
         </div>
       </nav>
 
