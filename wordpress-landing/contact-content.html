@@ -1,141 +1,180 @@
 <!-- ==========================================================
-     LEASEBASE CONTACT PAGE — GUTENBERG BLOCK CONTENT
-     ==========================================================
-     HOW TO USE (if the FSE template page-contact.html is not
-     auto-applied by WordPress):
-     1. Go to WP Admin → Pages → Contact (slug: contact)
-     2. Switch to the Code Editor (⋮ menu → Code editor)
-     3. Select ALL existing content and DELETE it
-     4. Paste this entire file content
-     5. Switch back to Visual Editor to verify
-     6. Click Update / Publish
-     7. Ensure the page uses the "Contact" template (Page Attributes
-        panel → Template → Contact) if available, otherwise the
-        FSE template page-contact.html should apply automatically
-        for the slug "contact".
+     LEASEBASE CONTACT PAGE — GUTENBERG BLOCK CONTENT (v6 Redesign)
      ========================================================== -->
-
 
 <!-- HERO -->
 <!-- wp:group {"className":"lb-contact-hero lb-section","layout":{"type":"constrained"}} -->
 <div class="wp-block-group lb-contact-hero lb-section">
-
 <!-- wp:heading {"level":1,"textAlign":"center"} -->
-<h1 class="wp-block-heading has-text-align-center">Let’s make rental management easier for you</h1>
+<h1 class="wp-block-heading has-text-align-center">Get in <span class="lb-gradient-text">Touch</span></h1>
 <!-- /wp:heading -->
-
 <!-- wp:paragraph {"align":"center","className":"lb-contact-hero-sub"} -->
-<p class="has-text-align-center lb-contact-hero-sub">Have a question, need support, or want to talk about your property portfolio? We're here to help.</p>
+<p class="has-text-align-center lb-contact-hero-sub">Ready to transform your property management? Let's talk about how LeaseBase can help you grow.</p>
 <!-- /wp:paragraph -->
-
 </div>
 <!-- /wp:group -->
-
 
 <!-- CONTACT FORM + INFO -->
 <!-- wp:group {"className":"lb-section lb-contact-layout-section","layout":{"type":"constrained"}} -->
 <div class="wp-block-group lb-section lb-contact-layout-section">
-
 <!-- wp:html -->
 <div class="lb-contact-layout">
 
   <!-- Contact Form -->
   <div class="lb-contact-form-wrap">
-    <h2 class="lb-contact-form-heading">Send us a message</h2>
-    <p class="lb-contact-form-sub">We typically reply within one business day.</p>
+    <h2 class="lb-contact-form-heading">Send Us a Message</h2>
+    <p class="lb-contact-form-sub">Fill out the form below and we'll get back to you within 24 hours.</p>
 
     <form id="lb-contact-form" class="lb-contact-form" novalidate>
+      <div class="lb-form-row lb-form-row--2col">
+        <div class="lb-form-field">
+          <label for="lb-contact-name" class="lb-form-label">Full Name <span>*</span></label>
+          <input type="text" id="lb-contact-name" name="name" class="lb-form-input" placeholder="John Smith" required autocomplete="name" />
+        </div>
+        <div class="lb-form-field">
+          <label for="lb-contact-email" class="lb-form-label">Email Address <span>*</span></label>
+          <input type="email" id="lb-contact-email" name="email" class="lb-form-input" placeholder="john@example.com" required autocomplete="email" />
+        </div>
+      </div>
 
       <div class="lb-form-row lb-form-row--2col">
         <div class="lb-form-field">
-          <label for="lb-contact-name" class="lb-form-label">Full Name <span aria-hidden="true">*</span></label>
-          <input
-            type="text"
-            id="lb-contact-name"
-            name="name"
-            class="lb-form-input"
-            placeholder="Jane Smith"
-            required
-            autocomplete="name"
-          />
+          <label for="lb-contact-company" class="lb-form-label">Company / Property Name</label>
+          <input type="text" id="lb-contact-company" name="company" class="lb-form-input" placeholder="Smith Properties" />
         </div>
         <div class="lb-form-field">
-          <label for="lb-contact-email" class="lb-form-label">Email Address <span aria-hidden="true">*</span></label>
-          <input
-            type="email"
-            id="lb-contact-email"
-            name="email"
-            class="lb-form-input"
-            placeholder="jane@example.com"
-            required
-            autocomplete="email"
-          />
+          <label for="lb-contact-units" class="lb-form-label">Number of Units</label>
+          <select id="lb-contact-units" name="units" class="lb-form-input lb-form-select">
+            <option value="">Select range</option>
+            <option value="1-10">1-10 units</option>
+            <option value="11-50">11-50 units</option>
+            <option value="51-100">51-100 units</option>
+            <option value="101-200">101-200 units</option>
+            <option value="200+">200+ units</option>
+          </select>
         </div>
       </div>
 
       <div class="lb-form-field">
-        <label for="lb-contact-subject" class="lb-form-label">Subject</label>
-        <select id="lb-contact-subject" name="subject" class="lb-form-input lb-form-select">
-          <option value="general">General Inquiry</option>
-          <option value="sales">Sales &amp; Pricing</option>
-          <option value="support">Product Support</option>
-          <option value="partnership">Partnership</option>
+        <label for="lb-contact-interest" class="lb-form-label">I'm interested in <span>*</span></label>
+        <select id="lb-contact-interest" name="interest" class="lb-form-input lb-form-select" required>
+          <option value="">Select an option</option>
+          <option value="demo">Scheduling a demo</option>
+          <option value="trial">Starting a free trial</option>
+          <option value="pricing">Custom pricing</option>
+          <option value="migration">Migrating from another system</option>
+          <option value="features">Learning about features</option>
           <option value="other">Other</option>
         </select>
       </div>
 
       <div class="lb-form-field">
-        <label for="lb-contact-message" class="lb-form-label">Message <span aria-hidden="true">*</span></label>
-        <textarea
-          id="lb-contact-message"
-          name="message"
-          class="lb-form-input lb-form-textarea"
-          placeholder="Tell us how we can help..."
-          rows="6"
-          required
-        ></textarea>
+        <label for="lb-contact-message" class="lb-form-label">Message <span>*</span></label>
+        <textarea id="lb-contact-message" name="message" class="lb-form-input lb-form-textarea" placeholder="Tell us about your property management needs..." rows="6" required></textarea>
       </div>
 
       <div id="lb-contact-status" class="lb-contact-status" aria-live="polite" hidden></div>
 
-      <button type="submit" id="lb-contact-submit" class="lb-contact-submit">
-        Send Message
-      </button>
+      <button type="submit" id="lb-contact-submit" class="lb-contact-submit">Send Message</button>
 
+      <p class="lb-form-privacy">By submitting this form, you agree to our Privacy Policy and Terms of Service.</p>
     </form>
   </div>
 
   <!-- Contact Info Sidebar -->
   <aside class="lb-contact-info">
-
     <div class="lb-contact-info-card">
-      <div class="lb-contact-info-icon" aria-hidden="true">✉️</div>
-      <h3 class="lb-contact-info-heading">Email Us</h3>
-      <p class="lb-contact-info-body">For general questions or if you prefer email:</p>
-      <a href="mailto:info@leasebase.ai" class="lb-contact-info-link">info@leasebase.ai</a>
+      <div class="lb-contact-info-inner">
+        <div class="lb-contact-info-icon lb-contact-info-icon--blue">✉️</div>
+        <div>
+          <h3 class="lb-contact-info-heading">Email Us</h3>
+          <a href="mailto:hello@leasebase.com" class="lb-contact-info-link">hello@leasebase.com</a>
+          <p class="lb-contact-info-body">We respond within 24 hours</p>
+        </div>
+      </div>
     </div>
 
     <div class="lb-contact-info-card">
-      <div class="lb-contact-info-icon" aria-hidden="true">🚀</div>
-      <h3 class="lb-contact-info-heading">Ready to get started?</h3>
-      <p class="lb-contact-info-body">Start free as an owner — no credit card required. Get up and running in minutes.</p>
-      <a href="https://signup.dev.leasebase.ai" class="lb-nav-btn lb-contact-signup-btn">Start Free</a>
+      <div class="lb-contact-info-inner">
+        <div class="lb-contact-info-icon lb-contact-info-icon--green">📞</div>
+        <div>
+          <h3 class="lb-contact-info-heading">Call Us</h3>
+          <a href="tel:+18005551234" class="lb-contact-info-link">1-800-555-1234</a>
+          <p class="lb-contact-info-body">Mon-Fri, 9am-6pm EST</p>
+        </div>
+      </div>
     </div>
 
     <div class="lb-contact-info-card">
-      <div class="lb-contact-info-icon" aria-hidden="true">⏱️</div>
-      <h3 class="lb-contact-info-heading">Response Time</h3>
-      <p class="lb-contact-info-body">We respond to all inquiries within one business day.</p>
+      <div class="lb-contact-info-inner">
+        <div class="lb-contact-info-icon lb-contact-info-icon--purple">💬</div>
+        <div>
+          <h3 class="lb-contact-info-heading">Live Chat</h3>
+          <p class="lb-contact-info-body">Click the chat bubble in the bottom right to start a conversation</p>
+        </div>
+      </div>
     </div>
 
+    <div class="lb-contact-why">
+      <h3>Why Contact Us?</h3>
+      <div class="lb-contact-why-item"><span class="lb-contact-why-check">✓</span><span>Schedule a personalized demo</span></div>
+      <div class="lb-contact-why-item"><span class="lb-contact-why-check">✓</span><span>Get custom pricing for large portfolios</span></div>
+      <div class="lb-contact-why-item"><span class="lb-contact-why-check">✓</span><span>Ask questions about features</span></div>
+      <div class="lb-contact-why-item"><span class="lb-contact-why-check">✓</span><span>Discuss migration from your current system</span></div>
+    </div>
   </aside>
 
 </div>
 <!-- /wp:html -->
-
 </div>
 <!-- /wp:group -->
 
+<!-- WHAT HAPPENS NEXT -->
+<!-- wp:group {"className":"lb-section lb-section-alt","style":{"spacing":{"padding":{"top":"96px","bottom":"96px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-section lb-section-alt" style="padding-top:96px;padding-bottom:96px">
+<!-- wp:heading {"textAlign":"center"} -->
+<h2 class="wp-block-heading has-text-align-center">What Happens Next?</h2>
+<!-- /wp:heading -->
+<!-- wp:html -->
+<div class="lb-next-steps-grid">
+  <div class="lb-next-step">
+    <div class="lb-next-step-icon lb-next-step-icon--blue">⏱️</div>
+    <h3>1. Quick Response</h3>
+    <p>We'll respond to your inquiry within 24 hours on business days.</p>
+  </div>
+  <div class="lb-next-step">
+    <div class="lb-next-step-icon lb-next-step-icon--indigo">👥</div>
+    <h3>2. Personalized Demo</h3>
+    <p>We'll schedule a demo tailored to your specific property management needs.</p>
+  </div>
+  <div class="lb-next-step">
+    <div class="lb-next-step-icon lb-next-step-icon--green">✓</div>
+    <h3>3. Get Started</h3>
+    <p>Start your free trial and begin transforming your property management.</p>
+  </div>
+</div>
+<!-- /wp:html -->
+</div>
+<!-- /wp:group -->
+
+<!-- FINAL CTA -->
+<!-- wp:group {"className":"lb-cta-banner","layout":{"type":"constrained"}} -->
+<div class="wp-block-group lb-cta-banner">
+<!-- wp:heading {"textAlign":"center"} -->
+<h2 class="wp-block-heading has-text-align-center">Prefer to Start on Your Own?</h2>
+<!-- /wp:heading -->
+<!-- wp:paragraph {"align":"center"} -->
+<p class="has-text-align-center">You can start your free 14-day trial right now. No credit card required.</p>
+<!-- /wp:paragraph -->
+<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
+<div class="wp-block-buttons">
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://signup.dev.leasebase.ai">Start Free Trial</a></div>
+<!-- /wp:button -->
+</div>
+<!-- /wp:buttons -->
+</div>
+<!-- /wp:group -->
 
 <!-- CONTACT FORM SCRIPT -->
 <!-- wp:html -->
@@ -156,11 +195,14 @@
     e.preventDefault();
     var name    = (form.elements['name'].value || '').trim();
     var email   = (form.elements['email'].value || '').trim();
-    var subject = form.elements['subject'].value || 'general';
+    var company = (form.elements['company'].value || '').trim();
+    var units   = form.elements['units'].value || '';
+    var interest = form.elements['interest'].value || '';
     var message = (form.elements['message'].value || '').trim();
 
     if (!name) { showStatus('Please enter your name.', true); form.elements['name'].focus(); return; }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showStatus('Please enter a valid email address.', true); form.elements['email'].focus(); return; }
+    if (!interest) { showStatus('Please select what you\'re interested in.', true); form.elements['interest'].focus(); return; }
     if (!message) { showStatus('Please enter a message.', true); form.elements['message'].focus(); return; }
 
     submitBtn.disabled = true;
@@ -170,7 +212,7 @@
     fetch('/wp-json/leasebase/v1/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, email: email, subject: subject, message: message })
+      body: JSON.stringify({ name: name, email: email, company: company, units: units, interest: interest, message: message })
     })
       .then(function (res) { return res.json(); })
       .then(function (data) {

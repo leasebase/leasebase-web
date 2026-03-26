@@ -1,5 +1,3 @@
-import type { CSSProperties } from "react";
-
 export type LogoVariant = "full" | "mark" | "icon" | "micro";
 export type LogoTheme = "light" | "dark";
 
@@ -10,17 +8,28 @@ interface LogoProps {
   className?: string;
 }
 
-const FULL_ASPECT = 220 / 760;
-
-function resolveLogoSrc(variant: LogoVariant, theme: LogoTheme): string {
-  if (variant === "full") {
-    return theme === "dark"
-      ? "/assets/brand/leasebase-logo-white.svg"
-      : "/assets/brand/leasebase-logo-full.svg";
-  }
-  if (variant === "mark") return "/assets/brand/leasebase-logo-mark.svg";
-  if (variant === "micro") return "/assets/brand/leasebase-logo-micro.svg";
-  return "/assets/brand/leasebase-logo-icon.svg";
+/** Inline SVG building icon matching the UIUX design system. */
+function LogoMark({ size }: { size: number }) {
+  return (
+    <div
+      className="rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg shadow-green-600/30 ring-1 ring-green-600/20"
+      style={{ width: size, height: size }}
+    >
+      <svg
+        className="text-white"
+        style={{ width: size * 0.56, height: size * 0.56 }}
+        viewBox="0 0 26 26"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <path d="M13 4L22 11L13 13L4 11L13 4Z" fill="white" fillOpacity="0.95" />
+        <path d="M13 13L22 11V19L13 22V13Z" fill="white" fillOpacity="0.5" />
+        <path d="M13 13L4 11V19L13 22V13Z" fill="white" fillOpacity="0.7" />
+        <rect x="10" y="17" width="6" height="5" fill="#22C55E" fillOpacity="0.8" />
+      </svg>
+    </div>
+  );
 }
 
 function defaultSize(variant: LogoVariant): number {
@@ -36,23 +45,42 @@ export function Logo({
   className = "",
 }: LogoProps) {
   const resolvedSize = size ?? defaultSize(variant);
-  const src = resolveLogoSrc(variant, theme);
-  const isFull = variant === "full";
-  const width = resolvedSize;
-  const height = isFull ? Math.round(resolvedSize * FULL_ASPECT) : resolvedSize;
-  const style: CSSProperties = isFull
-    ? { width: resolvedSize, height: "auto" }
-    : { width: resolvedSize, height: resolvedSize };
+  const isDark = theme === "dark";
+
+  // Mark / icon / micro — just the icon, no text
+  if (variant !== "full") {
+    return (
+      <span className={`lb-logo lb-logo-mark ${className}`.trim()}>
+        <LogoMark size={resolvedSize} />
+      </span>
+    );
+  }
+
+  // Full — icon + wordmark text
+  // Scale icon to ~22% of the full width, matching UIUX proportions
+  const iconSize = Math.round(resolvedSize * 0.2);
 
   return (
-    <span className={`lb-logo ${!isFull ? "lb-logo-mark" : ""} ${className}`.trim()}>
-      <img
-        src={src}
-        alt={isFull ? "LeaseBase" : "LeaseBase mark"}
-        width={width}
-        height={height}
-        style={style}
-      />
+    <span className={`lb-logo inline-flex items-center gap-2.5 ${className}`.trim()}>
+      <LogoMark size={iconSize} />
+      <span>
+        <span
+          className={`font-semibold tracking-tight leading-none block ${
+            isDark ? "text-white" : "text-slate-900"
+          }`}
+          style={{ fontSize: resolvedSize * 0.09 }}
+        >
+          LeaseBase
+        </span>
+        <span
+          className={`tracking-wide uppercase leading-tight block mt-0.5 ${
+            isDark ? "text-slate-400" : "text-slate-500"
+          }`}
+          style={{ fontSize: resolvedSize * 0.055 }}
+        >
+          Property OS
+        </span>
+      </span>
     </span>
   );
 }

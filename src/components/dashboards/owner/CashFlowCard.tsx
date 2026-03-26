@@ -34,10 +34,13 @@ export function CashFlowCard({ vm }: CashFlowCardProps) {
   ];
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="shadow-md border-gray-200">
+      <CardHeader className="bg-gradient-to-br from-gray-50 to-white">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-900">Cash Flow &amp; Receivables</h2>
+          <div>
+            <h2 className="text-[14px] font-semibold text-gray-900">Cash Flow &amp; Receivables</h2>
+            <p className="text-[12px] text-gray-600 mt-0.5">Monthly collection overview</p>
+          </div>
           <Link href="/app/payments" className="text-xs font-medium text-brand-600 hover:text-brand-700">
             View all →
           </Link>

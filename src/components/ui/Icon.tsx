@@ -60,12 +60,13 @@ export interface IconProps {
   name: string;
   size?: number;
   className?: string;
+  strokeWidth?: number;
 }
 
-export function Icon({ name, size = 18, className = "" }: IconProps) {
+export function Icon({ name, size = 18, className = "", strokeWidth }: IconProps) {
   const Component = iconMap[name];
   if (!Component) return null;
-  return <Component size={size} className={className} aria-hidden="true" />;
+  return <Component size={size} className={className} strokeWidth={strokeWidth} aria-hidden="true" />;
 }
 
 export { iconMap };

@@ -81,6 +81,14 @@ function leasebase_seo_meta() {
         $title = 'LeaseBase Demo | Book a Product Demo';
         $desc  = 'Book a LeaseBase demo to see how owners can manage leases, rent collection, maintenance, and the tenant experience in one connected platform.';
         $url   = home_url('/demo/');
+    } elseif (is_page('features')) {
+        $title = 'LeaseBase Features | Powerful Property Management Tools';
+        $desc  = 'Explore LeaseBase features: lease management, rent collection, maintenance tracking, document storage, automation, and more — all in one platform.';
+        $url   = home_url('/features/');
+    } elseif (is_page('about')) {
+        $title = 'About LeaseBase | Empowering Independent Property Owners';
+        $desc  = 'Learn about LeaseBase — our mission, story, team, and why 2,000+ property owners trust us to manage their rental portfolios.';
+        $url   = home_url('/about/');
     } else {
         return;
     }
@@ -117,6 +125,12 @@ function leasebase_document_title($title) {
     }
     if (is_page('demo')) {
         return 'LeaseBase Demo | Book a Product Demo';
+    }
+    if (is_page('features')) {
+        return 'LeaseBase Features | Powerful Property Management Tools';
+    }
+    if (is_page('about')) {
+        return 'About LeaseBase | Empowering Independent Property Owners';
     }
     return $title;
 }
