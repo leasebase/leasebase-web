@@ -11,6 +11,12 @@ jest.mock("next/link", () => {
   return { __esModule: true, default: MockLink };
 });
 
+/* ── Mock lucide-react icons used in LeasesTable columns ── */
+jest.mock("lucide-react", () => ({
+  ...jest.requireActual("lucide-react"),
+  Calendar: (props: any) => <svg data-testid="calendar-icon" {...props} />,
+}));
+
 /* ── Fixtures ── */
 
 const now = new Date().toISOString();
@@ -59,20 +65,20 @@ describe("LeasesTable", () => {
     expect(screen.getByText("INACTIVE")).toBeInTheDocument();
   });
 
-  test("renders tenant names or 'Not assigned'", () => {
+  test("renders tenant full names or 'Not assigned'", () => {
     render(<LeasesTable leases={leases} />);
-    expect(screen.getByText("J.Doe")).toBeInTheDocument();
+    expect(screen.getByText("John Doe")).toBeInTheDocument();
     expect(screen.getByText("Not assigned")).toBeInTheDocument();
   });
 
-  test("renders term type", () => {
+  test("renders rent amount", () => {
     render(<LeasesTable leases={leases} />);
-    expect(screen.getAllByText("12 Months").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("$1,500").length).toBeGreaterThanOrEqual(1);
   });
 
   test("links to lease detail page", () => {
     render(<LeasesTable leases={leases} />);
-    const viewLinks = screen.getAllByText("View");
+    const viewLinks = screen.getAllByText("View Details");
     expect(viewLinks[0].closest("a")).toHaveAttribute("href", "/app/leases/l1");
   });
 
@@ -81,19 +87,18 @@ describe("LeasesTable", () => {
     expect(screen.getByText("No leases found")).toBeInTheDocument();
   });
 
-  // ---- Clickable unit links ----
+  // ---- Unit sub-line shown ----
 
-  test("unit column links to /app/units/:id", () => {
+  test("unit number shown as sub-line under property", () => {
     render(<LeasesTable leases={leases} />);
-    const unitLinks = screen.getAllByText("Unit 101");
-    expect(unitLinks[0].closest("a")).toHaveAttribute("href", "/app/units/u1");
+    expect(screen.getAllByText("Unit 101").length).toBeGreaterThanOrEqual(1);
   });
 
   // ---- Clickable tenant links ----
 
   test("tenant name links to /app/tenants/:id", () => {
     render(<LeasesTable leases={leases} />);
-    const tenantLink = screen.getByText("J.Doe");
+    const tenantLink = screen.getByText("John Doe");
     expect(tenantLink.closest("a")).toHaveAttribute("href", "/app/tenants/t1");
   });
 
@@ -111,7 +116,7 @@ describe("LeasesTable", () => {
     expect(screen.getByText("DRAFT")).toBeInTheDocument();
     expect(screen.queryByText("ASSIGNED")).not.toBeInTheDocument();
     // Tenant should be clickable
-    const tenantLink = screen.getByText("J.Smith");
+    const tenantLink = screen.getByText("Jane Smith");
     expect(tenantLink.closest("a")).toHaveAttribute("href", "/app/tenants/t2");
   });
 
@@ -126,8 +131,8 @@ describe("LeasesTable", () => {
       ],
     });
     render(<LeasesTable leases={[multiLease]} />);
-    expect(screen.getByText("J.Doe")).toBeInTheDocument();
-    expect(screen.getByText("(+1 more)")).toBeInTheDocument();
+    expect(screen.getByText("John Doe")).toBeInTheDocument();
+    expect(screen.getByText("+1 more")).toBeInTheDocument();
   });
 
   // ---- Filter options contain only lease-lifecycle statuses ----
