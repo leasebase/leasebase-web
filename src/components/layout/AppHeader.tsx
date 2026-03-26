@@ -7,16 +7,12 @@ import {
   Menu,
   X,
   Bell,
-  MessageSquare,
   Search,
   LogOut,
-  Command,
   Settings,
   User,
-  ChevronDown,
 } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
-import { Avatar } from "@/components/ui/Avatar";
 import { DropdownMenu, type DropdownMenuItem } from "@/components/ui/DropdownMenu";
 import { Logo } from "@/components/Logo";
 import { useAppShell } from "./AppShell";
@@ -176,31 +172,16 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
             )}
           </Link>
 
-          {/* Account dropdown (both personas) */}
+          {/* Account dropdown — icon-only trigger, menu has Profile/Settings/Sign out */}
           {user && (
             <DropdownMenu
               trigger={
                 <button
                   type="button"
-                  className="flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 hover:bg-slate-50 transition-all focus:outline-none focus:ring-2 focus:ring-green-500/20"
+                  className="relative p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-green-500/20"
                   aria-label="Account menu"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center ring-2 ring-white shadow-sm">
-                    <span className="text-[11px] font-bold text-slate-600">
-                      {user.name
-                        ?.split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .slice(0, 2)
-                        .toUpperCase() || "?"}
-                    </span>
-                  </div>
-                  <div className="hidden sm:block text-left min-w-0">
-                    <p className="text-[13px] font-semibold text-slate-900 truncate max-w-[120px]">
-                      {user.name || "User"}
-                    </p>
-                  </div>
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
+                  <User className="w-[18px] h-[18px]" />
                 </button>
               }
               items={userMenuItems}
