@@ -487,12 +487,9 @@ function TenantDocuments() {
       {/* \u2500\u2500 Help Card \u2500\u2500 */}
       <div className="bg-gradient-to-br from-blue-50 to-blue-50/50 rounded-2xl border border-blue-200 p-6">
         <h3 className="text-[15px] font-semibold text-slate-900 mb-2">Need a document?</h3>
-        <p className="text-[13px] text-slate-600 mb-4">
-          If you need a specific document that\u2019s not listed here, contact your property manager and they\u2019ll provide it to you.
+        <p className="text-[13px] text-slate-600">
+          If you need a specific document that isn\u2019t listed here, reach out to your property manager directly and they\u2019ll provide it to you.
         </p>
-        <button className="flex items-center gap-2 h-10 px-4 bg-white text-slate-700 text-[13px] font-semibold rounded-xl border border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all">
-          Contact Property Manager
-        </button>
       </div>
     </div>
   );
