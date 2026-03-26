@@ -303,7 +303,7 @@ export function ManagerMaintenanceDetail() {
     if (!trimmed || trimmed === item?.assignee_id) return;
     setAssigning(true);
     try {
-      const res = await assignMaintenanceWorkOrder(id, trimmed);
+      const res = await assignMaintenanceWorkOrder(id, { assigneeId: trimmed });
       setItem(res.data);
     } catch { /* silent */ }
     finally { setAssigning(false); }

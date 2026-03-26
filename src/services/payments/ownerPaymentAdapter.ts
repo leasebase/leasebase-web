@@ -135,6 +135,27 @@ export async function fetchConnectStatus(): Promise<DomainResult<ConnectStatus |
   }
 }
 
+export interface OnboardingSessionResult {
+  clientSecret: string;
+  publishableKey: string;
+}
+
+/** Create a Stripe Connect embedded onboarding session (Account Session). */
+export async function createOnboardingSession(): Promise<DomainResult<OnboardingSessionResult | null>> {
+  try {
+    const res = await apiRequest<{ data: OnboardingSessionResult }>({
+      path: "api/payments/connect/onboard-session",
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    return { data: res.data, source: "live", error: null };
+  } catch (e: any) {
+    return { data: null, source: "unavailable", error: e?.message || "Failed to create onboarding session" };
+  }
+}
+
+/** Start redirect-based Stripe Connect onboarding (legacy). */
 export async function startOnboarding(): Promise<DomainResult<{ url: string } | null>> {
   try {
     const res = await apiRequest<{ data: { url: string } }>({
