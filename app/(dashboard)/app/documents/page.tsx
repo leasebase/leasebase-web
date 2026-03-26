@@ -2,11 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { FolderOpen, FileText, Plus, Download, Archive, MoreVertical, Upload, Search } from "lucide-react";
+import { FolderOpen, FileText, Download, Archive, MoreVertical, Upload, Search } from "lucide-react";
 import { DropdownMenu, type DropdownMenuItem } from "@/components/ui/DropdownMenu";
 import { authStore } from "@/lib/auth/store";
 import {
@@ -48,6 +47,37 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
+// ── Category icon colors (shared between cards and table rows) ───────────────
+
+const CATEGORY_ICON_STYLE: Record<string, string> = {
+  LEASE_AGREEMENT: "bg-blue-100 text-blue-600",
+  LEASE_ADDENDUM: "bg-blue-100 text-blue-600",
+  NOTICE: "bg-green-100 text-green-600",
+  PAYMENT_RECEIPT: "bg-purple-100 text-purple-600",
+  MOVE_IN_CHECKLIST: "bg-violet-100 text-violet-600",
+  MOVE_OUT_CHECKLIST: "bg-violet-100 text-violet-600",
+  MAINTENANCE_ATTACHMENT: "bg-yellow-100 text-yellow-600",
+  OWNER_UPLOAD: "bg-slate-100 text-slate-600",
+};
+
+const CATEGORY_BADGE_STYLE: Record<string, string> = {
+  LEASE_AGREEMENT: "bg-blue-100 text-blue-700",
+  LEASE_ADDENDUM: "bg-blue-100 text-blue-700",
+  NOTICE: "bg-green-100 text-green-700",
+  PAYMENT_RECEIPT: "bg-purple-100 text-purple-700",
+  MOVE_IN_CHECKLIST: "bg-violet-100 text-violet-700",
+  MOVE_OUT_CHECKLIST: "bg-violet-100 text-violet-700",
+  MAINTENANCE_ATTACHMENT: "bg-amber-100 text-amber-700",
+  OWNER_UPLOAD: "bg-slate-100 text-slate-700",
+};
+
+const CATEGORY_CARDS = [
+  { key: "LEASE_AGREEMENT" as const, label: "Leases", color: "bg-blue-100 text-blue-600" },
+  { key: "MAINTENANCE_ATTACHMENT" as const, label: "Maintenance", color: "bg-yellow-100 text-yellow-600" },
+  { key: "NOTICE" as const, label: "Notices", color: "bg-green-100 text-green-600" },
+  { key: "PAYMENT_RECEIPT" as const, label: "Receipts", color: "bg-purple-100 text-purple-600" },
+];
+
 // ══════════════════════════════════════════════════════════════════════════════
 // OWNER DOCUMENTS
 // ══════════════════════════════════════════════════════════════════════════════
@@ -58,6 +88,10 @@ function OwnerDocuments() {
   const [error, setError] = useState<string | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
 
   const loadDocs = useCallback(async () => {
     try {
@@ -99,41 +133,61 @@ function OwnerDocuments() {
     setTimeout(() => setSuccessMsg(null), 4000);
   }, [loadDocs]);
 
-  if (loading) {
-    return (
-      <div className="mt-6 space-y-2">
-        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} variant="text" className="h-16 w-full rounded-md" />)}
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>;
-  }
-
-  // Category counts
+  // Category counts (computed from full doc list)
   const categoryCounts = docs.reduce<Record<string, number>>((acc, d) => {
     const cat = d.category || "OTHER";
     acc[cat] = (acc[cat] || 0) + 1;
     return acc;
   }, {});
 
-  const categoryCards = [
-    { key: "LEASE_AGREEMENT", label: "Leases", color: "bg-blue-100 text-blue-600" },
-    { key: "MAINTENANCE_ATTACHMENT", label: "Maintenance", color: "bg-yellow-100 text-yellow-600" },
-    { key: "NOTICE", label: "Notices", color: "bg-green-100 text-green-600" },
-    { key: "PAYMENT_RECEIPT", label: "Receipts", color: "bg-purple-100 text-purple-600" },
-  ];
+  // Client-side filtering
+  const filteredDocs = docs.filter((d) => {
+    const matchesCat = !categoryFilter || d.category === categoryFilter;
+    const matchesSearch = !searchQuery || d.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCat && matchesSearch;
+  });
+
+  if (loading) {
+    return (
+      <div className="mt-6 space-y-6">
+        {/* Category cards skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="bg-white rounded-xl border border-slate-200 p-6">
+              <div className="flex items-center gap-3">
+                <Skeleton variant="rectangular" className="w-10 h-10 rounded-lg" />
+                <div className="flex-1">
+                  <Skeleton variant="text" className="h-4 w-20" />
+                  <Skeleton variant="text" className="mt-1 h-3 w-14" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Table skeleton */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-3">
+          <Skeleton variant="text" className="h-4 w-40" />
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} variant="text" className="h-14 w-full rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>;
+  }
 
   if (docs.length === 0) {
     return (
       <>
-        <div className="mt-8 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 p-12 text-center">
-          <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-4">
-            <FolderOpen className="w-8 h-8 text-gray-400" />
+        <div className="mt-8 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300 p-12 text-center">
+          <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-4">
+            <FolderOpen className="w-8 h-8 text-slate-400" />
           </div>
-          <h3 className="font-semibold text-gray-900 mb-2">No documents yet</h3>
-          <p className="text-gray-600 mb-4 max-w-md mx-auto">
+          <h3 className="font-semibold text-slate-900 mb-2">No documents yet</h3>
+          <p className="text-slate-600 mb-4 max-w-md mx-auto">
             Upload your first document to get started. You can organize leases, notices, and other property documents here.
           </p>
           <Button variant="primary" icon={<Upload size={16} />} onClick={() => setUploadOpen(true)}>Upload First Document</Button>
@@ -146,109 +200,167 @@ function OwnerDocuments() {
   return (
     <>
       {successMsg && (
-        <div className="mt-3 rounded-md border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-700">{successMsg}</div>
+        <div className="mt-3 rounded-xl border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-700">{successMsg}</div>
       )}
 
-      {/* Category Cards */}
+      {/* Category Cards — clickable to filter */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        {categoryCards.map((cat) => (
-          <div key={cat.key} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
-            <div className="flex items-center gap-3 mb-4">
-              <div className={`w-10 h-10 rounded-lg ${cat.color} flex items-center justify-center`}>
-                <FileText className="w-5 h-5" />
+        {CATEGORY_CARDS.map((cat) => {
+          const isActive = categoryFilter === cat.key;
+          return (
+            <button
+              key={cat.key}
+              type="button"
+              onClick={() => setCategoryFilter(isActive ? "" : cat.key)}
+              className={`bg-white rounded-xl border p-6 hover:shadow-lg transition-all text-left ${
+                isActive
+                  ? "border-brand-300 ring-2 ring-brand-200 shadow-md"
+                  : "border-slate-200/80 hover:border-slate-300"
+              }`}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`w-10 h-10 rounded-lg ${cat.color} flex items-center justify-center`}>
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-900">{cat.label}</h3>
+                  <p className="text-[13px] text-slate-600">{categoryCounts[cat.key] || 0} files</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">{cat.label}</h3>
-                <p className="text-sm text-gray-600">{categoryCounts[cat.key] || 0} files</p>
-              </div>
-            </div>
-          </div>
-        ))}
+              <span className="text-[12px] text-blue-600 hover:text-blue-700 font-medium">
+                {isActive ? "Show All \u2190" : "View All \u2192"}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Search & Filters */}
-      <div className="mt-6 flex items-center gap-3">
-        <div className="relative flex-1">
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[200px]">
           <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input type="text" placeholder="Search documents…"
-            className="w-full h-9 pl-9 pr-4 bg-white border border-slate-200 rounded-lg text-[12px] text-slate-700 placeholder:text-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all" />
+          <input
+            type="text"
+            placeholder="Search documents\u2026"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-9 pl-9 pr-4 bg-white border border-slate-200 rounded-lg text-[12px] text-slate-700 placeholder:text-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all"
+          />
         </div>
-        <select className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-[12px] text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all">
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-[12px] text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-300 transition-all"
+        >
           <option value="">All Categories</option>
           <option value="LEASE_AGREEMENT">Leases</option>
+          <option value="LEASE_ADDENDUM">Addendums</option>
           <option value="NOTICE">Notices</option>
           <option value="PAYMENT_RECEIPT">Receipts</option>
           <option value="MAINTENANCE_ATTACHMENT">Maintenance</option>
+          <option value="OWNER_UPLOAD">Uploads</option>
         </select>
-        <Button variant="primary" size="sm" icon={<Upload size={14} />} onClick={() => setUploadOpen(true)}>Upload</Button>
       </div>
 
       {/* Documents Table */}
-      <div className="mt-4 bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200/80">
-                <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Document</th>
-                <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Category</th>
-                <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Status</th>
-                <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Date Added</th>
-                <th className="text-right py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {docs.map((doc) => {
-                const isDownloadable = doc.status !== "DRAFT";
-                return (
-                  <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <FileText className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <span className="text-[13px] font-medium text-gray-900 truncate">{doc.title}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                        {CATEGORY_LABELS[doc.category] || doc.category}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6">
-                      <Badge variant={STATUS_VARIANTS[doc.status] || "neutral"}>
-                        {DOCUMENT_STATUS_LABELS[doc.status as DocumentStatus] || doc.status}
-                      </Badge>
-                    </td>
-                    <td className="py-4 px-6 text-[13px] text-gray-600">
-                      {formatDate(doc.created_at)}
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {isDownloadable && (
-                          <button onClick={() => handleDownload(doc.id)} className="text-[12px] text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1">
-                            <Download size={14} /> Download
-                          </button>
-                        )}
-                        <DropdownMenu
-                          trigger={
-                            <button type="button" className="rounded p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Document actions">
-                              <MoreVertical size={16} />
-                            </button>
-                          }
-                          items={[
-                            ...(isDownloadable ? [{ id: "download", label: "Download", icon: <Download size={14} />, onClick: () => handleDownload(doc.id) }] : []),
-                            { id: "archive", label: "Archive", icon: <Archive size={14} />, danger: true, onClick: () => handleArchive(doc.id) },
-                          ]}
-                          align="right"
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      <div className="mt-4 bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-[15px] font-semibold text-slate-900">
+                {categoryFilter ? `${CATEGORY_LABELS[categoryFilter] || categoryFilter} Documents` : "Recent Documents"}
+              </h2>
+              <p className="text-[13px] text-slate-500 mt-0.5">
+                {filteredDocs.length} document{filteredDocs.length !== 1 ? "s" : ""}
+                {categoryFilter || searchQuery ? " matching filters" : ""}
+              </p>
+            </div>
+            <Button variant="primary" size="sm" icon={<Upload size={14} />} onClick={() => setUploadOpen(true)}>Upload</Button>
+          </div>
         </div>
+        {filteredDocs.length === 0 ? (
+          <div className="p-12 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto mb-4">
+              <FolderOpen className="w-8 h-8 text-slate-400" />
+            </div>
+            <p className="text-[14px] text-slate-600 mb-1">No documents found</p>
+            <p className="text-[12px] text-slate-500">
+              {searchQuery || categoryFilter ? "Try adjusting your search or filter." : "Upload a document to get started."}
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200/80">
+                  <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Document</th>
+                  <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Category</th>
+                  <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Status</th>
+                  <th className="text-left py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Date Added</th>
+                  <th className="text-right py-3.5 px-6 text-[12px] font-semibold text-slate-700 uppercase tracking-wide">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredDocs.map((doc) => {
+                  const isDownloadable = doc.status !== "DRAFT";
+                  const iconStyle = CATEGORY_ICON_STYLE[doc.category] ?? "bg-slate-100 text-slate-600";
+                  const badgeStyle = CATEGORY_BADGE_STYLE[doc.category] ?? "bg-slate-100 text-slate-700";
+                  return (
+                    <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${iconStyle}`}>
+                            <FileText className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[13px] font-medium text-slate-900 truncate">{doc.title}</p>
+                            {doc.description && (
+                              <p className="text-[12px] text-slate-500 truncate">{doc.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className={`inline-flex px-2.5 py-1 rounded-lg text-[11px] font-semibold ${badgeStyle}`}>
+                          {CATEGORY_LABELS[doc.category] || doc.category}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <Badge variant={STATUS_VARIANTS[doc.status] || "neutral"}>
+                          {DOCUMENT_STATUS_LABELS[doc.status as DocumentStatus] || doc.status}
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-6 text-[13px] text-slate-600 font-medium">
+                        {formatDate(doc.created_at)}
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {isDownloadable && (
+                            <button onClick={() => handleDownload(doc.id)} className="text-[12px] text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1">
+                              <Download size={14} /> Download
+                            </button>
+                          )}
+                          <DropdownMenu
+                            trigger={
+                              <button type="button" className="rounded p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Document actions">
+                                <MoreVertical size={16} />
+                              </button>
+                            }
+                            items={[
+                              ...(isDownloadable ? [{ id: "download", label: "Download", icon: <Download size={14} />, onClick: () => handleDownload(doc.id) }] : []),
+                              { id: "archive", label: "Archive", icon: <Archive size={14} />, danger: true, onClick: () => handleArchive(doc.id) },
+                            ]}
+                            align="right"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
       <UploadDocumentModal open={uploadOpen} onClose={() => setUploadOpen(false)} onSuccess={handleUploadSuccess} />
     </>
@@ -512,7 +624,7 @@ export default function DocumentsPage() {
     <>
       <PageHeader
         title="Documents"
-        description="Upload, manage, and organize documents \u2014 leases, notices, and receipts."
+        description="Manage all property-related documents"
       />
       <OwnerDocuments />
     </>
