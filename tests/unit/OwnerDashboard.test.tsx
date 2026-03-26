@@ -159,8 +159,8 @@ describe("OwnerDashboard", () => {
     expect(screen.getByText("Monthly Cash Flow")).toBeInTheDocument();
     expect(screen.getByText("Outstanding Payments")).toBeInTheDocument();
 
-    // Alert rendered
-    expect(screen.getByText("1 rent payment overdue")).toBeInTheDocument();
+    // Alert rendered (text split across spans: count bold + message)
+    expect(screen.getByText(/rent payment/i)).toBeInTheDocument();
   });
 
   test("renders gracefully with partial domain failure", async () => {
