@@ -113,26 +113,35 @@ export default function Page() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Card>
               <CardBody>
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <DollarSign size={14} /> Collected
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Collected</p>
+                    <p className="mt-1.5 text-2xl font-bold text-slate-900">{formatCents(totalCollected)}</p>
+                  </div>
+                  <span className="rounded-xl bg-green-50 p-2.5 text-green-500 shadow-sm"><DollarSign size={20} /></span>
                 </div>
-                <p className="mt-1 text-2xl font-bold text-slate-900">{formatCents(totalCollected)}</p>
               </CardBody>
             </Card>
             <Card>
               <CardBody>
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <CreditCard size={14} /> Outstanding
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Outstanding</p>
+                    <p className="mt-1.5 text-2xl font-bold text-slate-900">{formatCents(totalPending)}</p>
+                  </div>
+                  <span className="rounded-xl bg-amber-50 p-2.5 text-amber-500 shadow-sm"><CreditCard size={20} /></span>
                 </div>
-                <p className="mt-1 text-2xl font-bold text-slate-900">{formatCents(totalPending)}</p>
               </CardBody>
             </Card>
             <Card>
               <CardBody>
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <AlertCircle size={14} /> Overdue
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Overdue</p>
+                    <p className="mt-1.5 text-2xl font-bold text-red-600">{formatCents(totalOverdue)}</p>
+                  </div>
+                  <span className="rounded-xl bg-red-50 p-2.5 text-red-500 shadow-sm"><AlertCircle size={20} /></span>
                 </div>
-                <p className="mt-1 text-2xl font-bold text-red-600">{formatCents(totalOverdue)}</p>
               </CardBody>
             </Card>
           </div>
@@ -142,7 +151,7 @@ export default function Page() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             >
               <option value="">All statuses</option>
               {PAYMENT_STATUSES.map((s) => (
@@ -153,14 +162,14 @@ export default function Page() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
               placeholder="Start date"
             />
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
               placeholder="End date"
             />
             <div className="relative flex-1 min-w-[180px]">
@@ -170,7 +179,7 @@ export default function Page() {
                 placeholder="Search by tenant ID…"
                 value={tenantSearch}
                 onChange={(e) => setTenantSearch(e.target.value)}
-                className="w-full rounded-md border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
               />
             </div>
           </div>
@@ -188,43 +197,43 @@ export default function Page() {
               className="mt-4"
             />
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-left text-xs text-slate-400">
-                    <th className="pb-2 pr-4">Date</th>
-                    <th className="pb-2 pr-4">Period</th>
-                    <th className="pb-2 pr-4">Method</th>
-                    <th className="pb-2 pr-4">Source</th>
-                    <th className="pb-2 pr-4 text-right">Amount</th>
-                    <th className="pb-2 pr-4 text-right">Fee</th>
-                    <th className="pb-2">Status</th>
+                  <tr className="border-b border-slate-200 bg-slate-50/80 text-left">
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Date</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Period</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Method</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Source</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-right">Amount</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-right">Fee</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredPayments.map((p) => (
-                    <tr key={p.id} className="border-b border-slate-100">
-                      <td className="py-2.5 pr-4 text-slate-600">
+                    <tr key={p.id} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50/60 transition-colors">
+                      <td className="px-4 py-3 text-slate-600">
                         {new Date(p.created_at).toLocaleDateString()}
                       </td>
-                      <td className="py-2.5 pr-4 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600">
                         {p.billing_period
                           ? new Date(p.billing_period + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })
                           : "—"}
                       </td>
-                      <td className="py-2.5 pr-4 text-slate-600">{p.method ?? "—"}</td>
-                      <td className="py-2.5 pr-4">
+                      <td className="px-4 py-3 text-slate-600">{p.method ?? "—"}</td>
+                      <td className="px-4 py-3">
                         <Badge variant={p.source === "AUTOPAY" ? "info" : "neutral"}>
                           {p.source ?? "MANUAL"}
                         </Badge>
                       </td>
-                      <td className="py-2.5 pr-4 text-right font-medium text-slate-900">
+                      <td className="px-4 py-3 text-right font-medium text-slate-900">
                         {formatCents(p.amount, p.currency)}
                       </td>
-                      <td className="py-2.5 pr-4 text-right text-slate-400">
+                      <td className="px-4 py-3 text-right text-slate-400">
                         {p.application_fee_amount ? formatCents(p.application_fee_amount, p.currency) : "—"}
                       </td>
-                      <td className="py-2.5">
+                      <td className="px-4 py-3">
                         <Badge variant={paymentStatusVariant[p.status] ?? "neutral"}>{p.status}</Badge>
                       </td>
                     </tr>

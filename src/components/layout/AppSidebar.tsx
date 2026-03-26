@@ -76,14 +76,14 @@ export function AppSidebar() {
     <>
       {/* ─── Desktop sidebar ─── */}
       <nav
-        className={`hidden shrink-0 flex-col border-r border-slate-200 bg-surface transition-[width] duration-200 ease-in-out md:flex ${
-          sidebarCollapsed ? "w-[72px]" : "w-[240px]"
+        className={`hidden shrink-0 flex-col border-r border-slate-200 bg-white transition-[width] duration-200 ease-in-out md:flex ${
+          sidebarCollapsed ? "w-[72px]" : "w-[260px]"
         }`}
         aria-label="Primary navigation"
       >
         {/* Branding */}
         <div
-          className={`flex items-center border-b border-slate-200 px-3 py-3 ${
+          className={`flex h-16 items-center border-b border-slate-100 px-4 ${
             sidebarCollapsed ? "justify-center" : "gap-2.5"
           }`}
         >
@@ -98,7 +98,7 @@ export function AppSidebar() {
         </div>
 
         {/* Nav items */}
-        <div className="flex-1 overflow-y-auto px-2 py-4">
+        <div className="flex-1 overflow-y-auto px-3 py-4">
           <SidebarNavGroups
             groups={groups}
             pathname={pathname}
@@ -107,7 +107,7 @@ export function AppSidebar() {
         </div>
 
         {/* Footer: collapse toggle */}
-        <div className="border-t border-slate-200 px-2 py-2">
+        <div className="border-t border-slate-100 px-3 py-2.5 bg-slate-50/50">
           <button
             type="button"
             onClick={toggleSidebar}
@@ -139,7 +139,7 @@ export function AppSidebar() {
             aria-hidden="true"
           />
           <nav
-            className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col overflow-y-auto border-r border-slate-200 bg-surface md:hidden"
+            className="fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col overflow-y-auto border-r border-slate-200 bg-white md:hidden"
             aria-label="Primary navigation"
           >
             {/* Mobile header */}

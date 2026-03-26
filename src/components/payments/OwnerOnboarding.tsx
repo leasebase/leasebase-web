@@ -14,6 +14,7 @@ import {
   type OnboardingSessionResult,
   type ConnectStatus,
 } from "@/services/payments/ownerPaymentAdapter";
+import { STRIPE_BRAND_COLOR } from "@/lib/stripe/theme";
 
 export interface OwnerOnboardingProps {
   /** Called when onboarding reaches a terminal state (completed or updated) */
@@ -46,7 +47,7 @@ export function OwnerOnboarding({ onStatusChange }: OwnerOnboardingProps) {
           appearance: {
             overlays: "dialog",
             variables: {
-              colorPrimary: "#18D7F0",
+              colorPrimary: STRIPE_BRAND_COLOR,
               borderRadius: "8px",
             },
           },

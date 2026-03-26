@@ -136,12 +136,12 @@ export function DataTable<T extends Record<string, any>>({
   /* ── Loading skeleton ── */
   if (loading) {
     return (
-      <div className={`rounded-lg border border-slate-200 overflow-hidden ${className}`}>
+      <div className={`rounded-xl border border-slate-200 overflow-hidden shadow-sm ${className}`}>
         <table className="w-full text-sm" role="table">
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50">
+            <tr className="border-b border-slate-200 bg-slate-50/80">
               {columns.map((col) => (
-                <th key={col.key} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <th key={col.key} className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                   {col.header}
                 </th>
               ))}
@@ -175,7 +175,7 @@ export function DataTable<T extends Record<string, any>>({
   /* ── Empty ── */
   if (rows.length === 0) {
     return (
-      <div className={`rounded-lg border border-slate-200 p-8 text-center text-sm text-slate-400 ${className}`}>
+      <div className={`rounded-xl border border-slate-200 p-8 text-center text-sm text-slate-400 ${className}`}>
         {emptyMessage}
       </div>
     );
@@ -190,10 +190,10 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   return (
-    <div className={`rounded-lg border border-slate-200 overflow-hidden ${className}`}>
+    <div className={`rounded-xl border border-slate-200 overflow-hidden shadow-sm ${className}`}>
       {/* Toolbar */}
       {showToolbar && (
-        <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-2.5">
+        <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-slate-50/80 px-4 py-2.5">
           {searchable && (
             <div className="relative min-w-[180px] flex-1 max-w-xs">
               <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500" aria-hidden="true" />
@@ -230,13 +230,13 @@ export function DataTable<T extends Record<string, any>>({
       <div className={`overflow-x-auto ${stickyHeader ? "max-h-[70vh] overflow-y-auto" : ""}`}>
         <table className="w-full text-sm" role="table">
           <thead className={stickyHeader ? "sticky top-0 z-10" : ""}>
-            <tr className="border-b border-slate-200 bg-slate-50">
+            <tr className="border-b border-slate-200 bg-slate-50/80">
               {columns.map((col) => {
                 const isSortable = col.sortable === true;
                 return (
                   <th
                     key={col.key}
-                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400 ${
+                    className={`px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500 ${
                       isSortable ? "cursor-pointer select-none hover:text-slate-700" : ""
                     } ${stickyHeader ? "bg-white" : ""}`}
                     onClick={isSortable ? () => toggleSort(col.key) : undefined}
@@ -264,7 +264,7 @@ export function DataTable<T extends Record<string, any>>({
               </tr>
             ) : (
               paginatedRows.map((row, i) => (
-                <tr key={getRowId(row, safePage * pageSize + i)} className="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                <tr key={getRowId(row, safePage * pageSize + i)} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50/60 transition-colors">
                   {columns.map((col) => (
                     <td key={col.key} className="px-4 py-3 text-slate-700">
                       {col.render ? col.render(row) : (row[col.key] as ReactNode)}

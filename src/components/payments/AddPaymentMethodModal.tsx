@@ -10,6 +10,7 @@ import {
   createSetupIntent,
   confirmPaymentMethod,
 } from "@/services/tenant/adapters/paymentMethodAdapter";
+import { STRIPE_BRAND_COLOR } from "@/lib/stripe/theme";
 
 // ── Inner form (must be inside <Elements>) ─────────────────────────────────
 
@@ -192,7 +193,7 @@ export function AddPaymentMethodModal({ open, onClose, onSuccess }: AddPaymentMe
               appearance: {
                 theme: "stripe",
                 variables: {
-                  colorPrimary: "#18D7F0",
+                  colorPrimary: STRIPE_BRAND_COLOR,
                   borderRadius: "8px",
                 },
               },

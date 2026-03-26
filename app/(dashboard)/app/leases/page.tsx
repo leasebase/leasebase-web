@@ -42,7 +42,7 @@ function LeasesListPage() {
     return (
       <>
         <PageHeader title="Leases" description="View and manage lease agreements." />
-        <div className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700" role="alert">
           {error}
         </div>
       </>

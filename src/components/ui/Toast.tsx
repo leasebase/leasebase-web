@@ -24,9 +24,9 @@ export function useToast() {
 }
 
 const variantStyles: Record<ToastVariant, string> = {
-  success: "border-emerald-600/60 bg-emerald-950/90 text-emerald-200",
-  error: "border-red-600/60 bg-red-950/90 text-red-200",
-  info: "border-blue-600/60 bg-blue-950/90 text-blue-200",
+  success: "border-green-300 bg-green-50 text-green-800",
+  error: "border-red-300 bg-red-50 text-red-800",
+  info: "border-blue-300 bg-blue-50 text-blue-800",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
