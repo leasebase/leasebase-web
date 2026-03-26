@@ -13,9 +13,9 @@ export interface StatCardProps {
 }
 
 const changeColors = {
-  positive: "text-green-600",
-  negative: "text-red-600",
-  neutral: "text-slate-500",
+  positive: "text-[#15803D]",
+  negative: "text-[#B91C1C]",
+  neutral: "text-slate-600",
 };
 
 export function StatCard({ label, value, change, changeType = "neutral", icon, iconColor, subtitle }: StatCardProps) {

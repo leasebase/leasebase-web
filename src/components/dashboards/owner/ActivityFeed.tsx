@@ -15,12 +15,12 @@ const eventIcons: Record<ActivityEventType, typeof CreditCard> = {
 
 /** Gradient color per event type for timeline icons */
 const eventIconGradient: Record<string, string> = {
-  PAYMENT_RECEIVED: "bg-gradient-to-br from-green-500 to-green-600 shadow-green-500/20",
-  TENANT_INVITED: "bg-gradient-to-br from-violet-500 to-violet-600 shadow-violet-500/20",
-  MAINTENANCE_CREATED: "bg-gradient-to-br from-amber-500 to-amber-600 shadow-amber-500/20",
-  MAINTENANCE_COMPLETED: "bg-gradient-to-br from-amber-500 to-amber-600 shadow-amber-500/20",
-  LEASE_RENEWED: "bg-gradient-to-br from-blue-500 to-blue-600 shadow-blue-500/20",
-  LEASE_DEACTIVATED: "bg-gradient-to-br from-blue-500 to-blue-600 shadow-blue-500/20",
+  PAYMENT_RECEIVED: "bg-gradient-to-br from-green-500 to-green-600 shadow-md shadow-green-500/30",
+  TENANT_INVITED: "bg-gradient-to-br from-violet-500 to-violet-600 shadow-md shadow-violet-500/30",
+  MAINTENANCE_CREATED: "bg-gradient-to-br from-amber-500 to-amber-600 shadow-md shadow-amber-500/30",
+  MAINTENANCE_COMPLETED: "bg-gradient-to-br from-amber-500 to-amber-600 shadow-md shadow-amber-500/30",
+  LEASE_RENEWED: "bg-gradient-to-br from-blue-500 to-blue-600 shadow-md shadow-blue-500/30",
+  LEASE_DEACTIVATED: "bg-gradient-to-br from-blue-500 to-blue-600 shadow-md shadow-blue-500/30",
 };
 
 function timeAgo(iso: string): string {
@@ -58,29 +58,29 @@ export function ActivityFeed({ vm }: ActivityFeedProps) {
         </div>
         <Link
           href="/app/notifications"
-          className="text-[12px] text-brand-600 hover:text-brand-700 font-semibold flex items-center gap-1"
+          className="text-[12px] text-green-600 hover:text-green-700 font-semibold flex items-center gap-1"
         >
           View All <ArrowUpRight className="w-3.5 h-3.5" />
         </Link>
       </div>
-      <div className="p-4">
+      <div className="p-5 bg-gradient-to-br from-gray-50/30 to-transparent">
         <div className="space-y-0">
           {vm.events.map((evt, index) => {
             const IconCmp = eventIcons[evt.type] ?? Clock;
-            const gradient = eventIconGradient[evt.type] ?? "bg-gradient-to-br from-slate-400 to-slate-500 shadow-slate-500/20";
+            const gradient = eventIconGradient[evt.type] ?? "bg-gradient-to-br from-slate-400 to-slate-500 shadow-md shadow-slate-500/30";
             const isLast = index === vm.events.length - 1;
 
             const inner = (
               <div className="flex gap-3.5 group">
                 <div className="flex flex-col items-center">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm ${gradient}`}>
-                    <IconCmp className="w-[15px] h-[15px] text-white" strokeWidth={2.5} />
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${gradient}`}>
+                    <IconCmp className="w-[17px] h-[17px] text-white" strokeWidth={2.5} />
                   </div>
                   {!isLast && (
-                    <div className="w-px flex-1 bg-slate-200 mt-1.5" />
+                    <div className="w-px flex-1 bg-gray-200 mt-1.5" />
                   )}
                 </div>
-                <div className="flex-1 pb-4 min-w-0">
+                <div className="flex-1 pb-3 min-w-0">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-[13px] font-semibold text-gray-900 mb-0.5">{evt.title}</p>

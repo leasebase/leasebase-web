@@ -16,6 +16,7 @@ import {
   Calendar,
   HardHat,
   AlertTriangle,
+  AlertCircle,
   Bell,
   CheckCircle2,
   Clock,
@@ -24,6 +25,8 @@ import {
   Receipt,
   Banknote,
   History,
+  DollarSign,
+  Home,
   type LucideIcon,
 } from "lucide-react";
 
@@ -36,6 +39,9 @@ const iconMap: Record<string, LucideIcon> = {
   tenants: Users,
   payments: CreditCard,
   maintenance: Wrench,
+  "dollar-sign": DollarSign,
+  "alert-circle": AlertCircle,
+  home: Home,
   messages: MessageSquare,
   reports: BarChart3,
   settings: Settings,
