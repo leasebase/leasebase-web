@@ -60,6 +60,16 @@ function LeasesListPage() {
     );
   }
 
+  const activeCount = leases.filter((l) => (l.display_status ?? l.status) === "ACTIVE" || (l.display_status ?? l.status) === "EXTENDED").length;
+  const draftCount = leases.filter((l) => (l.display_status ?? l.status) === "DRAFT").length;
+  const expiringCount = leases.filter((l) => {
+    if ((l.display_status ?? l.status) !== "ACTIVE") return false;
+    const end = new Date(l.end_date);
+    const now = new Date();
+    const diff = (end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+    return diff <= 90 && diff > 0;
+  }).length;
+
   return (
     <>
       <PageHeader
@@ -71,7 +81,29 @@ function LeasesListPage() {
           </Link>
         }
       />
-      <div className="mt-6">
+
+      {/* Summary strip */}
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <span className="inline-flex items-center gap-1.5 rounded-lg bg-green-50 border border-green-200 px-3 py-1.5 text-xs font-semibold text-green-700">
+          <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+          {activeCount} active
+        </span>
+        {draftCount > 0 && (
+          <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+            {draftCount} draft{draftCount !== 1 ? "s" : ""}
+          </span>
+        )}
+        {expiringCount > 0 && (
+          <span className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+            {expiringCount} expiring within 90d
+          </span>
+        )}
+        <span className="text-xs text-slate-400">{leases.length} total</span>
+      </div>
+
+      <div className="mt-5">
         <LeasesTable leases={leases} />
       </div>
     </>

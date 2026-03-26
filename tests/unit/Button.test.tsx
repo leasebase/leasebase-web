@@ -10,7 +10,7 @@ describe("Button", () => {
 
   test("applies variant classes", () => {
     const { rerender } = render(<Button variant="primary">Primary</Button>);
-    expect(screen.getByRole("button")).toHaveClass("bg-[var(--lb-color-primary)]");
+    expect(screen.getByRole("button")).toHaveClass("bg-brand-500");
 
     rerender(<Button variant="danger">Danger</Button>);
     expect(screen.getByRole("button")).toHaveClass("bg-danger");
