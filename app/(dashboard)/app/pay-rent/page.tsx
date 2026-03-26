@@ -7,7 +7,6 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  Download,
   ArrowRight,
   AlertCircle,
   Plus,
@@ -433,16 +432,9 @@ export default function Page() {
       {/* ── Help Card ── */}
       <div className="bg-gradient-to-br from-blue-50 to-blue-50/50 rounded-2xl border border-blue-200 p-6">
         <h3 className="text-[15px] font-semibold text-slate-900 mb-2">Need help with payments?</h3>
-        <p className="text-[13px] text-slate-600 mb-4">
+        <p className="text-[13px] text-slate-600">
           Contact your property manager for payment assistance, questions about your account, or to set up automatic payments.
         </p>
-        <Link
-          href="/app/maintenance/new"
-          className="inline-flex items-center gap-2 h-10 px-4 bg-white text-slate-700 text-[13px] font-semibold rounded-xl border border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all"
-        >
-          Contact Support
-          <ArrowRight className="w-4 h-4" />
-        </Link>
       </div>
 
       {/* Add Payment Method Modal */}

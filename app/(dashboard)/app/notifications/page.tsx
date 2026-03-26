@@ -154,8 +154,8 @@ export default function Page() {
       {/* ── Page Header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-[26px] font-semibold text-slate-900">Notifications</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-[26px] font-semibold text-slate-900 mb-1">Notifications</h1>
             {unreadCount > 0 && (
               <span className="px-3 py-1 bg-red-100 text-red-700 text-[12px] font-bold rounded-lg">
                 {unreadCount} new
