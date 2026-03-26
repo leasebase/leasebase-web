@@ -13,9 +13,9 @@ import { OwnerDashboardSkeleton } from "./owner/OwnerDashboardSkeleton";
 import { OwnerEmptyState } from "./owner/OwnerEmptyState";
 import { AlertStrip } from "./owner/AlertStrip";
 import { KpiGrid } from "./owner/KpiGrid";
-import { CashFlowCard } from "./owner/CashFlowCard";
+import { RevenueTrendCard } from "./owner/RevenueTrendCard";
+import { ActionPanel } from "./owner/ActionPanel";
 import { ActivityFeed } from "./owner/ActivityFeed";
-import { PriorityActions } from "@/components/ui/PriorityActions";
 import { deriveOwnerPriorityActions } from "@/lib/intelligence/deriveActions";
 import { ownerOnboardingSteps } from "@/lib/intelligence/checklists";
 import { track } from "@/lib/analytics";
@@ -129,18 +129,18 @@ export function OwnerDashboard() {
         <KpiGrid vm={vm.kpis} />
       </WidgetErrorBoundary>
 
-      {/* Action Required Panel + Cash Flow — 3-column grid */}
+      {/* Action Required Panel + Revenue Trend — 3-column grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
         {/* Action Required (1/3) */}
         <div className="xl:col-span-1">
-          <WidgetErrorBoundary name="Priority Actions">
-            <PriorityActions actions={priorityActions} />
+          <WidgetErrorBoundary name="Action Panel">
+            <ActionPanel actions={priorityActions} />
           </WidgetErrorBoundary>
         </div>
-        {/* Cash Flow / Revenue (2/3) */}
+        {/* Revenue Trend (2/3) */}
         <div className="xl:col-span-2">
-          <WidgetErrorBoundary name="Cash Flow">
-            <CashFlowCard vm={vm.cashFlow} />
+          <WidgetErrorBoundary name="Revenue Trend">
+            <RevenueTrendCard vm={vm.cashFlow} />
           </WidgetErrorBoundary>
         </div>
       </div>

@@ -93,7 +93,7 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
   const items: KpiItem[] = [
     {
       key: "collectedThisMonth",
-      label: "Monthly Cash Flow",
+      label: "Monthly Revenue",
       value: fmtKpiValue(kpis.collectedThisMonth, fmtCurrency),
       rawValue: kpis.collectedThisMonth.value,
       change: kpis.monthlyScheduledRent.value > 0
@@ -106,7 +106,7 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
     },
     {
       key: "overdueAmount",
-      label: "Outstanding Payments",
+      label: "Outstanding Rent",
       value: fmtKpiValue(kpis.overdueAmount, fmtCurrency),
       rawValue: kpis.overdueAmount.value,
       subtitle: "overdue",
@@ -116,7 +116,7 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
     },
     {
       key: "occupancy",
-      label: "Occupancy",
+      label: "Occupancy Rate",
       value: kpis.totalUnits.source === "unavailable"
         ? "—"
         : kpis.totalUnits.value > 0
@@ -133,7 +133,7 @@ function buildKpiGrid(data: OwnerDashboardData): KpiGridViewModel {
     },
     {
       key: "openMaintenanceRequests",
-      label: "Maintenance Requests",
+      label: "Active Leases",
       value: fmtKpiValue(kpis.openMaintenanceRequests, fmtNumber),
       rawValue: kpis.openMaintenanceRequests.value,
       subtitle: "open",
