@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Settings2 } from "lucide-react";
+import Link from "next/link";
+import { Settings2, Plus, Download } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import type { OwnerDashboardData, OwnerDashboardViewModel } from "@/services/dashboard/types";
@@ -10,6 +11,7 @@ import { toOwnerDashboardViewModel } from "@/services/dashboard/viewModel";
 import { WidgetErrorBoundary } from "./owner/WidgetErrorBoundary";
 import { OwnerDashboardSkeleton } from "./owner/OwnerDashboardSkeleton";
 import { OwnerEmptyState } from "./owner/OwnerEmptyState";
+import { AlertStrip } from "./owner/AlertStrip";
 import { PriorityActions } from "@/components/ui/PriorityActions";
 import { RecommendedActions } from "@/components/ui/RecommendedActions";
 import { WorkflowChecklist } from "@/components/ui/WorkflowChecklist";
@@ -82,6 +84,7 @@ export function OwnerDashboard() {
         <PageHeader
           title="Dashboard"
           description="Track income, performance, and expenses for your properties."
+          sticky
         />
         <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-sm text-red-700">
           {error}
@@ -99,6 +102,7 @@ export function OwnerDashboard() {
         <PageHeader
           title="Dashboard"
           description="Track income, performance, and expenses for your properties."
+          sticky
         />
         <OwnerEmptyState stage={data.setupStage} />
         {/* Calendly CTA for new users */}
@@ -159,21 +163,47 @@ export function OwnerDashboard() {
 
   return (
     <section aria-labelledby="owner-heading" className="space-y-6">
-      {/* Page Header with Customize button */}
+      {/* Sticky Page Header with CTAs */}
       <PageHeader
         title={vm.header.title}
         description={vm.header.subtitle}
+        sticky
         actions={
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={<Settings2 size={14} />}
-            onClick={() => setCustomizeOpen(true)}
-          >
-            Customize
-          </Button>
+          <>
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<Settings2 size={14} />}
+              onClick={() => setCustomizeOpen(true)}
+            >
+              Customize
+            </Button>
+            <Link href="/app/reports">
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={<Download size={14} />}
+              >
+                Export Report
+              </Button>
+            </Link>
+            <Link href="/app/properties/new">
+              <Button
+                variant="success"
+                size="sm"
+                icon={<Plus size={14} />}
+              >
+                Add Property
+              </Button>
+            </Link>
+          </>
         }
       />
+
+      {/* Alert Strip — UIUX gradient banner above KPIs */}
+      <WidgetErrorBoundary name="Alert Strip">
+        <AlertStrip vm={vm.alerts} />
+      </WidgetErrorBoundary>
 
       {/* Priority Actions (fixed) */}
       <WidgetErrorBoundary name="Priority Actions">

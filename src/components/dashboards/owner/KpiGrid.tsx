@@ -12,6 +12,21 @@ const provenanceLabel: Record<string, string> = {
   unavailable: "Data unavailable",
 };
 
+/** Maps KPI keys to UIUX gradient icon colors */
+const kpiIconColor: Record<string, string> = {
+  collectedThisMonth: "from-green-500 to-green-600",
+  overdueAmount: "from-red-500 to-red-600",
+  occupancy: "from-blue-500 to-blue-600",
+  openMaintenanceRequests: "from-violet-500 to-violet-600",
+};
+
+/** Maps KPI keys to UIUX change color type */
+function kpiChangeType(key: string, rawValue: number): "positive" | "negative" | "neutral" {
+  if (key === "overdueAmount") return rawValue > 0 ? "negative" : "neutral";
+  if (key === "collectedThisMonth") return "positive";
+  return "neutral";
+}
+
 interface KpiGridProps {
   vm: KpiGridViewModel;
 }
@@ -29,14 +44,17 @@ export function KpiGrid({ vm }: KpiGridProps) {
               label={kpi.label}
               value={kpi.value}
               change={kpi.change}
-              icon={<Icon name={kpi.icon} size={20} />}
+              changeType={kpiChangeType(kpi.key, kpi.rawValue)}
+              subtitle={kpi.subtitle}
+              icon={<Icon name={kpi.icon} size={22} strokeWidth={2.5} />}
+              iconColor={kpiIconColor[kpi.key]}
             />
           </Tooltip>
         );
 
         if (kpi.href) {
           return (
-            <Link key={kpi.key} href={kpi.href} className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400">
+            <Link key={kpi.key} href={kpi.href} className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400">
               {card}
             </Link>
           );
